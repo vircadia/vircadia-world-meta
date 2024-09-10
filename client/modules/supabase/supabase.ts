@@ -6,7 +6,8 @@ import {
     REALTIME_LISTEN_TYPES,
     REALTIME_POSTGRES_CHANGES_LISTEN_EVENT,
 } from 'https://esm.sh/@supabase/supabase-js@2';
-import { Agent } from '../../../shared/meta.js';
+import { log } from '../../../general/modules/log.ts';
+import { Agent } from "../../../meta.ts";
 
 export namespace Supabase {
     let supabaseClient: SupabaseClient | null = null;
@@ -22,7 +23,7 @@ export namespace Supabase {
     ): SupabaseClient {
         supabaseUrl = url;
         supabaseKey = key;
-        log(`Initializing Supabase client at ${url}`, 'info');
+        log({ message: `Initializing Supabase client at ${url}`, type: 'info' });
         supabaseClient = createClient(url, key);
         return supabaseClient;
     }
@@ -38,9 +39,9 @@ export namespace Supabase {
 
         try {
             supabaseClient.realtime.connect();
-            log(`Connected to Supabase Realtime at ${supabaseUrl}`, 'info');
+            log({ message: `Connected to Supabase Realtime at ${supabaseUrl}`, type: 'info' });
         } catch (error) {
-            log(`Failed to connect to Supabase Realtime: ${error}`, 'error');
+            log({ message: `Failed to connect to Supabase Realtime: ${error}`, type: 'error' });
             throw error;
         }
     }
@@ -80,7 +81,7 @@ export namespace Supabase {
         if (subscriptions) {
             subscriptions.forEach((subscription) => {
                 subscription.unsubscribe().catch((error) => {
-                    log(`Failed to unsubscribe from table ${channel}: ${error}`, 'error');
+                    log({ message: `Failed to unsubscribe from table ${channel}: ${error}`, type: 'error' });
                 });
             });
             activeSubscriptions.delete(channel);
@@ -103,7 +104,7 @@ export namespace Supabase {
     export function disconnectRealtime(): void {
         if (supabaseClient) {
             supabaseClient.realtime.disconnect();
-            log('Disconnected from Supabase Realtime', 'info');
+            log({ message: 'Disconnected from Supabase Realtime', type: 'info' });
         }
     }
 

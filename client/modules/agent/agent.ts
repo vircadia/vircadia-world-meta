@@ -1,5 +1,5 @@
 import { Supabase } from '../supabase/supabase.ts';
-import { SupabaseClient, REALTIME_LISTEN_TYPES } from 'jsr:@supabase/supabase-js@2';
+import { SupabaseClient, REALTIME_LISTEN_TYPES, REALTIME_POSTGRES_CHANGES_LISTEN_EVENT } from 'jsr:@supabase/supabase-js@2';
 import { Agent as AgentMeta, Primitive, Server } from '../../../meta.ts';
 import { log } from '../../../general/modules/log.ts';
 import { WebRTC } from './agent_webRTC.ts';
@@ -83,13 +83,13 @@ export namespace Agent {
                         };
                         await presenceChannel.track(presenceData);
                     } catch (error) {
-                        log(`${AGENT_LOG_PREFIX} Failed to update presence for world ${worldId}: ${error}`, 'error');
+                        log({ message: `${AGENT_LOG_PREFIX} Failed to update presence for world ${worldId}: ${error}`, type: 'error' });
                     }
                 } else {
-                    log(`${AGENT_LOG_PREFIX} Presence channel not joined for world ${worldId}, skipping update`, 'warn');
+                    log({ message: `${AGENT_LOG_PREFIX} Presence channel not joined for world ${worldId}, skipping update`, type: 'warn' });
                 }
             } catch (error) {
-                log(`${AGENT_LOG_PREFIX} Error updating presence for world ${worldId}: ${error}`, 'error');
+                log({ message: `${AGENT_LOG_PREFIX} Error updating presence for world ${worldId}: ${error}`, type: 'error' });
             }
         };
 
@@ -97,16 +97,16 @@ export namespace Agent {
             try {
                 localAudioStream = await WebRTC_Media.createLocalStream({ audio: true });
                 localVideoStream = await WebRTC_Media.createLocalStream({ video: true });
-                log(`${AGENT_LOG_PREFIX} Local audio and video streams initialized`);
+                log({ message: `${AGENT_LOG_PREFIX} Local audio and video streams initialized`, type: 'info' });
             } catch (error) {
-                log(`${AGENT_LOG_PREFIX} Error initializing local streams: ${error}`, 'error');
+                log({ message: `${AGENT_LOG_PREFIX} Error initializing local streams: ${error}`, type: 'error' });
             }
         };
     }
 
     export const connectToWorld = async (worldId: string, host: string, port: number) => {
         if (worldConnections[worldId]) {
-            log(`${AGENT_LOG_PREFIX} Already connected to world ${worldId}`, 'warn');
+            log({ message: `${AGENT_LOG_PREFIX} Already connected to world ${worldId}`, type: 'warn' });
             return;
         }
 
@@ -116,7 +116,7 @@ export namespace Agent {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const serverConfigAndStatus: Server.I_REQUEST_ConfigAndStatusResponse = await response.json();
-            log(`Server status for world ${worldId}: ${JSON.stringify(serverConfigAndStatus)}`, 'info');
+            log({ message: `Server status for world ${worldId}: ${JSON.stringify(serverConfigAndStatus)}`, type: 'info' });
 
             const url = `${host}:${port}${serverConfigAndStatus.API_URL}`;
             const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
@@ -138,12 +138,12 @@ export namespace Agent {
                 worldConnections[worldId] = newWorldConnection;
 
                 setupWorldConnection(worldId);
-                log(`${AGENT_LOG_PREFIX} Connected to world ${worldId}`, 'info');
+                log({ message: `${AGENT_LOG_PREFIX} Connected to world ${worldId}`, type: 'info' });
             } else {
-                log(`${AGENT_LOG_PREFIX} World ${worldId} was connected by another process`, 'warn');
+                log({ message: `${AGENT_LOG_PREFIX} World ${worldId} was connected by another process`, type: 'warn' });
             }
         } catch (error) {
-            log(`${AGENT_LOG_PREFIX} Failed to connect to world ${worldId}: ${error}`, 'error');
+            log({ message: `${AGENT_LOG_PREFIX} Failed to connect to world ${worldId}: ${error}`, type: 'error' });
         }
     };
 
@@ -161,7 +161,7 @@ export namespace Agent {
                 await world.audioContext.close();
             }
             delete worldConnections[worldId];
-            log(`${AGENT_LOG_PREFIX} Disconnected from world ${worldId}`, 'info');
+            log({ message: `${AGENT_LOG_PREFIX} Disconnected from world ${worldId}`, type: 'info' });
         }
     };
 
@@ -201,14 +201,14 @@ export namespace Agent {
                     }
                 })
                 .subscribe();
-            log(`${AGENT_LOG_PREFIX} Successfully connected to Supabase Realtime for world ${worldId}`, 'info');
+            log({ message: `${AGENT_LOG_PREFIX} Successfully connected to Supabase Realtime for world ${worldId}`, type: 'info' });
 
             world.presenceUpdateInterval = setInterval(() => {
                 void Self.updatePresence(worldId);
             }, PRESENCE_UPDATE_INTERVAL);
 
         } catch (error) {
-            log(`${AGENT_LOG_PREFIX} Failed to connect to Supabase Realtime for world ${worldId}: ${error}`, 'error');
+            log({ message: `${AGENT_LOG_PREFIX} Failed to connect to Supabase Realtime for world ${worldId}: ${error}`, type: 'error' });
         }
     };
 
@@ -224,7 +224,7 @@ export namespace Agent {
         WebRTC.setupRTCEventListeners(worldId, agentId, connection);
         WebRTC.addLocalStreamsToConnection(worldId, agentId, connection);
 
-        log(`${AGENT_LOG_PREFIX} Created agent ${agentId} in world ${worldId}`);
+        log({ message: `${AGENT_LOG_PREFIX} Created agent ${agentId} in world ${worldId}`, type: 'info' });
         await WebRTC.createAndSendOffer(worldId, agentId, connection);
     };
 
@@ -238,7 +238,7 @@ export namespace Agent {
         if (connection) {
             WebRTC.removeAgentConnection(worldId, agentId, connection);
             delete world.agentConnections[agentId];
-            log(`${AGENT_LOG_PREFIX} Removed agent ${agentId} from world ${worldId}`);
+            log({ message: `${AGENT_LOG_PREFIX} Removed agent ${agentId} from world ${worldId}`, type: 'info' });
         }
     };
 
@@ -280,7 +280,7 @@ export namespace Agent {
             }
         });
 
-        log(`${AGENT_LOG_PREFIX} Updated agent list for world ${worldId}: ${currentAgents}`, 'info');
+        log({ message: `${AGENT_LOG_PREFIX} Updated agent list for world ${worldId}: ${currentAgents}`, type: 'info' });
     };
 
     const updateAgentMetadata = (worldId: string, agentId: string, metadata: AgentMeta.C_Metadata) => {
@@ -291,7 +291,7 @@ export namespace Agent {
 
         if (world.agentConnections[agentId]) {
             world.agentConnections[agentId].metadata = metadata;
-            log(`${AGENT_LOG_PREFIX} Updated metadata for agent ${agentId} in world ${worldId}`);
+            log({ message: `${AGENT_LOG_PREFIX} Updated metadata for agent ${agentId} in world ${worldId}`, type: 'info' });
         }
     };
 
