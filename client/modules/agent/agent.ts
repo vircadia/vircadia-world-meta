@@ -1,10 +1,9 @@
-import { Supabase } from '../providers/supabase/supabase.js';
-import { SupabaseClient, REALTIME_LISTEN_TYPES } from '@supabase/supabase-js';
-import { Agent as AgentMeta, Primitive, Server } from '../../../shared/meta.js';
-import { log } from '../../../server/modules/general/log.js';
-import { WebRTC } from './agent_webRTC.js';
-import { WebRTC_Media } from './agent_webRTC_media.js';
-import axios from 'axios';
+import { Supabase } from '../supabase/supabase.ts';
+import { SupabaseClient, REALTIME_LISTEN_TYPES } from 'jsr:@supabase/supabase-js@2';
+import { Agent as AgentMeta, Primitive, Server } from '../../../meta.ts';
+import { log } from '../../../general/modules/log.ts';
+import { WebRTC } from './agent_webRTC.ts';
+import { WebRTC_Media } from './agent_webRTC_media.ts';
 
 export namespace Agent {
     export const AGENT_LOG_PREFIX = '[AGENT]';
@@ -112,10 +111,11 @@ export namespace Agent {
         }
 
         try {
-            const response = await axios.get<Server.I_REQUEST_ConfigAndStatusResponse>(
-                `${host}:${port}${Server.E_HTTPRequestPath.CONFIG_AND_STATUS}`,
-            );
-            const serverConfigAndStatus = response.data;
+            const response = await fetch(`${host}:${port}${Server.E_HTTPRequestPath.CONFIG_AND_STATUS}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const serverConfigAndStatus: Server.I_REQUEST_ConfigAndStatusResponse = await response.json();
             log(`Server status for world ${worldId}: ${JSON.stringify(serverConfigAndStatus)}`, 'info');
 
             const url = `${host}:${port}${serverConfigAndStatus.API_URL}`;

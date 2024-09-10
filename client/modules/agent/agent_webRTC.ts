@@ -1,6 +1,6 @@
-import { Agent, AgentMeta, Primitive } from '../../../shared/meta.js';
-import { WebRTC_Media } from './agent_webRTC_media.js';
-import { log } from '../../../server/modules/general/log.js';
+import { Agent, AgentMeta, Primitive } from '../../../meta.ts';
+import { WebRTC_Media } from './agent_webRTC_media.ts';
+import { log } from '../../../general/modules/log.ts';
 
 export namespace WebRTC {
     export const WEBRTC_LOG_PREFIX = '[WEBRTC]';

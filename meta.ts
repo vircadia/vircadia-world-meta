@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-import { z } from 'zod';
+import { z } from 'npm:zod';
 
 export namespace Primitive {
     export const S_Vector3 = z.object({

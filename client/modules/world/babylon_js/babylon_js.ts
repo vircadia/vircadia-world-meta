@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
-import { log } from "../../../../../server/modules/general/log.js";
-import { Supabase } from '../../../../../providers/supabase.js';
-import { Scene } from '@babylonjs/core/scene.js';
-import { Observer } from '@babylonjs/core/Misc/observable.js';
-import { Node } from '@babylonjs/core/node.js';
-import { Agent, World } from "../../../../deno/modules/vircadia-world-meta/meta.js";
-import { v7 as uuidv7 } from 'uuid';
-import * as ts from 'typescript';
+import { log } from "../../../../general/modules/log.ts";
+import { Supabase } from '../../supabase/supabase.ts';
+import { Scene } from 'npm:@babylonjs/core/scene.js';
+import { Observer } from 'npm:@babylonjs/core/Misc/observable.js';
+import { Node } from 'npm:@babylonjs/core';
+import { Agent, World } from "../../../../meta.ts";
+import { v7 as uuidv7 } from 'jsr:@std/uuid';
+import * as ts from 'npm:typescript';
 
 export namespace Babylon_JS {
     const WORLD_BABYLON_LOG_PREFIX = '[WORLD: BABYLON]';
@@ -15,7 +15,7 @@ export namespace Babylon_JS {
     const initializedWorlds: { [worldId: string]: Scene } = {};
 
     export namespace Meta {
-        export const create = async (metadata: Omit<World.I_WorldMetadata, 'id'>, scene: Scene): Promise<string> => {
+        export const create = async (metadata: Omit<World.I_WorldGLTF, 'id'>, scene: Scene): Promise<string> => {
             try {
                 const supabaseClient = Supabase.getSupabaseClient();
                 if (!supabaseClient) {
@@ -100,7 +100,7 @@ export namespace Babylon_JS {
             }
         };
 
-        export const list = async (): Promise<World.I_WorldMetadata[]> => {
+        export const list = async (): Promise<World.I_WorldGLTF[]> => {
             try {
                 const supabaseClient = Supabase.getSupabaseClient();
                 if (!supabaseClient) {
@@ -226,7 +226,7 @@ export namespace Babylon_JS {
         const entityObservers: Map<string, Observer<Node>> = new Map();
     
         export function add(entityId: string, code: string, scene: Scene): string {
-            const id = uuidv7();
+            const id = uuidv7.generate();
             const compilerOptions: ts.CompilerOptions = {
                 target: ts.ScriptTarget.ES2020,
                 module: ts.ModuleKind.ES2020,
