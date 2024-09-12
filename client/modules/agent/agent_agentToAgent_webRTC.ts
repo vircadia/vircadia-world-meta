@@ -1,8 +1,7 @@
-import { Agent, AgentMeta, Primitive } from '../../../meta.ts';
-import { WebRTC_Media } from './agent_webRTC_media.ts';
+import { Agent, Primitive } from '../../../meta.ts';
 import { log } from '../../../general/modules/log.ts';
 
-export namespace WebRTC {
+export namespace AgentToAgent_WebRTC {
     export const WEBRTC_LOG_PREFIX = '[WEBRTC]';
 
     // FIXME: These should be defined in config.
@@ -12,13 +11,13 @@ export namespace WebRTC {
         },
     ];
 
-    export const createAgentConnection = (worldId: string, agentId: string, metadata: AgentMeta.C_Metadata): Agent.AgentConnection => {
+    export const createAgentConnection = (agentId: string, metadata: Agent.C_Metadata): Agent.I_AgentToAgentConnection => {
         const rtcConnection = createRTCConnection(agentId);
-        const dataChannel = createDataChannel(rtcConnection, 'data');
+        const rtcDataChannel = createDataChannel(rtcConnection, 'data');
 
         return {
             rtcConnection,
-            dataChannel,
+            rtcDataChannel,
             mediaStream: null,
             metadata,
             panner: null,
@@ -31,31 +30,27 @@ export namespace WebRTC {
         return rtcConnection;
     };
 
-    export const setupRTCEventListeners = (worldId: string, agentId: string) => {
-        const world = Agent.worldConnections[worldId];
-        if (!world) return;
-
-        const connection = world.agentConnections[agentId];
+    export const setupRTCEventListeners = (agentId: string, connection: Agent.AgentConnection) => {
         if (!connection || !connection.rtcConnection) return;
 
         connection.rtcConnection.onicecandidate = (event) => {
             if (event.candidate) {
-                sendWebRTCSignal(worldId, {
-                    type: AgentMeta.E_SignalType.AGENT_ICE_Candidate,
+                sendWebRTCSignal({
+                    type: Agent.E_SignalType.AGENT_ICE_Candidate,
                     payload: event.candidate,
                     targetAgentId: agentId,
                 });
             }
         };
 
-        connection.rtcConnection.ontrack = (event) => handleIncomingStream(worldId, agentId, event.streams[0]);
-        connection.rtcConnection.onnegotiationneeded = () => createAndSendOffer(worldId, agentId);
+        connection.rtcConnection.ontrack = (event) => handleIncomingStream(agentId, event.streams[0]);
+        connection.rtcConnection.onnegotiationneeded = () => createAndSendOffer(agentId, connection);
 
         setupDataChannelListeners(
-            connection.dataChannel,
-            () => log(`${WEBRTC_LOG_PREFIX} Data channel opened with agent ${agentId} in world ${worldId}`),
-            () => log(`${WEBRTC_LOG_PREFIX} Data channel closed with agent ${agentId} in world ${worldId}`),
-            (event) => handleDataChannelMessage(worldId, agentId, event)
+            connection.rtcDataChannel,
+            () => log({ message: `${WEBRTC_LOG_PREFIX} Data channel opened with agent ${agentId}`, type: 'info' }),
+            () => log({ message: `${WEBRTC_LOG_PREFIX} Data channel closed with agent ${agentId}`, type: 'info' }),
+            (event) => handleDataChannelMessage(agentId, event)
         );
     };
 
@@ -74,11 +69,20 @@ export namespace WebRTC {
         }
     };
 
-    export const addLocalStreamsToConnection = (worldId: string, agentId: string) => {
-        const world = Agent.worldConnections[worldId];
-        if (!world) return;
+    export const setAudioStreamToConnection = async (data: {
+        constraints?: MediaStreamConstraints,
+        rtcPeerConnnection: RTCPeerConnection
+    }) => {
+        const mediaStream = await navigator.mediaDevices.getUserMedia(data.constraints);
 
-        const connection = world.agentConnections[agentId];
+        if (mediaStream) {
+            mediaStream.getTracks().forEach((track) => {
+                data.rtcPeerConnnection.addTrack(track, mediaStream);
+            });
+        }
+    }
+
+    export const addLocalStreamsToConnection = (agentId: string, connection: Agent.AgentConnection) => {
         if (!connection || !connection.rtcConnection) return;
 
         if (Agent.Self.localAudioStream) {
@@ -89,96 +93,74 @@ export namespace WebRTC {
         }
     };
 
-    export const createAndSendOffer = async (worldId: string, agentId: string) => {
-        const world = Agent.worldConnections[worldId];
-        if (!world) return;
-
-        const connection = world.agentConnections[agentId];
+    export const createAndSendOffer = async (agentId: string, connection: Agent.AgentConnection) => {
         if (!connection || !connection.rtcConnection) return;
 
         try {
             const offer = await createOffer(connection.rtcConnection);
-            await sendWebRTCSignal(worldId, {
-                type: AgentMeta.E_SignalType.AGENT_Offer,
+            await sendWebRTCSignal({
+                type: Agent.E_SignalType.AGENT_Offer,
                 payload: offer,
                 targetAgentId: agentId,
             });
         } catch (error) {
-            log(`${WEBRTC_LOG_PREFIX} Error creating and sending offer: ${error}`, 'error');
+            log({ message: `${WEBRTC_LOG_PREFIX} Error creating and sending offer: ${error}`, type: 'error' });
         }
     };
 
-    export const removeAgentConnection = (worldId: string, agentId: string) => {
-        const world = Agent.worldConnections[worldId];
-        if (!world) return;
-
-        const connection = world.agentConnections[agentId];
-        if (connection) {
-            if (connection.rtcConnection) {
-                closeRTCConnection(connection.rtcConnection);
-            }
-            if (connection.dataChannel) {
-                connection.dataChannel.close();
-            }
-            if (connection.mediaStream) {
-                connection.mediaStream.getTracks().forEach((track) => track.stop());
-            }
-            if (connection.panner) {
-                WebRTC_Media.cleanupAudio(connection.panner);
-            }
-            if (connection.audioUpdateInterval) {
-                clearInterval(connection.audioUpdateInterval);
-            }
+    export const removeAgentConnection = (agentId: string, connection: Agent.AgentConnection) => {
+        if (connection.rtcConnection) {
+            closeRTCConnection(connection.rtcConnection);
+        }
+        if (connection.rtcDataChannel) {
+            connection.rtcDataChannel.close();
+        }
+        if (connection.mediaStream) {
+            connection.mediaStream.getTracks().forEach((track) => track.stop());
+        }
+        if (connection.panner) {
+            WebRTC_Media.cleanupAudio(connection.panner);
+        }
+        if (connection.audioUpdateInterval) {
+            clearInterval(connection.audioUpdateInterval);
         }
     };
 
-    export const handleWebRTCOffer = async (worldId: string, data: { offer: RTCSessionDescriptionInit; fromAgentId: string }) => {
+    export const handleWebRTCOffer = async (data: { offer: RTCSessionDescriptionInit; fromAgentId: string }, connection: Agent.AgentConnection) => {
         const { offer, fromAgentId } = data;
-        const world = Agent.worldConnections[worldId];
-        if (!world) return;
-
-        const connection = world.agentConnections[fromAgentId];
         if (!connection || !connection.rtcConnection) return;
 
         try {
             const answer = await handleOffer(connection.rtcConnection, offer);
-            await sendWebRTCSignal(worldId, {
-                type: AgentMeta.E_SignalType.AGENT_Answer,
+            await sendWebRTCSignal({
+                type: Agent.E_SignalType.AGENT_Answer,
                 payload: answer,
                 targetAgentId: fromAgentId,
             });
         } catch (error) {
-            log(`${WEBRTC_LOG_PREFIX} Error handling WebRTC offer: ${error}`, 'error');
+            log({ message: `${WEBRTC_LOG_PREFIX} Error handling WebRTC offer: ${error}`, type: 'error' });
         }
     };
 
-    export const handleWebRTCAnswer = async (worldId: string, data: { answer: RTCSessionDescriptionInit; fromAgentId: string }) => {
-        const { answer, fromAgentId } = data;
-        const world = Agent.worldConnections[worldId];
-        if (!world) return;
-
-        const connection = world.agentConnections[fromAgentId];
+    export const handleWebRTCAnswer = async (data: { answer: RTCSessionDescriptionInit; fromAgentId: string }, connection: Agent.AgentConnection) => {
+        const { answer } = data;
         if (!connection || !connection.rtcConnection) return;
 
         try {
             await handleAnswer(connection.rtcConnection, answer);
         } catch (error) {
-            log(`${WEBRTC_LOG_PREFIX} Error handling WebRTC answer: ${error}`, 'error');
+            log({ message: `${WEBRTC_LOG_PREFIX} Error handling WebRTC answer: ${error}`, type: 'error' });
         }
     };
 
-    export const handleWebRTCIceCandidate = async (worldId: string, data: { candidate: RTCIceCandidateInit; fromAgentId: string }) => {
-        const { candidate, fromAgentId } = data;
-        const world = Agent.worldConnections[worldId];
-        if (!world) return;
-
-        const connection = world.agentConnections[fromAgentId];
+    export const handleWebRTCIceCandidate = async (data: { candidate: RTCIceCandidateInit; fromAgentId: string }, connection: Agent.AgentConnection) => {
+        const { candidate } = data;
         if (!connection || !connection.rtcConnection) return;
 
         try {
             await handleIceCandidate(connection.rtcConnection, candidate);
         } catch (error) {
-            log(`${WEBRTC_LOG_PREFIX} Error handling ICE candidate: ${error}`, 'error');
+            log({ message: `${WEBRTC_LOG_PREFIX} Error handling ICE candidate: ${error}`, type: 'error' });
         }
     };
 
@@ -216,28 +198,28 @@ export namespace WebRTC {
         rtcConnection.close();
     };
 
-    const sendWebRTCSignal = async (worldId: string, signal: {
-        type: AgentMeta.E_SignalType;
+    const sendWebRTCSignal = async (signal: {
+        type: Agent.E_SignalType;
         payload: RTCSessionDescriptionInit | RTCIceCandidateInit | RTCIceCandidate;
         targetAgentId: string;
     }) => {
-        const world = Agent.worldConnections[worldId];
+        const world = Agent.worldConnections[signal.targetAgentId];
         if (!world) return;
 
         try {
-            await world.supabaseClient?.channel(AgentMeta.E_ChannelType.SIGNALING_CHANNEL)
+            await world.supabaseClient?.channel(Agent.E_ChannelType.SIGNALING_CHANNEL)
                 .send({
                     type: 'broadcast',
                     event: signal.type,
                     payload: signal,
                 });
         } catch (error) {
-            log(`${WEBRTC_LOG_PREFIX} Error sending WebRTC signal: ${error}`, 'error');
+            log({ message: `${WEBRTC_LOG_PREFIX} Error sending WebRTC signal: ${error}`, type: 'error' });
         }
     };
 
-    const handleIncomingStream = async (worldId: string, agentId: string, stream: MediaStream) => {
-        const world = Agent.worldConnections[worldId];
+    const handleIncomingStream = async (agentId: string, stream: MediaStream) => {
+        const world = Agent.worldConnections[agentId];
         if (!world || !world.audioContext) return;
 
         const connection = world.agentConnections[agentId];
@@ -253,18 +235,18 @@ export namespace WebRTC {
             WebRTC_Media.setupIncomingAudio(world.audioContext, stream, panner);
 
             connection.audioUpdateInterval = setInterval(() => {
-                Agent.updateAgentAudioPosition(worldId, agentId);
+                Agent.updateAgentAudioPosition(agentId);
             }, 100); // Update interval
 
-            log(`${WEBRTC_LOG_PREFIX} Set up incoming audio for agent ${agentId} in world ${worldId}`);
+            log({ message: `${WEBRTC_LOG_PREFIX} Set up incoming audio for agent ${agentId}`, type: 'info' });
         } catch (error) {
-            log(`${WEBRTC_LOG_PREFIX} Error setting up incoming audio: ${error}`, 'error');
+            log({ message: `${WEBRTC_LOG_PREFIX} Error setting up incoming audio: ${error}`, type: 'error' });
         }
     };
 
-    const handleDataChannelMessage = (worldId: string, agentId: string, event: MessageEvent) => {
+    const handleDataChannelMessage = (agentId: string, event: MessageEvent) => {
         // Handle incoming data channel messages
-        log(`${WEBRTC_LOG_PREFIX} Received message from agent ${agentId} in world ${worldId}: ${event.data}`);
+        log({ message: `${WEBRTC_LOG_PREFIX} Received message from agent ${agentId}: ${event.data}`, type: 'info' });
         // Implement your logic for handling different types of messages here
     };
 }

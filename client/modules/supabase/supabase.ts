@@ -5,7 +5,7 @@ import {
     RealtimePostgresChangesPayload,
     REALTIME_LISTEN_TYPES,
     REALTIME_POSTGRES_CHANGES_LISTEN_EVENT,
-} from 'https://esm.sh/@supabase/supabase-js@2';
+} from 'jsr:@supabase/supabase-js@2';
 import { log } from '../../../general/modules/log.ts';
 import { Agent } from "../../../meta.ts";
 

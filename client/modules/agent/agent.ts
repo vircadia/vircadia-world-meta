@@ -1,249 +1,349 @@
-import { Supabase } from '../supabase/supabase.ts';
-import { SupabaseClient, REALTIME_LISTEN_TYPES, REALTIME_POSTGRES_CHANGES_LISTEN_EVENT } from 'jsr:@supabase/supabase-js@2';
-import { Agent as AgentMeta, Primitive, Server } from '../../../meta.ts';
-import { log } from '../../../general/modules/log.ts';
-import { WebRTC } from './agent_webRTC.ts';
-import { WebRTC_Media } from './agent_webRTC_media.ts';
+import { Supabase } from "../supabase/supabase.ts";
+import { REALTIME_LISTEN_TYPES } from "jsr:@supabase/supabase-js@2";
+import { Agent as AgentMeta, Primitive, Server } from "../../../meta.ts";
+import { log } from "../../../general/modules/log.ts";
+import { AgentToAgent_WebRTC } from "./agent_agentToAgent_webRTC.ts";
+import { Agent_Audio } from "./agent_audio.ts";
+import { agentStore } from "./agent_store.ts";
+import { reaction, runInAction } from "npm:mobx";
 
 export namespace Agent {
-    export const AGENT_LOG_PREFIX = '[AGENT]';
+    export const AGENT_LOG_PREFIX = "[AGENT]";
     const PRESENCE_UPDATE_INTERVAL = 250;
     const AUDIO_METADATA_UPDATE_INTERVAL = 100;
 
-    export interface AgentConnection {
-        rtcConnection: RTCPeerConnection | null;
-        rtcDataChannel: RTCDataChannel | null;
-        mediaStream: MediaStream | null;
-        metadata: AgentMeta.C_Metadata | null;
-        panner: PannerNode | null;
-        audioUpdateInterval: ReturnType<typeof setInterval> | null;
-    }
-
-    export interface WorldConnection {
-        host: string;
-        port: number;
-        supabaseClient: SupabaseClient | null;
-        agentConnections: { [key: string]: AgentConnection };
-        presenceUpdateInterval: ReturnType<typeof setInterval> | null;
-        position: Primitive.C_Vector3;
-        orientation: Primitive.C_Vector3;
-        audioContext: AudioContext | null;
-    }
-
-    interface AgentPresenceState {
-        agent_id: string;
-        position: Primitive.C_Vector3;
-        orientation: Primitive.C_Vector3;
-        online_at: string;
-    }
-
-    export const worldConnections: { [worldId: string]: WorldConnection } = {};
-
     // Our own agent data
     export namespace Self {
-        export let id: string = '';
-        export let localAudioStream: MediaStream | null = null;
-        export let localVideoStream: MediaStream | null = null;
-
-        export const updateId = (newId: typeof id) => {
-            id = newId;
-        };
-
-        export const updatePosition = (worldId: string, newPosition: Primitive.C_Vector3) => {
-            const world = worldConnections[worldId];
-            if (world) {
-                world.position = newPosition;
-                void updatePresence(worldId);
+        export const updatePosition = (newPosition: Primitive.C_Vector3) => {
+            const world = agentStore.worldConnection;
+            if (world?.presence) {
+                runInAction(() => {
+                    world.presence.position = newPosition;
+                });
+                void updatePresence();
             }
         };
 
-        export const updateOrientation = (worldId: string, newOrientation: Primitive.C_Vector3) => {
-            const world = worldConnections[worldId];
-            if (world) {
-                world.orientation = newOrientation;
-                void updatePresence(worldId);
+        export const updateAgentId = (newAgentId: string) => {
+            runInAction(() => {
+                agentStore.agentId = newAgentId;
+            });
+        };
+
+        export const updateOrientation = (
+            newOrientation: Primitive.C_Vector3,
+        ) => {
+            const world = agentStore.worldConnection;
+            if (world?.presence) {
+                runInAction(() => {
+                    world.presence.orientation = newOrientation;
+                });
+                void updatePresence();
             }
         };
 
-        export const updatePresence = async (worldId: string) => {
-            const world = worldConnections[worldId];
+        export const updatePresence = async () => {
+            const world = agentStore.worldConnection;
             if (!world) {
                 return;
             }
 
             try {
-                const presenceChannel = world.supabaseClient?.channel(AgentMeta.E_ChannelType.AGENT_METADATA);
-                if (presenceChannel?.state === 'joined') {
+                const presenceChannel = world.supabaseClient?.channel(
+                    AgentMeta.E_ChannelType.AGENT_METADATA,
+                );
+                if (presenceChannel?.state === "joined") {
                     try {
-                        const presenceData: AgentPresenceState = {
-                            agent_id: id,
-                            position: world.position,
-                            orientation: world.orientation,
-                            online_at: new Date().toISOString(),
-                        };
+                        const presenceData = new AgentMeta.C_Metadata({
+                            agentId: id,
+                            position: world.presence?.position ??
+                                new Primitive.C_Vector3(),
+                            orientation: world.presence?.orientation ??
+                                new Primitive.C_Vector3(),
+                            onlineAt: new Date().toISOString(),
+                        });
                         await presenceChannel.track(presenceData);
                     } catch (error) {
-                        log({ message: `${AGENT_LOG_PREFIX} Failed to update presence for world ${worldId}: ${error}`, type: 'error' });
+                        log({
+                            message:
+                                `${AGENT_LOG_PREFIX} Failed to update presence: ${error}`,
+                            type: "error",
+                        });
                     }
                 } else {
-                    log({ message: `${AGENT_LOG_PREFIX} Presence channel not joined for world ${worldId}, skipping update`, type: 'warn' });
+                    log({
+                        message:
+                            `${AGENT_LOG_PREFIX} Presence channel not joined, skipping update`,
+                        type: "warn",
+                    });
                 }
             } catch (error) {
-                log({ message: `${AGENT_LOG_PREFIX} Error updating presence for world ${worldId}: ${error}`, type: 'error' });
+                log({
+                    message:
+                        `${AGENT_LOG_PREFIX} Error updating presence: ${error}`,
+                    type: "error",
+                });
             }
         };
 
-        export const initializeLocalStreams = async () => {
+        export const initializeLocalAudioMediaStream = async () => {
             try {
-                localAudioStream = await WebRTC_Media.createLocalStream({ audio: true });
-                localVideoStream = await WebRTC_Media.createLocalStream({ video: true });
-                log({ message: `${AGENT_LOG_PREFIX} Local audio and video streams initialized`, type: 'info' });
+                const localAudioMediaStream = await Agent_Audio
+                    .createAudioMediaStream({});
+                runInAction(() => {
+                    agentStore.localAudioMediaStream = localAudioMediaStream;
+                });
+                log({
+                    message: `${AGENT_LOG_PREFIX} Local audio stream created.`,
+                    type: "info",
+                });
             } catch (error) {
-                log({ message: `${AGENT_LOG_PREFIX} Error initializing local streams: ${error}`, type: 'error' });
+                log({
+                    message:
+                        `${AGENT_LOG_PREFIX} Error initializing local audio stream: ${error}`,
+                    type: "error",
+                });
             }
         };
     }
 
-    export const connectToWorld = async (worldId: string, host: string, port: number) => {
-        if (worldConnections[worldId]) {
-            log({ message: `${AGENT_LOG_PREFIX} Already connected to world ${worldId}`, type: 'warn' });
+    export const connectToWorld = async (data: {
+        host: string;
+        port: number;
+        key: string;
+        agentId: string;
+        capabilities: {
+            useWebRTC: boolean;
+        };
+    }) => {
+        if (agentStore.worldConnection) {
+            log({
+                message: `${AGENT_LOG_PREFIX} Already connected to a world`,
+                type: "warn",
+            });
             return;
         }
 
+        agentStore.useWebRTC = data.capabilities.useWebRTC;
+        agentStore.agentId = data.agentId;
+
         try {
-            const response = await fetch(`${host}:${port}${Server.E_HTTPRequestPath.CONFIG_AND_STATUS}`);
+            const response = await fetch(
+                `${data.host}:${data.port}${Server.E_HTTPRequestPath.CONFIG_AND_STATUS}`,
+            );
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            const serverConfigAndStatus: Server.I_REQUEST_ConfigAndStatusResponse = await response.json();
-            log({ message: `Server status for world ${worldId}: ${JSON.stringify(serverConfigAndStatus)}`, type: 'info' });
+            const serverConfigAndStatus:
+                Server.I_REQUEST_ConfigAndStatusResponse = await response
+                    .json();
+            log({
+                message: `Server status: ${
+                    JSON.stringify(serverConfigAndStatus)
+                }`,
+                type: "info",
+            });
 
-            const url = `${host}:${port}${serverConfigAndStatus.API_URL}`;
-            const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
+            const url =
+                `${data.host}:${data.port}${serverConfigAndStatus.API_URL}`;
+            const key = data.key;
             const supabaseClient = Supabase.initializeSupabaseClient(url, key);
 
             // Double-checked locking
-            if (!worldConnections[worldId]) {
-                const newWorldConnection: WorldConnection = {
-                    host,
-                    port,
+            if (!agentStore.worldConnection) {
+                const newWorldConnection: AgentMeta.I_AgentToWorldConnection = {
+                    host: data.host,
+                    port: data.port,
                     supabaseClient,
-                    agentConnections: {},
+                    agentToAgentConnections: {},
                     presenceUpdateInterval: null,
-                    position: new Primitive.C_Vector3(),
-                    orientation: new Primitive.C_Vector3(),
-                    audioContext: WebRTC_Media.createAudioContext(),
+                    presence: new AgentMeta.C_Metadata({
+                        agentId: Self.id,
+                        position: new Primitive.C_Vector3(),
+                        orientation: new Primitive.C_Vector3(),
+                        onlineAt: new Date().toISOString(),
+                    }),
+                    audioContext: Agent_Audio.createAudioContext(),
                 };
 
-                worldConnections[worldId] = newWorldConnection;
+                runInAction(() => {
+                    agentStore.worldConnection = newWorldConnection;
+                });
 
-                setupWorldConnection(worldId);
-                log({ message: `${AGENT_LOG_PREFIX} Connected to world ${worldId}`, type: 'info' });
+                if (agentStore.worldConnection) {
+                    try {
+                        agentStore.worldConnection.supabaseClient?.channel(
+                            AgentMeta.E_ChannelType.AGENT_METADATA,
+                        )
+                            .on("presence", { event: "sync" }, () => {
+                                const presenceChannel = world.supabaseClient
+                                    ?.channel(
+                                        AgentMeta.E_ChannelType.AGENT_METADATA,
+                                    );
+                                const state =
+                                    presenceChannel?.presenceState() ?? {};
+                                handleAgentMetadataSync(
+                                    state as unknown as Record<
+                                        string,
+                                        AgentMeta.C_Metadata[]
+                                    >,
+                                );
+                            })
+                            .subscribe();
+                        world.supabaseClient?.channel(
+                            AgentMeta.E_ChannelType.SIGNALING_CHANNEL,
+                        )
+                            .on(REALTIME_LISTEN_TYPES.BROADCAST, {
+                                event: AgentMeta.E_SignalType.AGENT_Offer,
+                            }, (payload) => {
+                                const connection = world
+                                    .agentToAgentConnections[
+                                        payload.payload.fromAgentId
+                                    ];
+                                if (connection) {
+                                    runInAction(() => {
+                                        connection.rtcConnectionOffer =
+                                            payload.payload.offer;
+                                    });
+                                }
+                            })
+                            .on(REALTIME_LISTEN_TYPES.BROADCAST, {
+                                event: AgentMeta.E_SignalType.AGENT_Answer,
+                            }, (payload) => {
+                                const connection = world
+                                    .agentToAgentConnections[
+                                        payload.payload.fromAgentId
+                                    ];
+                                if (connection) {
+                                    runInAction(() => {
+                                        connection.rtcConnectionAnswer =
+                                            payload.payload.answer;
+                                    });
+                                }
+                            })
+                            .on(REALTIME_LISTEN_TYPES.BROADCAST, {
+                                event:
+                                    AgentMeta.E_SignalType.AGENT_ICE_Candidate,
+                            }, (payload) => {
+                                const connection = world
+                                    .agentToAgentConnections[
+                                        payload.payload.fromAgentId
+                                    ];
+                                if (connection) {
+                                    runInAction(() => {
+                                        connection.rtcConnectionIceCandidate =
+                                            payload.payload.candidate;
+                                    });
+                                }
+                            })
+                            .subscribe();
+                        log({
+                            message:
+                                `${AGENT_LOG_PREFIX} Successfully connected to Supabase Realtime`,
+                            type: "info",
+                        });
+
+                        world.presenceUpdateInterval = setInterval(() => {
+                            void Self.updatePresence();
+                        }, PRESENCE_UPDATE_INTERVAL);
+                    } catch (error) {
+                        log({
+                            message:
+                                `${AGENT_LOG_PREFIX} Failed to connect to Supabase Realtime: ${error}`,
+                            type: "error",
+                        });
+                    }
+                }
+                log({
+                    message: `${AGENT_LOG_PREFIX} Connected to world`,
+                    type: "info",
+                });
             } else {
-                log({ message: `${AGENT_LOG_PREFIX} World ${worldId} was connected by another process`, type: 'warn' });
+                log({
+                    message:
+                        `${AGENT_LOG_PREFIX} World was already connected by another process`,
+                    type: "warn",
+                });
             }
         } catch (error) {
-            log({ message: `${AGENT_LOG_PREFIX} Failed to connect to world ${worldId}: ${error}`, type: 'error' });
+            log({
+                message:
+                    `${AGENT_LOG_PREFIX} Failed to connect to world: ${error}`,
+                type: "error",
+            });
         }
     };
 
-    export const disconnectFromWorld = async (worldId: string) => {
-        const world = worldConnections[worldId];
+    export const disconnectFromWorld = async () => {
+        const world = agentStore.worldConnection;
         if (world) {
             if (world.presenceUpdateInterval) {
                 clearInterval(world.presenceUpdateInterval);
             }
-            Object.keys(world.agentConnections).forEach((agentId) => {
-                removeAgent(worldId, agentId);
+            Object.keys(world.agentToAgentConnections).forEach((agentId) => {
+                removeAgent(agentId);
             });
             await world.supabaseClient?.removeAllChannels();
             if (world.audioContext) {
                 await world.audioContext.close();
             }
-            delete worldConnections[worldId];
-            log({ message: `${AGENT_LOG_PREFIX} Disconnected from world ${worldId}`, type: 'info' });
+            runInAction(() => {
+                agentStore.worldConnection = null;
+            });
+            log({
+                message: `${AGENT_LOG_PREFIX} Disconnected from world`,
+                type: "info",
+            });
         }
     };
 
-    export const isConnectedToAnyWorld = () => Object.keys(worldConnections).length > 0;
-
-    const setupWorldConnection = (worldId: string) => {
-        const world = worldConnections[worldId];
+    export const createAgent = async (
+        agentId: string,
+        metadata: AgentMeta.C_Metadata,
+    ) => {
+        const world = agentStore.worldConnection;
         if (!world) {
             return;
         }
 
-        try {
-            world.supabaseClient?.channel(AgentMeta.E_ChannelType.AGENT_METADATA)
-                .on('presence', { event: 'sync' }, () => {
-                    const presenceChannel = world.supabaseClient?.channel(AgentMeta.E_ChannelType.AGENT_METADATA);
-                    const state = presenceChannel?.presenceState() ?? {};
-                    handleAgentMetadataSync(worldId, state as unknown as Record<string, AgentPresenceState[]>);
-                })
-                .subscribe();
-            world.supabaseClient?.channel(AgentMeta.E_ChannelType.SIGNALING_CHANNEL)
-                .on(REALTIME_LISTEN_TYPES.BROADCAST, { event: AgentMeta.E_SignalType.AGENT_Offer }, (payload) => {
-                    const connection = world.agentConnections[payload.payload.fromAgentId];
-                    if (connection) {
-                        WebRTC.handleWebRTCOffer(worldId, payload.payload, connection);
-                    }
-                })
-                .on(REALTIME_LISTEN_TYPES.BROADCAST, { event: AgentMeta.E_SignalType.AGENT_Answer }, (payload) => {
-                    const connection = world.agentConnections[payload.payload.fromAgentId];
-                    if (connection) {
-                        WebRTC.handleWebRTCAnswer(worldId, payload.payload, connection);
-                    }
-                })
-                .on(REALTIME_LISTEN_TYPES.BROADCAST, { event: AgentMeta.E_SignalType.AGENT_ICE_Candidate }, (payload) => {
-                    const connection = world.agentConnections[payload.payload.fromAgentId];
-                    if (connection) {
-                        WebRTC.handleWebRTCIceCandidate(worldId, payload.payload, connection);
-                    }
-                })
-                .subscribe();
-            log({ message: `${AGENT_LOG_PREFIX} Successfully connected to Supabase Realtime for world ${worldId}`, type: 'info' });
+        const connection = WebRTC.createAgentConnection(agentId, metadata);
+        runInAction(() => {
+            world.agentToAgentConnections[agentId] = connection;
+        });
 
-            world.presenceUpdateInterval = setInterval(() => {
-                void Self.updatePresence(worldId);
-            }, PRESENCE_UPDATE_INTERVAL);
+        WebRTC.setupRTCEventListeners(agentId, connection);
+        WebRTC.addLocalStreamsToConnection(agentId, connection);
 
-        } catch (error) {
-            log({ message: `${AGENT_LOG_PREFIX} Failed to connect to Supabase Realtime for world ${worldId}: ${error}`, type: 'error' });
-        }
+        log({
+            message: `${AGENT_LOG_PREFIX} Created agent ${agentId}`,
+            type: "info",
+        });
+        await WebRTC.createAndSendOffer(agentId, connection);
     };
 
-    export const createAgent = async (worldId: string, agentId: string, metadata: AgentMeta.C_Metadata) => {
-        const world = worldConnections[worldId];
+    export const removeAgent = (agentId: string) => {
+        const world = agentStore.worldConnection;
         if (!world) {
             return;
         }
 
-        const connection = WebRTC.createAgentConnection(worldId, agentId, metadata);
-        world.agentConnections[agentId] = connection;
-
-        WebRTC.setupRTCEventListeners(worldId, agentId, connection);
-        WebRTC.addLocalStreamsToConnection(worldId, agentId, connection);
-
-        log({ message: `${AGENT_LOG_PREFIX} Created agent ${agentId} in world ${worldId}`, type: 'info' });
-        await WebRTC.createAndSendOffer(worldId, agentId, connection);
-    };
-
-    export const removeAgent = (worldId: string, agentId: string) => {
-        const world = worldConnections[worldId];
-        if (!world) {
-            return;
-        }
-
-        const connection = world.agentConnections[agentId];
+        const connection = world.agentToAgentConnections[agentId];
         if (connection) {
-            WebRTC.removeAgentConnection(worldId, agentId, connection);
-            delete world.agentConnections[agentId];
-            log({ message: `${AGENT_LOG_PREFIX} Removed agent ${agentId} from world ${worldId}`, type: 'info' });
+            WebRTC.removeAgentConnection(agentId, connection);
+            runInAction(() => {
+                delete world.agentToAgentConnections[agentId];
+            });
+            log({
+                message: `${AGENT_LOG_PREFIX} Removed agent ${agentId}`,
+                type: "info",
+            });
         }
     };
 
-    const handleAgentMetadataSync = (worldId: string, state: Record<string, AgentPresenceState[]>) => {
-        const world = worldConnections[worldId];
+    const handleAgentMetadataSync = (
+        state: Record<string, AgentMeta.C_Metadata[]>,
+    ) => {
+        const world = agentStore.worldConnection;
         if (!world) {
             return;
         }
@@ -251,77 +351,132 @@ export namespace Agent {
         const currentAgents = Object.keys(state);
 
         // Handle removals
-        Object.keys(world.agentConnections).forEach((agentId) => {
+        Object.keys(world.agentToAgentConnections).forEach((agentId) => {
             if (!currentAgents.includes(agentId)) {
-                removeAgent(worldId, agentId);
+                removeAgent(agentId);
             }
         });
 
         // Handle additions and updates
         currentAgents.forEach(async (agentId) => {
-            if (agentId !== Self.id) {
+            if (agentId !== agentStore.agentId) {
                 try {
                     const agentData = state[agentId][0];
                     const metadata: AgentMeta.C_Metadata = {
-                        agentId: agentData.agent_id,
+                        agentId: agentData.agentId,
                         position: agentData.position,
                         orientation: agentData.orientation,
-                        onlineAt: agentData.online_at,
+                        onlineAt: agentData.onlineAt,
                     };
 
-                    if (!world.agentConnections[agentId]) {
-                        await createAgent(worldId, agentId, metadata);
+                    if (!world.agentToAgentConnections[agentId]) {
+                        await createAgent(agentId, metadata);
                     } else {
-                        updateAgentMetadata(worldId, agentId, metadata);
+                        updateAgentMetadata(agentId, metadata);
                     }
                 } catch (error) {
-                    console.error(`Invalid metadata for agent ${agentId} in world ${worldId}:`, error);
+                    console.error(
+                        `Invalid metadata for agent ${agentId}:`,
+                        error,
+                    );
                 }
             }
         });
 
-        log({ message: `${AGENT_LOG_PREFIX} Updated agent list for world ${worldId}: ${currentAgents}`, type: 'info' });
+        log({
+            message: `${AGENT_LOG_PREFIX} Updated agent list: ${currentAgents}`,
+            type: "info",
+        });
     };
 
-    const updateAgentMetadata = (worldId: string, agentId: string, metadata: AgentMeta.C_Metadata) => {
-        const world = worldConnections[worldId];
+    const updateAgentMetadata = (
+        agentId: string,
+        metadata: AgentMeta.C_Metadata,
+    ) => {
+        const world = agentStore.worldConnection;
         if (!world) {
             return;
         }
 
-        if (world.agentConnections[agentId]) {
-            world.agentConnections[agentId].metadata = metadata;
-            log({ message: `${AGENT_LOG_PREFIX} Updated metadata for agent ${agentId} in world ${worldId}`, type: 'info' });
+        if (world.agentToAgentConnections[agentId]) {
+            runInAction(() => {
+                world.agentToAgentConnections[agentId].presence = metadata;
+            });
+            log({
+                message:
+                    `${AGENT_LOG_PREFIX} Updated metadata for agent ${agentId}`,
+                type: "info",
+            });
         }
     };
 
-    export const updateAgentAudioPosition = (worldId: string, agentId: string) => {
-        const world = worldConnections[worldId];
+    export const updateAgentAudioPosition = (agentId: string) => {
+        const world = agentStore.worldConnection;
         if (!world || !world.audioContext) {
             return;
         }
 
-        const connection = world.agentConnections[agentId];
-        if (!connection || !connection.panner || !connection.metadata) {
+        const connection = world.agentToAgentConnections[agentId];
+        if (!connection || !connection.panner || !connection.presence) {
             return;
         }
 
-        const agentPosition = connection.metadata.position;
-        const agentOrientation = connection.metadata.orientation;
+        const agentPosition = connection.presence.position;
+        const agentOrientation = connection.presence.orientation;
 
         WebRTC_Media.updateAudioPosition(
             connection.panner,
             world.audioContext,
             {
-                x: agentPosition.x - world.position.x,
-                y: agentPosition.y - world.position.y,
-                z: agentPosition.z - world.position.z,
+                x: agentPosition.x - world.presence.position.x,
+                y: agentPosition.y - world.presence.position.y,
+                z: agentPosition.z - world.presence.position.z,
             },
             {
-                x: agentOrientation.x - world.orientation.x,
-                y: agentOrientation.y - world.orientation.y,
-                z: agentOrientation.z - world.orientation.z,
-            }
+                x: agentOrientation.x - world.presence.orientation.x,
+                y: agentOrientation.y - world.presence.orientation.y,
+                z: agentOrientation.z - world.presence.orientation.z,
+            },
         );
     };
 }
+
+// Set up reactions
+reaction(
+    () => agentStore.worldConnection,
+    (worldConnection) => {
+        if (worldConnection) {
+            console.log(
+                `Connected to world: ${worldConnection.host}:${worldConnection.port}`,
+            );
+        } else {
+            console.log("Disconnected from world");
+        }
+    },
+);
+
+reaction(
+    () => {
+        const agentCount = agentStore.worldConnection
+            ? Object.keys(agentStore.worldConnection.agentToAgentConnections)
+                .length
+            : 0;
+        return agentCount;
+    },
+    (agentCount) => {
+        console.log(`Agent count changed: ${agentCount}`);
+    },
+);
+
+// Optional: Add a reaction for localAudioMediaStream changes
+reaction(
+    () => agentStore.localAudioMediaStream,
+    (stream) => {
+        if (stream) {
+            console.log("Local audio media stream updated");
+            // Perform any necessary actions when the local audio stream changes
+        } else {
+            console.log("Local audio media stream removed");
+        }
+    },
+);

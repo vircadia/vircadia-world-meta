@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 
+import SupabaseClient from "https://jsr.io/@supabase/supabase-js/2.45.3/src/SupabaseClient.ts";
 import { z } from 'npm:zod';
 
 export namespace Primitive {
@@ -365,6 +366,28 @@ export namespace Agent {
     export enum E_WorldTransportChannel {
         WORLD_METADATA = 'world_metadata',
         SCENE_DATA = 'scene_data',
+    }
+
+    export interface I_AgentToAgentConnection {
+        rtcConnection: RTCPeerConnection | null;
+        rtcConnectionOffer: RTCSessionDescriptionInit;
+        rtcConnectionAnswer: RTCSessionDescriptionInit;
+        rtcConnectionIceCandidate: RTCIceCandidateInit;
+        rtcDataChannel: RTCDataChannel | null;
+        incomingAudioMediaStream: MediaStream | null;
+        presence: Agent.C_Metadata | null;
+        panner: PannerNode | null;
+        audioUpdateInterval: ReturnType<typeof setInterval> | null;
+    }
+    
+    export interface I_AgentToWorldConnection {
+        host: string;
+        port: number;
+        supabaseClient: SupabaseClient | null;
+        agentToAgentConnections: { [key: string]: I_AgentToAgentConnection };
+        presenceUpdateInterval: ReturnType<typeof setInterval> | null;
+        presence: Agent.C_Metadata;
+        audioContext: AudioContext | null;
     }
 }
 
