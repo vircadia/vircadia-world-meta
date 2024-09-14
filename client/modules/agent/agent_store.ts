@@ -1,20 +1,21 @@
-import { makeAutoObservable, autorun, reaction } from 'npm:mobx';
+import { makeAutoObservable } from 'npm:mobx';
 import { Agent as AgentMeta } from '../../../meta.ts';
 
 export interface SharedState {
-    worldConnection: AgentMeta.I_AgentToWorldConnection | null;
+    worldConnection: AgentMeta.I_AgentWorldConnection | null;
     localAudioMediaStream: MediaStream | null;
 }
 
-class AgentStore {
-    worldConnection: AgentMeta.I_AgentToWorldConnection | null = null;
+class agentStore {
+    worldConnection: AgentMeta.I_AgentWorldConnection | null = null;
     localAudioMediaStream: MediaStream | null = null;
     agentId: string | null = null;
     useWebRTC: boolean = false;
+    iceServers: RTCIceServer[] = [];
 
     constructor() {
         makeAutoObservable(this);
     }
 }
 
-export const agentStore = new AgentStore();
+export const Agent_Store = new agentStore();

@@ -1,67 +1,7 @@
 /* eslint-disable no-unused-vars */
 
-import SupabaseClient from "https://jsr.io/@supabase/supabase-js/2.45.3/src/SupabaseClient.ts";
+import SupabaseClient from 'https://jsr.io/@supabase/supabase-js/2.45.3/src/SupabaseClient.ts';
 import { z } from 'npm:zod';
-
-export namespace Primitive {
-    export const S_Vector3 = z.object({
-        x: z.number(),
-        y: z.number(),
-        z: z.number(),
-    });
-
-    export type I_Vector3 = z.infer<typeof S_Vector3>;
-
-    export class C_Vector3 {
-        public x: number;
-        public y: number;
-        public z: number;
-
-        constructor(_x?: number, _y?: number, _z?: number) {
-            this.x = _x ?? 0;
-            this.y = _y ?? 0;
-            this.z = _z ?? 0;
-        }
-
-        static parse(obj: {
-            x: number | any
-            y: number | any
-            z: number | any
-        }): C_Vector3 {
-            const parsedData = S_Vector3.parse(obj);
-            return new C_Vector3(parsedData.x, parsedData.y, parsedData.z);
-        }
-    }
-
-    export const S_Color3 = z.object({
-        r: z.number(),
-        g: z.number(),
-        b: z.number(),
-    });
-
-    export type I_Color3 = z.infer<typeof S_Color3>;
-
-    export class C_Color3 {
-        public r: number;
-        public g: number;
-        public b: number;
-
-        constructor(_r?: number, _g?: number, _b?: number) {
-            this.r = _r ?? 0;
-            this.g = _g ?? 0;
-            this.b = _b ?? 0;
-        }
-
-        static parse(obj: {
-            r: number | any
-            g: number | any
-            b: number | any
-        }): C_Color3 {
-            const parsedData = S_Color3.parse(obj);
-            return new C_Color3(parsedData.r, parsedData.g, parsedData.b);
-        }
-    }
-}
 
 export namespace World {
     export interface I_CommonEntityProperties {
@@ -72,12 +12,11 @@ export namespace World {
             updatedAt: Date;
             babylonjs: {
                 [key: string]: unknown;
-            }
-        }
+            };
+        };
     }
 
     export interface I_BabylonEntityScriptProperties {
-
         client_behaviors: string[];
         client_actions: string[];
         server_behaviors: string[];
@@ -97,7 +36,7 @@ export namespace World {
         extensions?: Record<string, unknown>;
         extras?: I_CommonEntityProperties & {
             [key: string]: unknown;
-        }
+        };
         asset: any; // Consider creating a more specific type for asset
     }
 
@@ -155,7 +94,7 @@ export namespace World {
         extensions?: Record<string, unknown>;
         extras?: I_CommonEntityProperties & {
             [key: string]: unknown;
-        }
+        };
     }
 
     export interface I_Material {
@@ -185,7 +124,7 @@ export namespace World {
         extensions?: Record<string, unknown>;
         extras?: I_CommonEntityProperties & {
             [key: string]: unknown;
-        }
+        };
     }
 
     export interface I_Image {
@@ -198,7 +137,7 @@ export namespace World {
         extensions?: Record<string, unknown>;
         extras?: I_CommonEntityProperties & {
             [key: string]: unknown;
-        }
+        };
     }
 
     export interface I_Sampler {
@@ -212,7 +151,7 @@ export namespace World {
         extensions?: Record<string, unknown>;
         extras?: I_CommonEntityProperties & {
             [key: string]: unknown;
-        }
+        };
     }
 
     export interface I_Animation {
@@ -224,7 +163,7 @@ export namespace World {
         extensions?: Record<string, unknown>;
         extras?: I_CommonEntityProperties & {
             [key: string]: unknown;
-        }
+        };
     }
 
     export interface I_Skin {
@@ -237,7 +176,7 @@ export namespace World {
         extensions?: Record<string, unknown>;
         extras?: I_CommonEntityProperties & {
             [key: string]: unknown;
-        }
+        };
     }
 
     export interface I_Camera {
@@ -263,7 +202,7 @@ export namespace World {
         extensions?: Record<string, unknown>;
         extras?: I_CommonEntityProperties & {
             [key: string]: unknown;
-        }
+        };
     }
 
     export interface I_BufferView {
@@ -278,7 +217,7 @@ export namespace World {
         extensions?: Record<string, unknown>;
         extras?: I_CommonEntityProperties & {
             [key: string]: unknown;
-        }
+        };
     }
 
     export interface I_Accessor {
@@ -306,15 +245,29 @@ export namespace World {
         extensions?: Record<string, unknown>;
         extras?: I_CommonEntityProperties & {
             [key: string]: unknown;
-        }
+        };
     }
 
     export namespace Mutation {
-        
     }
 }
 
 export namespace Agent {
+    export interface I_Module_Agent {
+    }
+
+    export interface I_Module_Agent_World {
+    }
+
+    export interface I_Module_Agent_To_Agent {
+    }
+
+    export interface I_Module_Agent_Audio {
+    }
+
+    export interface I_Module_Agent_Store {
+    }
+
     export enum E_ChannelEvent {
         AGENT_JOINED = 'agent-joined',
         AGENT_LEFT = 'agent-left',
@@ -347,16 +300,24 @@ export namespace Agent {
 
         constructor(data: z.infer<typeof MetadataSchema>) {
             this.agentId = data.agentId;
-            this.position = new Primitive.C_Vector3(data.position.x, data.position.y, data.position.z);
-            this.orientation = new Primitive.C_Vector3(data.orientation.x, data.orientation.y, data.orientation.z);
+            this.position = new Primitive.C_Vector3(
+                data.position.x,
+                data.position.y,
+                data.position.z,
+            );
+            this.orientation = new Primitive.C_Vector3(
+                data.orientation.x,
+                data.orientation.y,
+                data.orientation.z,
+            );
             this.onlineAt = data.onlineAt;
         }
 
         static parse(obj: {
-            agentId: string | any
-            position: { x: number; y: number; z: number } | any
-            orientation: { x: number; y: number; z: number } | any
-            onlineAt: string | any
+            agentId: string | any;
+            position: { x: number; y: number; z: number } | any;
+            orientation: { x: number; y: number; z: number } | any;
+            onlineAt: string | any;
         }): C_Metadata {
             const parsedData = MetadataSchema.parse(obj);
             return new C_Metadata(parsedData);
@@ -368,23 +329,22 @@ export namespace Agent {
         SCENE_DATA = 'scene_data',
     }
 
-    export interface I_AgentToAgentConnection {
+    export interface I_AgentPeerConnection {
         rtcConnection: RTCPeerConnection | null;
-        rtcConnectionOffer: RTCSessionDescriptionInit;
-        rtcConnectionAnswer: RTCSessionDescriptionInit;
-        rtcConnectionIceCandidate: RTCIceCandidateInit;
+        rtcConnectionOffer: RTCSessionDescriptionInit | null;
+        rtcConnectionAnswer: RTCSessionDescriptionInit | null;
+        rtcConnectionIceCandidate: RTCIceCandidateInit | null;
         rtcDataChannel: RTCDataChannel | null;
         incomingAudioMediaStream: MediaStream | null;
         presence: Agent.C_Metadata | null;
         panner: PannerNode | null;
-        audioUpdateInterval: ReturnType<typeof setInterval> | null;
     }
-    
-    export interface I_AgentToWorldConnection {
+
+    export interface I_AgentWorldConnection {
         host: string;
         port: number;
         supabaseClient: SupabaseClient | null;
-        agentToAgentConnections: { [key: string]: I_AgentToAgentConnection };
+        agentPeerConnections: { [key: string]: I_AgentPeerConnection };
         presenceUpdateInterval: ReturnType<typeof setInterval> | null;
         presence: Agent.C_Metadata;
         audioContext: AudioContext | null;
@@ -408,5 +368,65 @@ export namespace Server {
     export interface I_REQUEST_ConfigAndStatusResponse {
         API_URL: string | null;
         S3_STORAGE_URL: string | null;
+    }
+}
+
+export namespace Primitive {
+    export const S_Vector3 = z.object({
+        x: z.number(),
+        y: z.number(),
+        z: z.number(),
+    });
+
+    export type I_Vector3 = z.infer<typeof S_Vector3>;
+
+    export class C_Vector3 {
+        public x: number;
+        public y: number;
+        public z: number;
+
+        constructor(_x?: number, _y?: number, _z?: number) {
+            this.x = _x ?? 0;
+            this.y = _y ?? 0;
+            this.z = _z ?? 0;
+        }
+
+        static parse(obj: {
+            x: number | any;
+            y: number | any;
+            z: number | any;
+        }): C_Vector3 {
+            const parsedData = S_Vector3.parse(obj);
+            return new C_Vector3(parsedData.x, parsedData.y, parsedData.z);
+        }
+    }
+
+    export const S_Color3 = z.object({
+        r: z.number(),
+        g: z.number(),
+        b: z.number(),
+    });
+
+    export type I_Color3 = z.infer<typeof S_Color3>;
+
+    export class C_Color3 {
+        public r: number;
+        public g: number;
+        public b: number;
+
+        constructor(_r?: number, _g?: number, _b?: number) {
+            this.r = _r ?? 0;
+            this.g = _g ?? 0;
+            this.b = _b ?? 0;
+        }
+
+        static parse(obj: {
+            r: number | any;
+            g: number | any;
+            b: number | any;
+        }): C_Color3 {
+            const parsedData = S_Color3.parse(obj);
+            return new C_Color3(parsedData.r, parsedData.g, parsedData.b);
+        }
     }
 }
