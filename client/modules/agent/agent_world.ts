@@ -106,9 +106,9 @@ export class Agent_World {
                 Agent_Store.world = null;
             });
 
-            await Agent_Peer.deinitializePresence();
+            await Agent_World.Peer.deinitializePresence();
             if (Agent_Store.useWebRTC) {
-                await Agent_Peer.deinitializeSignaling();
+                await Agent_World.Peer.deinitializeSignaling();
             }
 
             log({
@@ -152,13 +152,13 @@ export class Agent_World {
                 console.log('Agent presence state:', state);
                 // Handle agent presence state
                 Object.keys(state).forEach((agentId) => {
-                    Agent_Peer.updateAgentPosition(agentId);
+                    Agent_World.Peer.updateAgentPosition(agentId);
                 });
             })
             .on('presence', { event: 'join' }, ({ key, newPresences }) => {
                 console.log('Agent joined:', key, newPresences);
                 // Handle agent join
-                Agent_Peer.updateAgentPosition(key);
+                Agent_World.Peer.updateAgentPosition(key);
             })
             .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
                 console.log('Agent left:', key, leftPresences);
@@ -203,7 +203,7 @@ export class Agent_World {
 
         if (Agent_Store.useWebRTC) {
             try {
-                Agent_Peer.establishWebRTCPeerConnection(agentId);
+                Agent_World.Peer.establishWebRTCPeerConnection(agentId);
             } catch (error) {
                 log({
                     message:
@@ -307,257 +307,334 @@ export class Agent_World {
             }
         }
     };
-}
 
-class Agent_Peer {
-    static sendWebRTCSignal = async (data: {
-        type: AgentMeta.WebRTC.E_SignalType;
-        payload:
-            | RTCSessionDescriptionInit
-            | RTCIceCandidateInit
-            | RTCIceCandidate;
-        targetAgentId: string;
-    }) => {
-        const world = Agent_Store.world;
-        if (!world) return;
+    static Peer = class {
+        static sendWebRTCSignal = async (data: {
+            type: AgentMeta.WebRTC.E_SignalType;
+            payload:
+                | RTCSessionDescriptionInit
+                | RTCIceCandidateInit
+                | RTCIceCandidate;
+            targetAgentId: string;
+        }) => {
+            const world = Agent_Store.world;
+            if (!world) return;
 
-        try {
-            await world.supabaseClient?.channel(
-                AgentMeta.E_Realtime_BroadcastChannel.AGENT_SIGNAL,
-            )
-                .send({
-                    type: 'broadcast',
-                    event: data.type,
-                    payload: data.payload,
+            try {
+                await world.supabaseClient?.channel(
+                    AgentMeta.E_Realtime_BroadcastChannel.AGENT_SIGNAL,
+                )
+                    .send({
+                        type: 'broadcast',
+                        event: data.type,
+                        payload: data.payload,
+                    });
+            } catch (error) {
+                log({
+                    message:
+                        `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Error sending WebRTC signal: ${error}`,
+                    type: 'error',
                 });
-        } catch (error) {
+            }
+        };
+
+        static updateAgentPosition(agentId: string): void {
+            const world = Agent_Store.world;
+            if (!world || !world.audioContext) {
+                return;
+            }
+
+            const connection = world.agentPeerConnections[agentId];
+            if (
+                !connection || !connection.incomingAudioMediaPanner ||
+                !connection.presence
+            ) {
+                return;
+            }
+
+            const agentPosition = connection.presence.position;
+            const agentOrientation = connection.presence.orientation;
+
+            Agent_Audio.updateAudioPosition(
+                connection.incomingAudioMediaPanner,
+                world.audioContext,
+                {
+                    x: agentPosition.x - world.presence.position.x,
+                    y: agentPosition.y - world.presence.position.y,
+                    z: agentPosition.z - world.presence.position.z,
+                },
+                {
+                    x: agentOrientation.x - world.presence.orientation.x,
+                    y: agentOrientation.y - world.presence.orientation.y,
+                    z: agentOrientation.z - world.presence.orientation.z,
+                },
+            );
+        }
+
+        static async attachIncomingAudioMediaStream(data: {
+            agentId: string;
+            stream: MediaStream;
+        }): Promise<void> {
+            const world = Agent_Store.world;
+            if (!world) {
+                throw new Error('World not found');
+            }
+
+            const connection = world.agentPeerConnections[data.agentId];
+            if (!connection) {
+                throw new Error('Connection not found');
+            }
+
+            if (!world.audioContext) {
+                throw new Error('Audio context not found');
+            } else if (world.audioContext.state === 'closed') {
+                throw new Error('Audio context is closed');
+            }
+
+            if (world.audioContext.state === 'suspended') {
+                await Agent_Audio.resumeAudioContext(world.audioContext);
+            }
+
+            if (connection.incomingAudioMediaPanner) {
+                Agent_Audio.removeIncomingAudioStream(
+                    connection.incomingAudioMediaPanner,
+                );
+                log({
+                    message:
+                        `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Removed incoming audio stream for agent ${data.agentId} because a new stream was received and is being added now.`,
+                    type: 'debug',
+                });
+            }
+            connection.incomingAudioMediaPanner = Agent_Audio
+                .addIncomingAudioStream({
+                    audioContext: world.audioContext,
+                    mediaStream: data.stream,
+                    pannerOptions: {
+                        // TODO: Put this in a config
+                        panningModel: 'HRTF',
+                        distanceModel: 'inverse',
+                        refDistance: 1,
+                        maxDistance: 10000,
+                    },
+                });
+
             log({
                 message:
-                    `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Error sending WebRTC signal: ${error}`,
-                type: 'error',
+                    `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Set up incoming audio for agent ${data.agentId}`,
+                type: 'info',
             });
+        }
+
+        static async initializePresence(supabaseClient: SupabaseClient) {
+            // Placeholder for initializing presence
+        }
+
+        static async initializeSignaling(supabaseClient: SupabaseClient) {
+            // Placeholder for initializing signaling
+        }
+
+        static async SetupReceiveUpdateIntervals(
+            supabaseClient: SupabaseClient,
+        ) {
+            // Placeholder for setting up receive update intervals
+        }
+
+        static async deinitializePresence() {
+            // Placeholder for deinitializing presence
+        }
+
+        static async deinitializeSignaling() {
+            // Placeholder for deinitializing signaling
+        }
+
+        static establishWebRTCPeerConnection(agentId: string): void {
+            const world = Agent_Store.world;
+            if (!world) {
+                throw new Error('No world connection available');
+            }
+
+            const connection = world.agentPeerConnections[agentId];
+
+            if (!connection.rtcConnection) {
+                connection.rtcConnection = Agent_WebRTC.createPeerConnection(
+                    Agent_Store.iceServers,
+                );
+            }
+
+            connection.rtcConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    this.sendWebRTCSignal({
+                        type: AgentMeta.WebRTC.E_SignalType.AGENT_ICE_Candidate,
+                        payload: event.candidate,
+                        targetAgentId: agentId,
+                    });
+                }
+            };
+
+            connection.rtcConnection.ontrack = (event) => {
+                this.attachIncomingAudioMediaStream({
+                    agentId,
+                    stream: event.streams[0],
+                });
+            };
+
+            connection.rtcConnection.onnegotiationneeded = async () => {
+                try {
+                    const offer = await Agent_WebRTC.createOffer(
+                        connection.rtcConnection!,
+                    );
+                    await this.sendWebRTCSignal({
+                        type: AgentMeta.WebRTC.E_SignalType.AGENT_Offer,
+                        payload: offer,
+                        targetAgentId: agentId,
+                    });
+                } catch (error) {
+                    console.error('Error during negotiation:', error);
+                }
+            };
+
+            if (!connection.rtcDataChannel) {
+                connection.rtcDataChannel = Agent_WebRTC.createDataChannel(
+                    connection.rtcConnection,
+                    'data',
+                );
+                Agent_WebRTC.setupDataChannelListeners(
+                    connection.rtcDataChannel,
+                    () =>
+                        console.log(
+                            `Data channel opened with agent ${agentId}`,
+                        ),
+                    () =>
+                        console.log(
+                            `Data channel closed with agent ${agentId}`,
+                        ),
+                    (event) =>
+                        Agent_WebRTC.handleDataChannelMessage(agentId, event),
+                );
+            }
+
+            // Initiate the connection if we haven't already
+            if (
+                !connection.rtcConnectionOffer &&
+                !connection.rtcConnectionAnswer
+            ) {
+                connection.rtcConnection.onnegotiationneeded(
+                    new Event('negotiationneeded'),
+                );
+            }
+        }
+
+        static async handleWebRTCSignal(signal: {
+            type: AgentMeta.WebRTC.E_SignalType;
+            payload: RTCSessionDescriptionInit | RTCIceCandidateInit;
+            fromAgentId: string;
+        }): Promise<void> {
+            const world = Agent_Store.world;
+            if (!world) {
+                throw new Error('No world connection available');
+            }
+
+            const connection = world.agentPeerConnections[signal.fromAgentId];
+            if (!connection || !connection.rtcConnection) {
+                throw new Error('No RTC connection available for agent');
+            }
+
+            switch (signal.type) {
+                case AgentMeta.WebRTC.E_SignalType.AGENT_Offer: {
+                    const answer = await Agent_WebRTC.handleOffer(
+                        connection.rtcConnection,
+                        signal.payload as RTCSessionDescriptionInit,
+                    );
+                    await this.sendWebRTCSignal({
+                        type: AgentMeta.WebRTC.E_SignalType.AGENT_Answer,
+                        payload: answer,
+                        targetAgentId: signal.fromAgentId,
+                    });
+                    break;
+                }
+                case AgentMeta.WebRTC.E_SignalType.AGENT_Answer:
+                    await Agent_WebRTC.handleAnswer(
+                        connection.rtcConnection,
+                        signal.payload as RTCSessionDescriptionInit,
+                    );
+                    break;
+                case AgentMeta.WebRTC.E_SignalType.AGENT_ICE_Candidate:
+                    await Agent_WebRTC.addIceCandidate(
+                        connection.rtcConnection,
+                        signal.payload as RTCIceCandidateInit,
+                    );
+                    break;
+                default:
+                    console.error('Unknown signal type:', signal.type);
+            }
         }
     };
 
-    static updateAgentPosition(agentId: string): void {
-        const world = Agent_Store.world;
-        if (!world || !world.audioContext) {
-            return;
-        }
-
-        const connection = world.agentPeerConnections[agentId];
-        if (
-            !connection || !connection.incomingAudioMediaPanner ||
-            !connection.presence
-        ) {
-            return;
-        }
-
-        const agentPosition = connection.presence.position;
-        const agentOrientation = connection.presence.orientation;
-
-        Agent_Audio.updateAudioPosition(
-            connection.incomingAudioMediaPanner,
-            world.audioContext,
-            {
-                x: agentPosition.x - world.presence.position.x,
-                y: agentPosition.y - world.presence.position.y,
-                z: agentPosition.z - world.presence.position.z,
-            },
-            {
-                x: agentOrientation.x - world.presence.orientation.x,
-                y: agentOrientation.y - world.presence.orientation.y,
-                z: agentOrientation.z - world.presence.orientation.z,
-            },
-        );
-    }
-
-    static async attachIncomingAudioMediaStream(data: {
-        agentId: string;
-        stream: MediaStream;
-    }): Promise<void> {
-        const world = Agent_Store.world;
-        if (!world) {
-            throw new Error('World not found');
-        }
-
-        const connection = world.agentPeerConnections[data.agentId];
-        if (!connection) {
-            throw new Error('Connection not found');
-        }
-
-        if (!world.audioContext) {
-            throw new Error('Audio context not found');
-        } else if (world.audioContext.state === 'closed') {
-            throw new Error('Audio context is closed');
-        }
-
-        if (world.audioContext.state === 'suspended') {
-            await Agent_Audio.resumeAudioContext(world.audioContext);
-        }
-
-        if (connection.incomingAudioMediaPanner) {
-            Agent_Audio.removeIncomingAudioStream(
-                connection.incomingAudioMediaPanner,
-            );
-            log({
-                message:
-                    `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Removed incoming audio stream for agent ${data.agentId} because a new stream was received and is being added now.`,
-                type: 'debug',
-            });
-        }
-        connection.incomingAudioMediaPanner = Agent_Audio
-            .addIncomingAudioStream({
-                audioContext: world.audioContext,
-                mediaStream: data.stream,
-                pannerOptions: {
-                    // TODO: Put this in a config
-                    panningModel: 'HRTF',
-                    distanceModel: 'inverse',
-                    refDistance: 1,
-                    maxDistance: 10000,
-                },
-            });
-
-        log({
-            message:
-                `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Set up incoming audio for agent ${data.agentId}`,
-            type: 'info',
-        });
-    }
-
-    static async initializePresence(supabaseClient: SupabaseClient) {
-        // Placeholder for initializing presence
-    }
-
-    static async initializeSignaling(supabaseClient: SupabaseClient) {
-        // Placeholder for initializing signaling
-    }
-
-    static async SetupReceiveUpdateIntervals(supabaseClient: SupabaseClient) {
-        // Placeholder for setting up receive update intervals
-    }
-
-    static async deinitializePresence() {
-        // Placeholder for deinitializing presence
-    }
-
-    static async deinitializeSignaling() {
-        // Placeholder for deinitializing signaling
-    }
-
-    static establishWebRTCPeerConnection(agentId: string): void {
-        const world = Agent_Store.world;
-        if (!world) {
-            throw new Error('No world connection available');
-        }
-
-        const connection = world.agentPeerConnections[agentId];
-
-        if (!connection.rtcConnection) {
-            connection.rtcConnection = Agent_WebRTC.createPeerConnection(
-                Agent_Store.iceServers,
-            );
-        }
-
-        connection.rtcConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                this.sendWebRTCSignal({
-                    type: AgentMeta.WebRTC.E_SignalType.AGENT_ICE_Candidate,
-                    payload: event.candidate,
-                    targetAgentId: agentId,
+    static Test = class {
+        static async databaseConnection() {
+            const world = Agent_Store.world;
+            if (!world || !world.supabaseClient) {
+                log({
+                    message:
+                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} No world connection or Supabase client available`,
+                    type: 'error',
                 });
+                return;
             }
-        };
 
-        connection.rtcConnection.ontrack = (event) => {
-            this.attachIncomingAudioMediaStream({
-                agentId,
-                stream: event.streams[0],
-            });
-        };
-
-        connection.rtcConnection.onnegotiationneeded = async () => {
             try {
-                const offer = await Agent_WebRTC.createOffer(
-                    connection.rtcConnection!,
-                );
-                await this.sendWebRTCSignal({
-                    type: AgentMeta.WebRTC.E_SignalType.AGENT_Offer,
-                    payload: offer,
-                    targetAgentId: agentId,
+                // Insert a test record
+                const { data: insertData, error: insertError } = await world
+                    .supabaseClient
+                    .from('test_table')
+                    .insert({
+                        message: 'Test message',
+                        timestamp: new Date().toISOString(),
+                    })
+                    .select();
+
+                if (insertError) throw insertError;
+
+                log({
+                    message:
+                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} Inserted test record: ${
+                            JSON.stringify(insertData)
+                        }`,
+                    type: 'info',
+                });
+
+                // Retrieve the test record
+                const { data: retrieveData, error: retrieveError } = await world
+                    .supabaseClient
+                    .from('test_table')
+                    .select('*')
+                    .order('timestamp', { ascending: false })
+                    .limit(1);
+
+                if (retrieveError) throw retrieveError;
+
+                log({
+                    message:
+                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} Retrieved test record: ${
+                            JSON.stringify(retrieveData)
+                        }`,
+                    type: 'info',
+                });
+
+                log({
+                    message:
+                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} Database test completed successfully`,
+                    type: 'success',
                 });
             } catch (error) {
-                console.error('Error during negotiation:', error);
-            }
-        };
-
-        if (!connection.rtcDataChannel) {
-            connection.rtcDataChannel = Agent_WebRTC.createDataChannel(
-                connection.rtcConnection,
-                'data',
-            );
-            Agent_WebRTC.setupDataChannelListeners(
-                connection.rtcDataChannel,
-                () => console.log(`Data channel opened with agent ${agentId}`),
-                () => console.log(`Data channel closed with agent ${agentId}`),
-                (event) =>
-                    Agent_WebRTC.handleDataChannelMessage(agentId, event),
-            );
-        }
-
-        // Initiate the connection if we haven't already
-        if (!connection.rtcConnectionOffer && !connection.rtcConnectionAnswer) {
-            connection.rtcConnection.onnegotiationneeded(
-                new Event('negotiationneeded'),
-            );
-        }
-    }
-
-    static async handleWebRTCSignal(signal: {
-        type: AgentMeta.WebRTC.E_SignalType;
-        payload: RTCSessionDescriptionInit | RTCIceCandidateInit;
-        fromAgentId: string;
-    }): Promise<void> {
-        const world = Agent_Store.world;
-        if (!world) {
-            throw new Error('No world connection available');
-        }
-
-        const connection = world.agentPeerConnections[signal.fromAgentId];
-        if (!connection || !connection.rtcConnection) {
-            throw new Error('No RTC connection available for agent');
-        }
-
-        switch (signal.type) {
-            case AgentMeta.WebRTC.E_SignalType.AGENT_Offer: {
-                const answer = await Agent_WebRTC.handleOffer(
-                    connection.rtcConnection,
-                    signal.payload as RTCSessionDescriptionInit,
-                );
-                await this.sendWebRTCSignal({
-                    type: AgentMeta.WebRTC.E_SignalType.AGENT_Answer,
-                    payload: answer,
-                    targetAgentId: signal.fromAgentId,
+                log({
+                    message:
+                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} Database test failed: ${error}`,
+                    type: 'error',
                 });
-                break;
             }
-            case AgentMeta.WebRTC.E_SignalType.AGENT_Answer:
-                await Agent_WebRTC.handleAnswer(
-                    connection.rtcConnection,
-                    signal.payload as RTCSessionDescriptionInit,
-                );
-                break;
-            case AgentMeta.WebRTC.E_SignalType.AGENT_ICE_Candidate:
-                await Agent_WebRTC.addIceCandidate(
-                    connection.rtcConnection,
-                    signal.payload as RTCIceCandidateInit,
-                );
-                break;
-            default:
-                console.error('Unknown signal type:', signal.type);
         }
-    }
+    };
 }
 
 // Set up reactions
