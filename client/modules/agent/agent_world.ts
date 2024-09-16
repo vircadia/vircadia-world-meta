@@ -151,10 +151,14 @@ export class Agent_World {
                 ).presenceState();
                 console.log('Agent presence state:', state);
                 // Handle agent presence state
+                Object.keys(state).forEach((agentId) => {
+                    Agent_Peer.updateAgentPosition(agentId);
+                });
             })
             .on('presence', { event: 'join' }, ({ key, newPresences }) => {
                 console.log('Agent joined:', key, newPresences);
                 // Handle agent join
+                Agent_Peer.updateAgentPosition(key);
             })
             .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
                 console.log('Agent left:', key, leftPresences);
@@ -334,6 +338,39 @@ class Agent_Peer {
             });
         }
     };
+
+    static updateAgentPosition(agentId: string): void {
+        const world = Agent_Store.world;
+        if (!world || !world.audioContext) {
+            return;
+        }
+
+        const connection = world.agentPeerConnections[agentId];
+        if (
+            !connection || !connection.incomingAudioMediaPanner ||
+            !connection.presence
+        ) {
+            return;
+        }
+
+        const agentPosition = connection.presence.position;
+        const agentOrientation = connection.presence.orientation;
+
+        Agent_Audio.updateAudioPosition(
+            connection.incomingAudioMediaPanner,
+            world.audioContext,
+            {
+                x: agentPosition.x - world.presence.position.x,
+                y: agentPosition.y - world.presence.position.y,
+                z: agentPosition.z - world.presence.position.z,
+            },
+            {
+                x: agentOrientation.x - world.presence.orientation.x,
+                y: agentOrientation.y - world.presence.orientation.y,
+                z: agentOrientation.z - world.presence.orientation.z,
+            },
+        );
+    }
 
     static async attachIncomingAudioMediaStream(data: {
         agentId: string;
@@ -560,35 +597,3 @@ reaction(
         }
     },
 );
-
-// TODO: This should be part of a watcher, so if an agent peer connection updates its presence and we have audio on it, we will update the audio panner and such locally so we can spatialize their audio.
-
-// static updateAgentAudioPosition(agentId: string): void {
-//     const world = Agent_Store.world;
-//     if (!world || !world.audioContext) {
-//         return;
-//     }
-
-//     const connection = world.agentPeerConnections[agentId];
-//     if (!connection || !connection.panner || !connection.presence) {
-//         return;
-//     }
-
-//     const agentPosition = connection.presence.position;
-//     const agentOrientation = connection.presence.orientation;
-
-//     Agent_Audio.updateAudioPosition(
-//         connection.panner,
-//         world.audioContext,
-//         {
-//             x: agentPosition.x - world.presence.position.x,
-//             y: agentPosition.y - world.presence.position.y,
-//             z: agentPosition.z - world.presence.position.z,
-//         },
-//         {
-//             x: agentOrientation.x - world.presence.orientation.x,
-//             y: agentOrientation.y - world.presence.orientation.y,
-//             z: agentOrientation.z - world.presence.orientation.z,
-//         },
-//     );
-// }
