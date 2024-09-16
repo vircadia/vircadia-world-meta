@@ -61,6 +61,14 @@ export namespace Primitive {
     }
 }
 
+export namespace Environment {
+    const ENVIRONMENT_PREFIX = "VIRCADIA_WORLD_"
+
+    export enum ENVIRONMENT_VARIABLE {
+        SERVER_DEBUG = `${ENVIRONMENT_PREFIX}SERVER_DEBUG`,
+    }
+}
+
 export namespace World {
     export interface I_CommonEntityProperties {
         vircadia: {
