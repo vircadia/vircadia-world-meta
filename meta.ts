@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
-
-import SupabaseClient from 'https://jsr.io/@supabase/supabase-js/2.45.3/src/SupabaseClient.ts';
+import { SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 import { z } from 'npm:zod';
 
 export namespace World {
@@ -253,37 +251,50 @@ export namespace World {
 }
 
 export namespace Agent {
-    export interface I_Module_Agent {
+    export namespace WebRTC {
+        export enum E_SignalType {
+            AGENT_Offer = 'agent-agent-offer-packet',
+            AGENT_Answer = 'agent-agent-answer-packet',
+            AGENT_ICE_Candidate = 'agent-agent-ice-candidate-packet',
+        }
     }
 
-    export interface I_Module_Agent_World {
+    export enum E_Realtime_Postgres_TableChannel {
+        WORLD_GLTF = 'world_gltf',
+        SCENES = 'scenes',
+        NODES = 'nodes',
+        MESHES = 'meshes',
+        MATERIALS = 'materials',
+        TEXTURES = 'textures',
+        IMAGES = 'images',
+        SAMPLERS = 'samplers',
+        ANIMATIONS = 'animations',
+        SKINS = 'skins',
+        CAMERAS = 'cameras',
+        BUFFERS = 'buffers',
+        BUFFER_VIEWS = 'buffer_views',
+        ACCESSORS = 'accessors',
     }
 
-    export interface I_Module_Agent_To_Agent {
+    export enum E_Realtime_BroadcastChannel {
     }
 
-    export interface I_Module_Agent_Audio {
+    export enum E_Realtime_PresenceChannel {
+        AGENT_PRESENCE = 'agent_presence',
     }
 
-    export interface I_Module_Agent_Store {
-    }
+    // export enum E_ChannelType {
+    //     AGENT_METADATA = 'agent_metadata',
+    //     SIGNALING_CHANNEL = 'signaling_channel',
+    //     WORLD_METADATA = 'world_metadata',
+    //     SCENE_DATA = 'scene_data',
+    // }
 
-    export enum E_ChannelEvent {
-        AGENT_JOINED = 'agent-joined',
-        AGENT_LEFT = 'agent-left',
-        AGENT_METADATA_UPDATED = 'agent-metadata-updated',
-    }
-
-    export enum E_SignalType {
-        AGENT_Offer = 'agent-agent-offer-packet',
-        AGENT_Answer = 'agent-agent-answer-packet',
-        AGENT_ICE_Candidate = 'agent-agent-ice-candidate-packet',
-    }
-
-    export enum E_ChannelType {
-        AGENT_METADATA = 'agent_metadata',
-        SIGNALING_CHANNEL = 'signaling_channel',
-    }
+    // export enum E_ChannelEvent {
+    //     AGENT_JOINED = 'agent-joined',
+    //     AGENT_LEFT = 'agent-left',
+    //     AGENT_PRESENCE_UPDATED = 'agent-presence-updated',
+    // }
 
     const MetadataSchema = z.object({
         agentId: z.string(),
@@ -324,11 +335,6 @@ export namespace Agent {
         }
     }
 
-    export enum E_WorldTransportChannel {
-        WORLD_METADATA = 'world_metadata',
-        SCENE_DATA = 'scene_data',
-    }
-
     export interface I_AgentPeerConnection {
         rtcConnection: RTCPeerConnection | null;
         rtcConnectionOffer: RTCSessionDescriptionInit | null;
@@ -336,8 +342,8 @@ export namespace Agent {
         rtcConnectionIceCandidate: RTCIceCandidateInit | null;
         rtcDataChannel: RTCDataChannel | null;
         incomingAudioMediaStream: MediaStream | null;
+        incomingAudioMediaPanner: PannerNode | null;
         presence: Agent.C_Metadata | null;
-        panner: PannerNode | null;
     }
 
     export interface I_AgentWorldConnection {
@@ -345,7 +351,6 @@ export namespace Agent {
         port: number;
         supabaseClient: SupabaseClient | null;
         agentPeerConnections: { [key: string]: I_AgentPeerConnection };
-        presenceUpdateInterval: ReturnType<typeof setInterval> | null;
         presence: Agent.C_Metadata;
         audioContext: AudioContext | null;
     }

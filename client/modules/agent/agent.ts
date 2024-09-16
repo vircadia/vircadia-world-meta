@@ -1,18 +1,7 @@
-/// <reference lib="dom" />
-
 import { reaction, runInAction } from 'npm:mobx';
 import { log } from '../../../general/modules/log.ts';
-import { Agent as AgentMeta } from '../../../meta.ts';
-import { Agent_Audio } from './agent_audio.ts';
 import { Agent_Store } from './agent_store.ts';
 import { Agent_World } from './agent_world.ts';
-
-export interface SharedState {
-    worldConnection: AgentMeta.I_AgentWorldConnection | null;
-    localAudioMediaStream: MediaStream | null;
-}
-
-// Removed local agentStore definition
 
 export class Agent {
     static readonly AGENT_LOG_PREFIX = '[AGENT]';
@@ -23,56 +12,47 @@ export class Agent {
         Agent_Store.iceServers = data.iceServers ?? [];
     }
 
-    static async initializeLocalAudioMediaStream(): Promise<void> {
-        try {
-            const localAudioMediaStream = await Agent_Audio
-                .createAudioMediaStream({});
-            runInAction(() => {
-                Agent_Store.localAudioMediaStream = localAudioMediaStream;
-            });
-            log({
-                message:
-                    `${Agent.AGENT_LOG_PREFIX} Local audio stream created.`,
-                type: 'info',
-            });
-        } catch (error) {
-            log({
-                message:
-                    `${Agent.AGENT_LOG_PREFIX} Error initializing local audio stream: ${error}`,
-                type: 'error',
-            });
-        }
+    static setLocalAudioMediaStream(localAudioMediaStream: MediaStream): void {
+        runInAction(() => {
+            Agent_Store.localAudioMediaStream = localAudioMediaStream;
+        });
     }
 
-    static updateAgentAudioPosition(agentId: string): void {
-        Agent_World.updateAgentAudioPosition(agentId);
-    }
+    static World = Agent_World;
 }
 
 // Set up reactions
 reaction(
-    () => Agent_Store.worldConnection,
+    () => Agent_Store.world,
     (worldConnection) => {
         if (worldConnection) {
-            console.log(
-                `Connected to world: ${worldConnection.host}:${worldConnection.port}`,
-            );
+            log({
+                message:
+                    `Connected to world: ${worldConnection.host}:${worldConnection.port}`,
+                type: 'info',
+            });
         } else {
-            console.log('Disconnected from world');
+            log({
+                message: 'Disconnected from world',
+                type: 'info',
+            });
         }
     },
 );
 
 reaction(
     () => {
-        const agentCount = Agent_Store.worldConnection
-            ? Object.keys(Agent_Store.worldConnection.agentPeerConnections)
+        const agentCount = Agent_Store.world
+            ? Object.keys(Agent_Store.world.agentPeerConnections)
                 .length
             : 0;
         return agentCount;
     },
     (agentCount) => {
-        console.log(`Agent count changed: ${agentCount}`);
+        log({
+            message: `Agent count changed: ${agentCount}`,
+            type: 'info',
+        });
     },
 );
 
@@ -80,9 +60,15 @@ reaction(
     () => Agent_Store.localAudioMediaStream,
     (stream) => {
         if (stream) {
-            console.log('Local audio media stream updated');
+            log({
+                message: 'Local audio media stream updated',
+                type: 'info',
+            });
         } else {
-            console.log('Local audio media stream removed');
+            log({
+                message: 'Local audio media stream removed',
+                type: 'info',
+            });
         }
     },
 );
