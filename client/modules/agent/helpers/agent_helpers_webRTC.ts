@@ -1,5 +1,5 @@
-import { log } from '../../../general/modules/log.ts';
-import { Agent as AgentMeta } from '../../../meta.ts';
+import { log } from '../../../../general/modules/log.ts';
+import { Agent as AgentMeta } from '../../../../meta.ts';
 import { Agent_Audio } from './agent_helpers_audio.ts';
 
 export namespace Agent_WebRTC {
@@ -55,84 +55,6 @@ export namespace Agent_WebRTC {
         await peerConnection.addIceCandidate(
             new RTCIceCandidate(candidate),
         );
-    };
-
-    export const sendWebRTCSignal = async (data: {
-        type: AgentMeta.E_SignalType;
-        payload:
-            | RTCSessionDescriptionInit
-            | RTCIceCandidateInit
-            | RTCIceCandidate;
-        targetAgentId: string;
-        world: AgentMeta.I_AgentWorldConnection;
-    }) => {
-        if (!data.world) return;
-
-        try {
-            await data.world.supabaseClient?.channel(
-                AgentMeta.E_ChannelType.SIGNALING_CHANNEL,
-            )
-                .send({
-                    type: 'broadcast',
-                    event: data.type,
-                    payload: data.payload,
-                });
-        } catch (error) {
-            log({
-                message:
-                    `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Error sending WebRTC signal: ${error}`,
-                type: 'error',
-            });
-        }
-    };
-
-    export const handleIncomingStream = async (data: {
-        agentId: string;
-        stream: MediaStream;
-        world: AgentMeta.I_AgentWorldConnection;
-    }) => {
-        if (!data.world) {
-            throw new Error('World not found');
-        }
-
-        const connection = data.world.agentPeerConnections[data.agentId];
-        if (!connection) {
-            throw new Error('Connection not found');
-        }
-
-        if (!data.world.audioContext) {
-            throw new Error('Audio context not found');
-        }
-
-        await Agent_Audio.resumeAudioContext(data.world.audioContext);
-        if (connection.incomingAudioMediaPanner) {
-            Agent_Audio.removeIncomingAudioStream(
-                connection.incomingAudioMediaPanner,
-            );
-            log({
-                message:
-                    `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Removed incoming audio stream for agent ${data.agentId} because a new stream was received and is being added now.`,
-                type: 'debug',
-            });
-        }
-        connection.incomingAudioMediaPanner = Agent_Audio
-            .addIncomingAudioStream({
-                audioContext: data.world.audioContext,
-                mediaStream: data.stream,
-                pannerOptions: {
-                    // TODO: Put this in a config
-                    panningModel: 'HRTF',
-                    distanceModel: 'inverse',
-                    refDistance: 1,
-                    maxDistance: 10000,
-                },
-            });
-
-        log({
-            message:
-                `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Set up incoming audio for agent ${data.agentId}`,
-            type: 'info',
-        });
     };
 
     export const handleDataChannelMessage = (

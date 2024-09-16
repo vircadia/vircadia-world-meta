@@ -1,4 +1,4 @@
-import { Primitive } from '../../../meta.ts';
+import { Primitive } from '../../../../meta.ts';
 
 export namespace Agent_Audio {
     export const AGENT_AUDIO_LOG_PREFIX = '[AGENT AUDIO]';

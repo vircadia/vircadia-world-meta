@@ -277,24 +277,12 @@ export namespace Agent {
     }
 
     export enum E_Realtime_BroadcastChannel {
+        AGENT_SIGNAL = 'agent_signal',
     }
 
     export enum E_Realtime_PresenceChannel {
         AGENT_PRESENCE = 'agent_presence',
     }
-
-    // export enum E_ChannelType {
-    //     AGENT_METADATA = 'agent_metadata',
-    //     SIGNALING_CHANNEL = 'signaling_channel',
-    //     WORLD_METADATA = 'world_metadata',
-    //     SCENE_DATA = 'scene_data',
-    // }
-
-    // export enum E_ChannelEvent {
-    //     AGENT_JOINED = 'agent-joined',
-    //     AGENT_LEFT = 'agent-left',
-    //     AGENT_PRESENCE_UPDATED = 'agent-presence-updated',
-    // }
 
     const MetadataSchema = z.object({
         agentId: z.string(),
