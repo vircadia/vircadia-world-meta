@@ -10,6 +10,8 @@ import { Agent_WebRTC } from './helpers/agent_helpers_webRTC.ts';
 export class Agent_World {
     static readonly AGENT_WORLD_LOG_PREFIX = '[AGENT_WORLD]';
 
+    static readonly worldConnected = () => Agent_Store.world !== null;
+
     static async connectToWorld(data: {
         host: string;
         port: number;
@@ -566,72 +568,6 @@ export class Agent_World {
                     break;
                 default:
                     console.error('Unknown signal type:', signal.type);
-            }
-        }
-    };
-
-    static Test = class {
-        static async databaseConnection() {
-            const world = Agent_Store.world;
-            if (!world || !world.supabaseClient) {
-                log({
-                    message:
-                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} No world connection or Supabase client available`,
-                    type: 'error',
-                });
-                return;
-            }
-
-            try {
-                // Insert a test record
-                const { data: insertData, error: insertError } = await world
-                    .supabaseClient
-                    .from('test_table')
-                    .insert({
-                        message: 'Test message',
-                        timestamp: new Date().toISOString(),
-                    })
-                    .select();
-
-                if (insertError) throw insertError;
-
-                log({
-                    message:
-                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} Inserted test record: ${
-                            JSON.stringify(insertData)
-                        }`,
-                    type: 'info',
-                });
-
-                // Retrieve the test record
-                const { data: retrieveData, error: retrieveError } = await world
-                    .supabaseClient
-                    .from('test_table')
-                    .select('*')
-                    .order('timestamp', { ascending: false })
-                    .limit(1);
-
-                if (retrieveError) throw retrieveError;
-
-                log({
-                    message:
-                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} Retrieved test record: ${
-                            JSON.stringify(retrieveData)
-                        }`,
-                    type: 'info',
-                });
-
-                log({
-                    message:
-                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} Database test completed successfully`,
-                    type: 'success',
-                });
-            } catch (error) {
-                log({
-                    message:
-                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} Database test failed: ${error}`,
-                    type: 'error',
-                });
             }
         }
     };

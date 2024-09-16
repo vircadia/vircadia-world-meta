@@ -1,4 +1,4 @@
-import { reaction, runInAction } from 'npm:mobx';
+import { runInAction, reaction } from 'npm:mobx';
 import { log } from '../../../general/modules/log.ts';
 import { Agent_Store } from './agent_store.ts';
 import { Agent_World } from './agent_world.ts';
@@ -19,6 +19,7 @@ export class Agent {
     }
 
     static World = Agent_World;
+    static Store = Agent_Store;
 }
 
 // Set up reactions
