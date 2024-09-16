@@ -1,6 +1,66 @@
 import { SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 import { z } from 'npm:zod';
 
+export namespace Primitive {
+    export const S_Vector3 = z.object({
+        x: z.number(),
+        y: z.number(),
+        z: z.number(),
+    });
+
+    export type I_Vector3 = z.infer<typeof S_Vector3>;
+
+    export class C_Vector3 {
+        public x: number;
+        public y: number;
+        public z: number;
+
+        constructor(_x?: number, _y?: number, _z?: number) {
+            this.x = _x ?? 0;
+            this.y = _y ?? 0;
+            this.z = _z ?? 0;
+        }
+
+        static parse(obj: {
+            x: number | any;
+            y: number | any;
+            z: number | any;
+        }): C_Vector3 {
+            const parsedData = S_Vector3.parse(obj);
+            return new C_Vector3(parsedData.x, parsedData.y, parsedData.z);
+        }
+    }
+
+    export const S_Color3 = z.object({
+        r: z.number(),
+        g: z.number(),
+        b: z.number(),
+    });
+
+    export type I_Color3 = z.infer<typeof S_Color3>;
+
+    export class C_Color3 {
+        public r: number;
+        public g: number;
+        public b: number;
+
+        constructor(_r?: number, _g?: number, _b?: number) {
+            this.r = _r ?? 0;
+            this.g = _g ?? 0;
+            this.b = _b ?? 0;
+        }
+
+        static parse(obj: {
+            r: number | any;
+            g: number | any;
+            b: number | any;
+        }): C_Color3 {
+            const parsedData = S_Color3.parse(obj);
+            return new C_Color3(parsedData.r, parsedData.g, parsedData.b);
+        }
+    }
+}
+
 export namespace World {
     export interface I_CommonEntityProperties {
         vircadia: {
@@ -361,65 +421,5 @@ export namespace Server {
     export interface I_REQUEST_ConfigAndStatusResponse {
         API_URL: string | null;
         S3_STORAGE_URL: string | null;
-    }
-}
-
-export namespace Primitive {
-    export const S_Vector3 = z.object({
-        x: z.number(),
-        y: z.number(),
-        z: z.number(),
-    });
-
-    export type I_Vector3 = z.infer<typeof S_Vector3>;
-
-    export class C_Vector3 {
-        public x: number;
-        public y: number;
-        public z: number;
-
-        constructor(_x?: number, _y?: number, _z?: number) {
-            this.x = _x ?? 0;
-            this.y = _y ?? 0;
-            this.z = _z ?? 0;
-        }
-
-        static parse(obj: {
-            x: number | any;
-            y: number | any;
-            z: number | any;
-        }): C_Vector3 {
-            const parsedData = S_Vector3.parse(obj);
-            return new C_Vector3(parsedData.x, parsedData.y, parsedData.z);
-        }
-    }
-
-    export const S_Color3 = z.object({
-        r: z.number(),
-        g: z.number(),
-        b: z.number(),
-    });
-
-    export type I_Color3 = z.infer<typeof S_Color3>;
-
-    export class C_Color3 {
-        public r: number;
-        public g: number;
-        public b: number;
-
-        constructor(_r?: number, _g?: number, _b?: number) {
-            this.r = _r ?? 0;
-            this.g = _g ?? 0;
-            this.b = _b ?? 0;
-        }
-
-        static parse(obj: {
-            r: number | any;
-            g: number | any;
-            b: number | any;
-        }): C_Color3 {
-            const parsedData = S_Color3.parse(obj);
-            return new C_Color3(parsedData.r, parsedData.g, parsedData.b);
-        }
     }
 }
