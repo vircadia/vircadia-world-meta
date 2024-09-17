@@ -101,6 +101,11 @@ export namespace Agent_WebRTC {
     export const deinitConnection = (
         connection: AgentMeta.I_AgentPeerConnection,
     ) => {
+        if (connection.incomingAudioMediaPanner) {
+            Agent_Audio.removeIncomingAudioStream(
+                connection.incomingAudioMediaPanner,
+            );
+        }
         if (connection.rtcDataChannel) {
             connection.rtcDataChannel.close();
         }
@@ -111,11 +116,6 @@ export namespace Agent_WebRTC {
         }
         if (connection.rtcConnection) {
             connection.rtcConnection.close();
-        }
-        if (connection.incomingAudioMediaPanner) {
-            Agent_Audio.removeIncomingAudioStream(
-                connection.incomingAudioMediaPanner,
-            );
         }
     };
 }

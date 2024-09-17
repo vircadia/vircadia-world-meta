@@ -19,71 +19,63 @@ export class Agent_World {
         agentId: string;
         capabilities: {
             useWebRTC: boolean;
+            useWebAudio: boolean;
         };
     }): Promise<void> {
         if (Agent_Store.world) {
-            log({
-                message:
-                    `${Agent_World.AGENT_WORLD_LOG_PREFIX} Already connected to a world`,
-                type: 'warn',
-            });
-            return;
+            throw new Error(`${Agent_World.AGENT_WORLD_LOG_PREFIX} Already connected to a world`);
         }
 
         Agent_Store.useWebRTC = data.capabilities.useWebRTC;
+        Agent_Store.useWebAudio = data.capabilities.useWebAudio;
 
+        let serverConfigAndStatus: Server.I_REQUEST_ConfigAndStatusResponse;
         try {
-            let serverConfigAndStatus: Server.I_REQUEST_ConfigAndStatusResponse;
-            try {
-                serverConfigAndStatus = await Agent_World
-                    .getStatus(data);
-            } catch (error) {
-                throw new Error(
-                    'Failed to get server status, is the server running?',
-                );
-            }
-
-            let supabaseClient: SupabaseClient | null = null;
-            try {
-                supabaseClient = Supabase.createClient(
-                    `${data.host}:${data.port}${serverConfigAndStatus.API_URL}`,
-                    data.key,
-                );
-            } catch (error) {
-                throw new Error(
-                    'Failed to initialize Supabase client, is the server running?',
-                );
-            }
-
-            runInAction(() => {
-                Agent_Store.world = {
+            serverConfigAndStatus = await Agent_World
+                .getStatus({
                     host: data.host,
                     port: data.port,
-                    supabaseClient,
-                    agentPeerConnections: {},
-                    presence: new AgentMeta.C_Metadata({
-                        agentId: data.agentId,
-                        position: new Primitive.C_Vector3(),
-                        orientation: new Primitive.C_Vector3(),
-                        onlineAt: new Date().toISOString(),
-                    }),
-                    audioContext: Agent_Audio.createAudioContext(),
-                };
-            });
-
-            if (Agent_Store.world) {
-                await Agent_World.subscribeToWorld();
-            } else {
-                throw new Error(
-                    'No world connection available, failed to create object in store.',
-                );
-            }
+                });
         } catch (error) {
-            log({
-                message:
-                    `${Agent_World.AGENT_WORLD_LOG_PREFIX} Failed to connect to world: ${error}`,
-                type: 'error',
-            });
+            throw new Error(
+                `Failed to get server status: ${error}`,
+            );
+        }
+
+        let supabaseClient: SupabaseClient | null = null;
+        try {
+            supabaseClient = Supabase.createClient(
+                `${data.host}:${data.port}${serverConfigAndStatus.API_URL}`,
+                data.key,
+            );
+        } catch (error) {
+            throw new Error(
+                `Failed to initialize Supabase client: ${error}`,
+            );
+        }
+
+        runInAction(() => {
+            Agent_Store.world = {
+                host: data.host,
+                port: data.port,
+                supabaseClient,
+                agentPeerConnections: {},
+                presence: new AgentMeta.C_Presence({
+                    agentId: data.agentId,
+                    position: new Primitive.C_Vector3(),
+                    orientation: new Primitive.C_Vector3(),
+                    lastUpdated: new Date().toISOString(),
+                }),
+                audioContext: Agent_Store.useWebAudio ? null : Agent_Audio.createAudioContext(),
+            };
+        });
+
+        if (Agent_Store.world) {
+            Agent_World.subscribeToWorld();
+        } else {
+            throw new Error(
+                'No world connection available, failed to create object in store.',
+            );
         }
 
         log({
@@ -96,10 +88,12 @@ export class Agent_World {
         const world = Agent_Store.world;
         if (world) {
             Object.keys(world.agentPeerConnections).forEach((agentId) => {
-                Agent_World.removeAgent(agentId);
+                Agent_World.Peer.removeAgent({
+                    agentId,
+                });
             });
             if (world.supabaseClient) {
-                await Supabase.destroyClient(world.supabaseClient);
+                world.supabaseClient = Supabase.destroyClient(world.supabaseClient);
             }
             if (world.audioContext) {
                 await Agent_Audio.destroyAudioContext(world.audioContext);
@@ -108,10 +102,7 @@ export class Agent_World {
                 Agent_Store.world = null;
             });
 
-            await Agent_World.Peer.deinitializePresence();
-            if (Agent_Store.useWebRTC) {
-                await Agent_World.Peer.deinitializeSignaling();
-            }
+            Agent_Store.world = null;
 
             log({
                 message:
@@ -148,169 +139,256 @@ export class Agent_World {
         // Subscribe to Presence
         supabase.channel(AgentMeta.E_Realtime_PresenceChannel.AGENT_PRESENCE)
             .on('presence', { event: 'sync' }, () => {
+                // FIXME: This probably won't work as-is, check it later.
                 const state = supabase.channel(
                     AgentMeta.E_Realtime_PresenceChannel.AGENT_PRESENCE,
                 ).presenceState();
-                console.log('Agent presence state:', state);
-                // Handle agent presence state
-                Object.keys(state).forEach((agentId) => {
-                    Agent_World.Peer.updateAgentPosition(agentId);
+                const currentTimestamp = new Date().toISOString();
+                Object.entries(state).forEach(([agentId, presenceData]) => {
+                    if (Agent_Store.world?.agentPeerConnections[agentId]) {
+                        const meta = presenceData.metas[0]; // Assuming we use the first meta entry
+                        Agent_Store.world.agentPeerConnections[agentId].presence = new AgentMeta.C_Presence({
+                            agentId,
+                            position: meta.position || new Primitive.C_Vector3(),
+                            orientation: meta.orientation || new Primitive.C_Vector3(),
+                            lastUpdated: currentTimestamp
+                        });
+                    }
                 });
+                console.log('Presence sync event data:', event);
+                console.log('Presence state updated at:', currentTimestamp);
             })
             .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-                console.log('Agent joined:', key, newPresences);
-                // Handle agent join
-                Agent_World.Peer.updateAgentPosition(key);
+                newPresences.forEach((presence) => {
+                    log({
+                        message: `${Agent_World.AGENT_WORLD_LOG_PREFIX} Agent joined: ${presence.agentId}`,
+                        type: 'info',
+                    });
+                    Agent_World.Peer.createAgent({
+                        agentId: presence.agentId,
+                    });
+                });
             })
             .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-                console.log('Agent left:', key, leftPresences);
-                // Handle agent leave
+                leftPresences.forEach((presence) => {
+                    log({
+                        message: `${Agent_World.AGENT_WORLD_LOG_PREFIX} Agent left: ${presence.agentId}`,
+                        type: 'info',
+                    });
+                    Agent_World.Peer.removeAgent({
+                        agentId: presence.agentId,
+                    });
+                });
             })
             .subscribe();
 
-        console.log('Subscribed to world channels');
+        console.log(`${Agent_World.AGENT_WORLD_LOG_PREFIX} Subscribed to world channels`);
     }
 
     private static async getStatus(
         data: { host: string; port: number },
     ): Promise<Server.I_REQUEST_ConfigAndStatusResponse> {
+        log({
+            message: `${Agent_World.AGENT_WORLD_LOG_PREFIX} Getting status ${data.host}:${data.port}`,
+            type: 'info',
+        });
         const response = await fetch(
             `${data.host}:${data.port}${Server.E_HTTPRequestPath.CONFIG_AND_STATUS}`,
         );
+        log({
+            message: `${Agent_World.AGENT_WORLD_LOG_PREFIX} Status response: ${response}`,
+            type: 'debug',
+        });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`${response.status}: ${response.statusText}`);
         }
         return await response.json();
     }
 
-    static createAgent(
-        agentId: string,
-        metadata: AgentMeta.C_Metadata,
-    ): void {
+    static updateAudioPanners(agentId?: string): void {
         const world = Agent_Store.world;
-        if (!world) {
-            return;
-        }
+        if (!world) return;
 
-        const connection: AgentMeta.I_AgentPeerConnection = {
-            rtcConnection: null,
-            rtcConnectionOffer: null,
-            rtcConnectionAnswer: null,
-            rtcConnectionIceCandidate: null,
-            rtcDataChannel: null,
-            incomingAudioMediaStream: null,
-            presence: metadata,
-            incomingAudioMediaPanner: null,
-        };
-
-        if (Agent_Store.useWebRTC) {
-            try {
-                Agent_World.Peer.establishWebRTCPeerConnection(agentId);
-            } catch (error) {
-                log({
-                    message:
-                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} Failed to establish WebRTC peer connection for agent ${agentId}: ${error}`,
-                    type: 'error',
-                });
+        if (agentId) {
+            // Update specific agent's audio panner
+            const connection = world.agentPeerConnections[agentId];
+            if (connection && connection.incomingAudioMediaPanner && connection.presence && world.audioContext) {
+                const agentPosition = connection.presence.position;
+                const agentOrientation = connection.presence.orientation;
+                Agent_Audio.updateAudioPannerPosition(
+                    connection.incomingAudioMediaPanner,
+                    world.audioContext,
+                    {
+                        x: agentPosition.x - world.presence.position.x,
+                        y: agentPosition.y - world.presence.position.y,
+                        z: agentPosition.z - world.presence.position.z,
+                    },
+                    {
+                        x: agentOrientation.x - world.presence.orientation.x,
+                        y: agentOrientation.y - world.presence.orientation.y,
+                        z: agentOrientation.z - world.presence.orientation.z,
+                    },
+                );
             }
+        } else {
+            // Update all agents' audio panners relative to the local agent
+            Object.keys(world.agentPeerConnections).forEach((id) => {
+                const connection = world.agentPeerConnections[id];
+                if (connection && connection.incomingAudioMediaPanner && connection.presence && world.audioContext) {
+                    const agentPosition = connection.presence.position;
+                    const agentOrientation = connection.presence.orientation;
+                    Agent_Audio.updateAudioPannerPosition(
+                        connection.incomingAudioMediaPanner,
+                        world.audioContext,
+                        {
+                            x: agentPosition.x - world.presence.position.x,
+                            y: agentPosition.y - world.presence.position.y,
+                            z: agentPosition.z - world.presence.position.z,
+                        },
+                        {
+                            x: agentOrientation.x - world.presence.orientation.x,
+                            y: agentOrientation.y - world.presence.orientation.y,
+                            z: agentOrientation.z - world.presence.orientation.z,
+                        },
+                    );
+                }
+            });
         }
-
-        runInAction(() => {
-            world.agentPeerConnections[agentId] = connection;
-        });
-
-        log({
-            message:
-                `${Agent_World.AGENT_WORLD_LOG_PREFIX} Created agent ${agentId}`,
-            type: 'info',
-        });
     }
 
-    static removeAgent(agentId: string): void {
+    static updateId(agentId: string): void {
         const world = Agent_Store.world;
-        if (!world) {
-            return;
-        }
-
-        const connection = world.agentPeerConnections[agentId];
-        if (connection) {
-            if (connection.rtcConnection) {
-                Agent_WebRTC.deinitConnection(connection);
-            }
+        if (world?.presence) {
             runInAction(() => {
-                delete world.agentPeerConnections[agentId];
+                world.presence.agentId = agentId;
             });
+            void this.pushPresence();
+        }
+    }
+
+    static updatePosition(data: {
+        newPosition: Primitive.C_Vector3;
+    }): void {
+        const world = Agent_Store.world;
+        if (world?.presence) {
+            runInAction(() => {
+                world.presence.position = data.newPosition;
+            });
+            void this.pushPresence();
+        }
+    }
+
+    static updateOrientation(data: {
+        newOrientation: Primitive.C_Vector3;
+    }): void {
+        const world = Agent_Store.world;
+        if (world?.presence) {
+            runInAction(() => {
+                world.presence.orientation = data.newOrientation;
+            });
+            void this.pushPresence();
+        }
+    }
+
+    private static async pushPresence(): Promise<void> {
+        const world = Agent_Store.world;
+        try {
+            if (world?.presence) {
+                await world.supabaseClient?.channel(
+                    AgentMeta.E_Realtime_PresenceChannel.AGENT_PRESENCE,
+                )?.send({
+                    type: 'presence',
+                    event: JSON.stringify(world.presence),
+                });
+            } else {
+                log({
+                    message:
+                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} No presence to push`,
+                    type: 'warn',
+                });
+            }
+        } catch (error) {
             log({
                 message:
-                    `${Agent_World.AGENT_WORLD_LOG_PREFIX} Removed agent ${agentId}`,
+                    `${Agent_World.AGENT_WORLD_LOG_PREFIX} Failed to push presence: ${error}`,
+                type: 'error',
+            });
+        }
+    }
+
+    static Peer = class {
+        static createAgent(data: {
+            agentId: string;
+            presence?: AgentMeta.C_Presence;
+        }): void {
+            const world = Agent_Store.world;
+            if (!world) {
+                return;
+            }
+    
+            const connection: AgentMeta.I_AgentPeerConnection = {
+                rtcConnection: null,
+                rtcConnectionOffer: null,
+                rtcConnectionAnswer: null,
+                rtcConnectionIceCandidate: null,
+                rtcDataChannel: null,
+                incomingAudioMediaStream: null,
+                presence: data.presence ?? new AgentMeta.C_Presence({
+                    agentId: data.agentId,
+                    position: new Primitive.C_Vector3(),
+                    orientation: new Primitive.C_Vector3(),
+                    lastUpdated: new Date().toISOString(),
+                }),
+                incomingAudioMediaPanner: null,
+            };
+    
+            if (Agent_Store.useWebRTC) {
+                try {
+                    Agent_World.Peer.establishWebRTCPeerConnection(data.agentId);
+                } catch (error) {
+                    log({
+                        message:
+                            `${Agent_World.AGENT_WORLD_LOG_PREFIX} Failed to establish WebRTC peer connection for agent ${data.agentId}: ${error}`,
+                        type: 'error',
+                    });
+                }
+            }
+    
+            runInAction(() => {
+                world.agentPeerConnections[data.agentId] = connection;
+            });
+    
+            log({
+                message:
+                    `${Agent_World.AGENT_WORLD_LOG_PREFIX} Created agent ${data.agentId}`,
                 type: 'info',
             });
         }
-    }
-
-    static Self = class {
-        static updateId(agentId: string): void {
-            const world = Agent_Store.world;
-            if (world?.presence) {
-                runInAction(() => {
-                    world.presence.agentId = agentId;
-                });
-                void this.pushPresence();
-            }
-        }
-
-        static updatePosition(data: {
-            newPosition: Primitive.C_Vector3;
+    
+        static removeAgent(data: {
+            agentId: string;
         }): void {
             const world = Agent_Store.world;
-            if (world?.presence) {
-                runInAction(() => {
-                    world.presence.position = data.newPosition;
-                });
-                void this.pushPresence();
+            if (!world) {
+                return;
             }
-        }
-
-        static updateOrientation(data: {
-            newOrientation: Primitive.C_Vector3;
-        }): void {
-            const world = Agent_Store.world;
-            if (world?.presence) {
-                runInAction(() => {
-                    world.presence.orientation = data.newOrientation;
-                });
-                void this.pushPresence();
-            }
-        }
-
-        private static async pushPresence(): Promise<void> {
-            const world = Agent_Store.world;
-            try {
-                if (world?.presence) {
-                    await world.supabaseClient?.channel(
-                        AgentMeta.E_Realtime_PresenceChannel.AGENT_PRESENCE,
-                    )?.send({
-                        type: 'presence',
-                        event: JSON.stringify(world.presence),
-                    });
-                } else {
-                    log({
-                        message:
-                            `${Agent_World.AGENT_WORLD_LOG_PREFIX} No presence to push`,
-                        type: 'warn',
-                    });
+    
+            const connection = world.agentPeerConnections[data.agentId];
+            if (connection) {
+                if (connection.rtcConnection) {
+                    Agent_WebRTC.deinitConnection(connection);
                 }
-            } catch (error) {
+                runInAction(() => {
+                    delete world.agentPeerConnections[data.agentId];
+                });
                 log({
                     message:
-                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} Failed to push presence: ${error}`,
-                    type: 'error',
+                        `${Agent_World.AGENT_WORLD_LOG_PREFIX} Removed agent ${data.agentId}`,
+                    type: 'info',
                 });
             }
         }
-    };
 
-    static Peer = class {
         static sendWebRTCSignal = async (data: {
             type: AgentMeta.WebRTC.E_SignalType;
             payload:
@@ -340,7 +418,11 @@ export class Agent_World {
             }
         };
 
-        static updateAgentPosition(agentId: string): void {
+        static updateAudioPosition(agentId: string): void {
+            if (!Agent_Store.useWebAudio) {
+                return;
+            }
+
             const world = Agent_Store.world;
             if (!world || !world.audioContext) {
                 return;
@@ -357,7 +439,8 @@ export class Agent_World {
             const agentPosition = connection.presence.position;
             const agentOrientation = connection.presence.orientation;
 
-            Agent_Audio.updateAudioPosition(
+
+            Agent_Audio.updateAudioPannerPosition(
                 connection.incomingAudioMediaPanner,
                 world.audioContext,
                 {
@@ -411,13 +494,7 @@ export class Agent_World {
                 .addIncomingAudioStream({
                     audioContext: world.audioContext,
                     mediaStream: data.stream,
-                    pannerOptions: {
-                        // TODO: Put this in a config
-                        panningModel: 'HRTF',
-                        distanceModel: 'inverse',
-                        refDistance: 1,
-                        maxDistance: 10000,
-                    },
+                    pannerOptions: AgentMeta.Audio.DEFAULT_PANNER_OPTIONS,
                 });
 
             log({
@@ -425,28 +502,6 @@ export class Agent_World {
                     `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Set up incoming audio for agent ${data.agentId}`,
                 type: 'info',
             });
-        }
-
-        static async initializePresence(supabaseClient: SupabaseClient) {
-            // Placeholder for initializing presence
-        }
-
-        static async initializeSignaling(supabaseClient: SupabaseClient) {
-            // Placeholder for initializing signaling
-        }
-
-        static async SetupReceiveUpdateIntervals(
-            supabaseClient: SupabaseClient,
-        ) {
-            // Placeholder for setting up receive update intervals
-        }
-
-        static async deinitializePresence() {
-            // Placeholder for deinitializing presence
-        }
-
-        static async deinitializeSignaling() {
-            // Placeholder for deinitializing signaling
         }
 
         static establishWebRTCPeerConnection(agentId: string): void {
@@ -573,40 +628,50 @@ export class Agent_World {
     };
 }
 
-// Set up reactions
 reaction(
-    () => Agent_Store.world,
-    (world) => {
-        if (world) {
-            console.log(
-                `Connected to world: ${world.host}:${world.port}`,
-            );
-        } else {
-            console.log('Disconnected from world');
-        }
+    () => Agent_Store.world?.presence.position,
+    (position) => {
+        Agent_World.updateAudioPanners();
+        console.log(`Local agent position updated: ${position}`);
+    },
+);
+
+reaction(
+    () => Agent_Store.world?.presence.orientation,
+    (orientation) => {
+        Agent_World.updateAudioPanners();
+        console.log(`Local agent orientation updated: ${orientation}`);
     },
 );
 
 reaction(
     () => {
-        const agentCount = Agent_Store.world
-            ? Object.keys(Agent_Store.world.agentPeerConnections)
-                .length
-            : 0;
-        return agentCount;
+        const world = Agent_Store.world;
+        return world ? Object.values(world.agentPeerConnections).map(conn => conn.presence?.position) : [];
     },
-    (agentCount) => {
-        console.log(`Agent count changed: ${agentCount}`);
+    (positions) => {
+        positions.forEach((position, index) => {
+            if (position) {
+                const agentId = Object.keys(Agent_Store.world!.agentPeerConnections)[index];
+                Agent_World.updateAudioPanners(agentId);
+                console.log(`Peer agent ${agentId} position updated: ${position}`);
+            }
+        });
     },
 );
 
 reaction(
-    () => Agent_Store.localAudioMediaStream,
-    (stream) => {
-        if (stream) {
-            console.log('Local audio media stream updated');
-        } else {
-            console.log('Local audio media stream removed');
-        }
+    () => {
+        const world = Agent_Store.world;
+        return world ? Object.values(world.agentPeerConnections).map(conn => conn.presence?.orientation) : [];
+    },
+    (orientations) => {
+        orientations.forEach((orientation, index) => {
+            if (orientation) {
+                const agentId = Object.keys(Agent_Store.world!.agentPeerConnections)[index];
+                Agent_World.updateAudioPanners(agentId);
+                console.log(`Peer agent ${agentId} orientation updated: ${orientation}`);
+            }
+        });
     },
 );

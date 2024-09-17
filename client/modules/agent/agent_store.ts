@@ -6,6 +6,7 @@ class agentStore {
     localAudioMediaStream: MediaStream | null = null;
     agentId: string | null = null;
     useWebRTC: boolean = false;
+    useWebAudio: boolean = false;
     iceServers: RTCIceServer[] = [];
 
     constructor() {

@@ -327,6 +327,15 @@ export namespace Agent {
         }
     }
 
+    export namespace Audio {
+        export const DEFAULT_PANNER_OPTIONS: PannerOptions = {
+            panningModel: 'HRTF',
+            distanceModel: 'inverse',
+            refDistance: 1,
+            maxDistance: 10000,
+        };
+    }
+
     export enum E_Realtime_Postgres_TableChannel {
         WORLD_GLTF = 'world_gltf',
         SCENES = 'scenes',
@@ -356,14 +365,14 @@ export namespace Agent {
         agentId: z.string(),
         position: Primitive.S_Vector3,
         orientation: Primitive.S_Vector3,
-        onlineAt: z.string(),
+        lastUpdated: z.string(),
     });
 
-    export class C_Metadata {
+    export class C_Presence {
         agentId: string;
         position: Primitive.C_Vector3;
         orientation: Primitive.C_Vector3;
-        onlineAt: string;
+        lastUpdated: string;
 
         constructor(data: z.infer<typeof MetadataSchema>) {
             this.agentId = data.agentId;
@@ -377,17 +386,17 @@ export namespace Agent {
                 data.orientation.y,
                 data.orientation.z,
             );
-            this.onlineAt = data.onlineAt;
+            this.lastUpdated = data.lastUpdated;
         }
 
         static parse(obj: {
             agentId: string | any;
             position: { x: number; y: number; z: number } | any;
             orientation: { x: number; y: number; z: number } | any;
-            onlineAt: string | any;
-        }): C_Metadata {
+            lastUpdated: string | any;
+        }): C_Presence {
             const parsedData = MetadataSchema.parse(obj);
-            return new C_Metadata(parsedData);
+            return new C_Presence(parsedData);
         }
     }
 
@@ -399,7 +408,7 @@ export namespace Agent {
         rtcDataChannel: RTCDataChannel | null;
         incomingAudioMediaStream: MediaStream | null;
         incomingAudioMediaPanner: PannerNode | null;
-        presence: Agent.C_Metadata | null;
+        presence: Agent.C_Presence | null;
     }
 
     export interface I_AgentWorldConnection {
@@ -407,7 +416,7 @@ export namespace Agent {
         port: number;
         supabaseClient: SupabaseClient | null;
         agentPeerConnections: { [key: string]: I_AgentPeerConnection };
-        presence: Agent.C_Metadata;
+        presence: Agent.C_Presence;
         audioContext: AudioContext | null;
     }
 }

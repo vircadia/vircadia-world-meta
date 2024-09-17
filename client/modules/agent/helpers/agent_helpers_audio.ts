@@ -48,7 +48,7 @@ export namespace Agent_Audio {
         return mediaStream;
     };
 
-    export const updateAudioPosition = (
+    export const updateAudioPannerPosition = (
         panner: PannerNode,
         audioContext: AudioContext,
         position: Primitive.I_Vector3,
