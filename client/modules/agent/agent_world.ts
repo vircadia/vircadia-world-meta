@@ -53,7 +53,7 @@ export class Agent_World {
         let supabaseClient: SupabaseClient | null = null;
         try {
             supabaseClient = Supabase.createClient(
-                `${data.host}:${data.port}${serverConfigAndStatus.API_URL}`,
+                `${serverConfigAndStatus.API_URL}`,
                 data.key,
             );
         } catch (error) {
