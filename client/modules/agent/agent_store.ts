@@ -7,6 +7,7 @@ class agentStore {
     agentId: string | null = null;
     useWebRTC: boolean = false;
     useWebAudio: boolean = false;
+    debugMode: boolean = false;
     iceServers: RTCIceServer[] = [];
 
     constructor() {

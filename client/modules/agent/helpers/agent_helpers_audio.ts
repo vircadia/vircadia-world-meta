@@ -22,7 +22,9 @@ export namespace Agent_Audio {
         return panner;
     };
 
-    export const createAudioContext = (): AudioContext => new AudioContext();
+    export const createAudioContext = (): AudioContext => {
+        return new AudioContext();
+    };
 
     export const resumeAudioContext = async (
         audioContext: AudioContext,

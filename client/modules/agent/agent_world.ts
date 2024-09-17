@@ -10,7 +10,15 @@ import { Agent_WebRTC } from './helpers/agent_helpers_webRTC.ts';
 export class Agent_World {
     static readonly AGENT_WORLD_LOG_PREFIX = '[AGENT_WORLD]';
 
-    static readonly worldConnected = () => Agent_Store.world !== null;
+    static readonly connected = () => Agent_Store.world !== null;
+    static readonly databaseConnected = () => {
+        return Agent_Store.world?.supabaseClient && Agent_Store.world.supabaseClient.getChannels().length > 0;
+    }
+    static readonly realtimeConnected = () => {
+        return Agent_Store.world?.supabaseClient?.realtime.connectionState() === 'open';
+    }
+    static readonly host = () => Agent_Store.world?.host;
+    static readonly port = () => Agent_Store.world?.port;
 
     static async connectToWorld(data: {
         host: string;
@@ -66,7 +74,7 @@ export class Agent_World {
                     orientation: new Primitive.C_Vector3(),
                     lastUpdated: new Date().toISOString(),
                 }),
-                audioContext: Agent_Store.useWebAudio ? null : Agent_Audio.createAudioContext(),
+                audioContext: Agent_Store.useWebAudio ? Agent_Audio.createAudioContext() : null,
             };
         });
 
@@ -133,6 +141,12 @@ export class Agent_World {
                         },
                     )
                     .subscribe();
+
+                log({
+                    message: `${Agent_World.AGENT_WORLD_LOG_PREFIX} Subscribed to ${table} channel`,
+                    type: 'debug',
+                    debug: Agent_Store.debugMode
+                });
             },
         );
 
@@ -146,6 +160,7 @@ export class Agent_World {
                 const currentTimestamp = new Date().toISOString();
                 Object.entries(state).forEach(([agentId, presenceData]) => {
                     if (Agent_Store.world?.agentPeerConnections[agentId]) {
+                        // @ts-ignore
                         const meta = presenceData.metas[0]; // Assuming we use the first meta entry
                         Agent_Store.world.agentPeerConnections[agentId].presence = new AgentMeta.C_Presence({
                             agentId,
@@ -182,7 +197,11 @@ export class Agent_World {
             })
             .subscribe();
 
-        console.log(`${Agent_World.AGENT_WORLD_LOG_PREFIX} Subscribed to world channels`);
+        log({
+            message: `${Agent_World.AGENT_WORLD_LOG_PREFIX} Subscribed to realtime presence channel`,
+            type: 'debug',
+            debug: Agent_Store.debugMode
+        });
     }
 
     private static async getStatus(

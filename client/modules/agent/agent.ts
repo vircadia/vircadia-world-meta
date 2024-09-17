@@ -8,8 +8,12 @@ export class Agent {
 
     static initialize(data: {
         iceServers?: RTCIceServer[];
+        debugMode?: boolean;
     }) {
-        Agent_Store.iceServers = data.iceServers ?? [];
+        runInAction(() => {
+            Agent_Store.iceServers = data.iceServers ?? [];
+            Agent_Store.debugMode = data.debugMode ?? false;
+        });
     }
 
     static setLocalAudioMediaStream(localAudioMediaStream: MediaStream): void {
