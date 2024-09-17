@@ -422,21 +422,12 @@ export namespace Agent {
 }
 
 export namespace Server {
-    export enum E_HTTPRoute {
-        API = '/api',
-        GRAPHQL = '/graphql',
-        STORAGE = '/storage',
-        STUDIO = '/studio',
-        INBUCKET = '/inbucket',
-        DB = '/db',
-    }
-
     export enum E_HTTPRequestPath {
         CONFIG_AND_STATUS = '/config-and-status',
     }
 
     export interface I_REQUEST_ConfigAndStatusResponse {
         API_URL: string | null;
-        S3_STORAGE_URL: string | null;
+        STORAGE_URL: string | null;
     }
 }
