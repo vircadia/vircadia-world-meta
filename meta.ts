@@ -453,9 +453,6 @@ export namespace Server {
         GENERAL = 'general',
     }
 
-    export enum E_ProxyEndpoint {
-    }
-
     export interface I_REQUEST_ConfigAndStatusResponse {
         API_URL: string | null;
         STORAGE_URL: string | null;

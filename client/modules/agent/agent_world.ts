@@ -56,6 +56,10 @@ export class Agent_World {
 
         let supabaseClient: SupabaseClient | null = null;
         try {
+            if (!serverConfigAndStatus.API_URL) {
+                throw new Error('No API URL found');
+            }
+
             supabaseClient = Supabase.createClient({
                 url: serverConfigAndStatus.API_URL,
                 key: data.key,
