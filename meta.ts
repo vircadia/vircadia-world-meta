@@ -438,16 +438,22 @@ export namespace Agent {
 }
 
 export namespace Server {
-    export enum E_HTTPRequestPath {
-        CONFIG_AND_STATUS = '/config-and-status',
+    export const GENERAL_ENDPOINT_BASE = '/api/v1';
+
+    export enum E_GeneralEndpoint {
+        CONFIG_AND_STATUS = `${GENERAL_ENDPOINT_BASE}/config-and-status`,
+    }
+
+    export enum E_ProxySubdomain {
+        SUPABASE_API = 'supabase-api',
+        SUPABASE_STORAGE = 'supabase-storage',
+        SUPABASE_GRAPHQL = 'supabase-graphql',
+        SUPABASE_INBUCKET = 'supabase-inbucket',
+        SUPABASE_STUDIO = 'supabase-studio',
+        GENERAL = 'general',
     }
 
     export enum E_ProxyEndpoint {
-        SUPABASE_API = '/supabase/api',
-        SUPABASE_STORAGE = '/supabase/storage',
-        SUPABASE_GRAPHQL = '/supabase/graphql',
-        SUPABASE_INBUCKET = '/supabase/inbucket',
-        SUPABASE_STUDIO = '/supabase/studio',
     }
 
     export interface I_REQUEST_ConfigAndStatusResponse {
