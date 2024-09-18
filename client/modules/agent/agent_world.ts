@@ -52,10 +52,10 @@ export class Agent_World {
 
         let supabaseClient: SupabaseClient | null = null;
         try {
-            supabaseClient = Supabase.createClient(
-                `${serverConfigAndStatus.API_URL}`,
-                data.key,
-            );
+            supabaseClient = Supabase.createClient({
+                url: serverConfigAndStatus.API_URL,
+                key: data.key,
+            });
         } catch (error) {
             throw new Error(
                 `Failed to initialize Supabase client: ${error}`,

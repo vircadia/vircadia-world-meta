@@ -1,5 +1,5 @@
-import { makeAutoObservable } from 'npm:mobx';
-import { Agent as AgentMeta } from '../../../meta.ts';
+import { makeAutoObservable } from "npm:mobx";
+import { Agent as AgentMeta } from "../../../meta.ts";
 
 class agentStore {
     world: AgentMeta.I_AgentWorldConnection | null = null;
