@@ -442,6 +442,14 @@ export namespace Server {
         CONFIG_AND_STATUS = '/config-and-status',
     }
 
+    export enum E_ProxyEndpoint {
+        SUPABASE_API = '/supabase/api',
+        SUPABASE_STORAGE = '/supabase/storage',
+        SUPABASE_GRAPHQL = '/supabase/graphql',
+        SUPABASE_INBUCKET = '/supabase/inbucket',
+        SUPABASE_STUDIO = '/supabase/studio',
+    }
+
     export interface I_REQUEST_ConfigAndStatusResponse {
         API_URL: string | null;
         STORAGE_URL: string | null;
