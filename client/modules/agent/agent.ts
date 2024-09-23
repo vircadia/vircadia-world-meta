@@ -1,7 +1,7 @@
 import { runInAction, reaction } from 'npm:mobx';
 import { log } from '../../../general/modules/log.ts';
-import { Agent_Store } from './agent_store.ts';
-import { Agent_World } from './agent_world.ts';
+import { Agent_Store } from './store.ts';
+import { Agent_World } from './world.ts';
 
 export class Agent {
     static readonly AGENT_LOG_PREFIX = '[AGENT]';
