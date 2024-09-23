@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'npm:mobx';
+import { makeAutoObservable } from 'mobx';
 import { Agent as AgentMeta } from '../../../meta.ts';
 
 class agentStore {

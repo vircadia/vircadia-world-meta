@@ -1,4 +1,4 @@
-import { log as colorLog } from 'npm:console-log-colors';
+import EC from 'eight-colors';
 
 export function log(data: {
     message: string,
@@ -6,27 +6,31 @@ export function log(data: {
     debug?: boolean,
 }): void {
     if (!data.type) {
-        data.type = 'info';
+        console.log(data.message);
+        return;
     }
 
     switch (data.type) {
         case 'debug':
             if (data.debug) {
-                colorLog.blue('ℹ', data.message);
+                console.debug(EC.blue(`ℹ ${data.message}`));
             }
             break;
         case 'info':
-            colorLog.blue('ℹ', data.message);
+            console.info(EC.blue(`ℹ ${data.message}`));
             break;
         case 'success':
-            colorLog.green('✔', data.message);
+            console.log(EC.green(`✔ ${data.message}`));
             break;
         case 'error':
-            colorLog.red('✖', data.message);
+            console.error(EC.red(`✖ ${data.message}`));
             break;
         case 'warn':
         case 'warning':
-            colorLog.yellow('⚠', data.message);
+            console.warn(EC.yellow(`⚠ ${data.message}`));
+            break;
+        default:
+            console.info(EC.white(`? ${data.message}`));
             break;
     }
 }

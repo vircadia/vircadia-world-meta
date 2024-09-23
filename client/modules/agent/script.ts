@@ -1,4 +1,4 @@
-import { transpile } from 'npm:typescript';
+import { transpile } from 'typescript';
 import { log } from '../../../general/modules/log.ts';
 
 export class Agent_Script {
@@ -6,14 +6,14 @@ export class Agent_Script {
 
     private static transpile(script: string): string {
         log({
-            message: `${Script.scriptLogPrefix} Transpiling script: ${script}`,
+            message: `${Agent_Script.scriptLogPrefix} Transpiling script: ${script}`,
             type: 'info',
         });
 
         const transpiledScript: string = (transpile as (input: string) => string)(script);
 
         log({
-            message: `${Script.scriptLogPrefix} Transpiled script: ${transpiledScript}`,
+            message: `${Agent_Script.scriptLogPrefix} Transpiled script: ${transpiledScript}`,
             type: 'info',
         });
 
@@ -36,7 +36,7 @@ export class Agent_Script {
         const wrappedAndTranspiledScript = this.wrapAndTranspile(script, contextKeys);
 
         log({
-            message: `${Script.scriptLogPrefix} Executing script with context: ${wrappedAndTranspiledScript}`,
+            message: `${Agent_Script.scriptLogPrefix} Executing script with context: ${wrappedAndTranspiledScript}`,
             type: 'info',
         });
 
@@ -45,3 +45,5 @@ export class Agent_Script {
         return scriptFunction(...Object.values(context) as unknown[]);
     }
 }
+
+export default Agent_Script;

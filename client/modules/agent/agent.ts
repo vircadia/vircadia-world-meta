@@ -1,4 +1,4 @@
-import { runInAction, reaction } from 'npm:mobx';
+import { runInAction, reaction } from 'mobx';
 import { log } from '../../../general/modules/log.ts';
 import { Agent_Store } from './store.ts';
 import { Agent_World } from './world.ts';

@@ -1,5 +1,5 @@
-import { SupabaseClient } from 'jsr:@supabase/supabase-js@2';
-import { reaction, runInAction } from 'npm:mobx';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { reaction, runInAction } from 'mobx';
 import { log } from '../../../general/modules/log.ts';
 import { Agent as AgentMeta, Primitive, Server } from '../../../meta.ts';
 import { Supabase } from '../supabase/supabase.ts';
