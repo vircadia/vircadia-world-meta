@@ -1,4 +1,4 @@
-import { Agent_Script } from './script.ts';
+import { Script } from './script.ts';
 
 Deno.test('Script execution with context', () => {
     const player = {

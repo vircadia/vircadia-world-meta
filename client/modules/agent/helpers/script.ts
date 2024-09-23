@@ -1,19 +1,19 @@
 import { transpile } from 'typescript';
-import { log } from '../../../general/modules/log.ts';
+import { log } from '../../../../general/modules/log.ts';
 
-export class Agent_Script {
+export class Script {
     static readonly scriptLogPrefix = '[SCRIPT]';
 
     private static transpile(script: string): string {
         log({
-            message: `${Agent_Script.scriptLogPrefix} Transpiling script: ${script}`,
+            message: `${Script.scriptLogPrefix} Transpiling script: ${script}`,
             type: 'info',
         });
 
         const transpiledScript: string = (transpile as (input: string) => string)(script);
 
         log({
-            message: `${Agent_Script.scriptLogPrefix} Transpiled script: ${transpiledScript}`,
+            message: `${Script.scriptLogPrefix} Transpiled script: ${transpiledScript}`,
             type: 'info',
         });
 
@@ -36,7 +36,7 @@ export class Agent_Script {
         const wrappedAndTranspiledScript = this.wrapAndTranspile(script, contextKeys);
 
         log({
-            message: `${Agent_Script.scriptLogPrefix} Executing script with context: ${wrappedAndTranspiledScript}`,
+            message: `${Script.scriptLogPrefix} Executing script with context: ${wrappedAndTranspiledScript}`,
             type: 'info',
         });
 
@@ -46,4 +46,4 @@ export class Agent_Script {
     }
 }
 
-export default Agent_Script;
+export default Script;

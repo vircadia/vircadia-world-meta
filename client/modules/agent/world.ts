@@ -4,8 +4,8 @@ import { log } from '../../../general/modules/log.ts';
 import { Agent as AgentMeta, Primitive, Server } from '../../../meta.ts';
 import { Supabase } from '../supabase/supabase.ts';
 import { Agent_Store } from './store.ts';
-import { Agent_Audio } from './helpers/audio.ts';
-import { Agent_WebRTC } from './helpers/webRTC.ts';
+import { Audio } from './helpers/audio.ts';
+import { WebRTC } from './helpers/webrtc.ts';
 
 export class Agent_World {
     static readonly AGENT_WORLD_LOG_PREFIX = '[AGENT_WORLD]';
@@ -40,13 +40,13 @@ export class Agent_World {
 
         if (data.iceServers) {
             runInAction(() => {
-                Agent_Store.iceServers = data.iceServers;
+                Agent_Store.iceServers = data.iceServers ?? [];
             });
         }
 
         if (data.debugMode) {
             runInAction(() => {
-                Agent_Store.debugMode = data.debugMode;
+                Agent_Store.debugMode = data.debugMode ?? false;
             });
         }
 
@@ -95,7 +95,7 @@ export class Agent_World {
                     lastUpdated: new Date().toISOString(),
                 }),
                 audioContext: Agent_Store.useWebAudio
-                    ? Agent_Audio.createAudioContext()
+                    ? Audio.createAudioContext()
                     : null,
             };
         });
@@ -128,7 +128,7 @@ export class Agent_World {
                 );
             }
             if (world.audioContext) {
-                await Agent_Audio.destroyAudioContext(world.audioContext);
+                await Audio.destroyAudioContext(world.audioContext);
             }
             runInAction(() => {
                 Agent_Store.world = null;
@@ -270,7 +270,7 @@ export class Agent_World {
             ) {
                 const agentPosition = connection.presence.position;
                 const agentOrientation = connection.presence.orientation;
-                Agent_Audio.updateAudioPannerPosition(
+                Audio.updateAudioPannerPosition(
                     connection.incomingAudioMediaPanner,
                     world.audioContext,
                     {
@@ -295,7 +295,7 @@ export class Agent_World {
                 ) {
                     const agentPosition = connection.presence.position;
                     const agentOrientation = connection.presence.orientation;
-                    Agent_Audio.updateAudioPannerPosition(
+                    Audio.updateAudioPannerPosition(
                         connection.incomingAudioMediaPanner,
                         world.audioContext,
                         {
@@ -445,7 +445,7 @@ export class Agent_World {
             const connection = world.agentPeerConnections[data.agentId];
             if (connection) {
                 if (connection.rtcConnection) {
-                    Agent_WebRTC.deinitConnection(connection);
+                    WebRTC.deinitConnection(connection);
                 }
                 runInAction(() => {
                     delete world.agentPeerConnections[data.agentId];
@@ -483,7 +483,7 @@ export class Agent_World {
             } catch (error) {
                 log({
                     message:
-                        `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Error sending WebRTC signal: ${error}`,
+                        `${WebRTC.AGENT_WEBRTC_LOG_PREFIX} Error sending WebRTC signal: ${error}`,
                     type: 'error',
                 });
             }
@@ -510,7 +510,7 @@ export class Agent_World {
             const agentPosition = connection.presence.position;
             const agentOrientation = connection.presence.orientation;
 
-            Agent_Audio.updateAudioPannerPosition(
+            Audio.updateAudioPannerPosition(
                 connection.incomingAudioMediaPanner,
                 world.audioContext,
                 {
@@ -547,20 +547,20 @@ export class Agent_World {
             }
 
             if (world.audioContext.state === 'suspended') {
-                await Agent_Audio.resumeAudioContext(world.audioContext);
+                await Audio.resumeAudioContext(world.audioContext);
             }
 
             if (connection.incomingAudioMediaPanner) {
-                Agent_Audio.removeIncomingAudioStream(
+                Audio.removeIncomingAudioStream(
                     connection.incomingAudioMediaPanner,
                 );
                 log({
                     message:
-                        `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Removed incoming audio stream for agent ${data.agentId} because a new stream was received and is being added now.`,
+                        `${WebRTC.AGENT_WEBRTC_LOG_PREFIX} Removed incoming audio stream for agent ${data.agentId} because a new stream was received and is being added now.`,
                     type: 'debug',
                 });
             }
-            connection.incomingAudioMediaPanner = Agent_Audio
+            connection.incomingAudioMediaPanner = Audio
                 .addIncomingAudioStream({
                     audioContext: world.audioContext,
                     mediaStream: data.stream,
@@ -569,7 +569,7 @@ export class Agent_World {
 
             log({
                 message:
-                    `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Set up incoming audio for agent ${data.agentId}`,
+                    `${WebRTC.AGENT_WEBRTC_LOG_PREFIX} Set up incoming audio for agent ${data.agentId}`,
                 type: 'info',
             });
         }
@@ -583,7 +583,7 @@ export class Agent_World {
             const connection = world.agentPeerConnections[agentId];
 
             if (!connection.rtcConnection) {
-                connection.rtcConnection = Agent_WebRTC.createPeerConnection(
+                connection.rtcConnection = WebRTC.createPeerConnection(
                     Agent_Store.iceServers,
                 );
             }
@@ -608,7 +608,7 @@ export class Agent_World {
 
             connection.rtcConnection.onnegotiationneeded = async () => {
                 try {
-                    const offer = await Agent_WebRTC.createOffer(
+                    const offer = await WebRTC.createOffer(
                         connection.rtcConnection!,
                     );
                     await this.sendWebRTCSignal({
@@ -622,11 +622,11 @@ export class Agent_World {
             };
 
             if (!connection.rtcDataChannel) {
-                connection.rtcDataChannel = Agent_WebRTC.createDataChannel(
+                connection.rtcDataChannel = WebRTC.createDataChannel(
                     connection.rtcConnection,
                     'data',
                 );
-                Agent_WebRTC.setupDataChannelListeners(
+                WebRTC.setupDataChannelListeners(
                     connection.rtcDataChannel,
                     () =>
                         console.log(
@@ -637,7 +637,7 @@ export class Agent_World {
                             `Data channel closed with agent ${agentId}`,
                         ),
                     (event) =>
-                        Agent_WebRTC.handleDataChannelMessage(agentId, event),
+                        WebRTC.handleDataChannelMessage(agentId, event),
                 );
             }
 
@@ -669,7 +669,7 @@ export class Agent_World {
 
             switch (signal.type) {
                 case AgentMeta.WebRTC.E_SignalType.AGENT_Offer: {
-                    const answer = await Agent_WebRTC.handleOffer(
+                    const answer = await WebRTC.handleOffer(
                         connection.rtcConnection,
                         signal.payload as RTCSessionDescriptionInit,
                     );
@@ -681,13 +681,13 @@ export class Agent_World {
                     break;
                 }
                 case AgentMeta.WebRTC.E_SignalType.AGENT_Answer:
-                    await Agent_WebRTC.handleAnswer(
+                    await WebRTC.handleAnswer(
                         connection.rtcConnection,
                         signal.payload as RTCSessionDescriptionInit,
                     );
                     break;
                 case AgentMeta.WebRTC.E_SignalType.AGENT_ICE_Candidate:
-                    await Agent_WebRTC.addIceCandidate(
+                    await WebRTC.addIceCandidate(
                         connection.rtcConnection,
                         signal.payload as RTCIceCandidateInit,
                     );

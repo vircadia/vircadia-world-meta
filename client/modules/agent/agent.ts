@@ -2,14 +2,10 @@ import { runInAction, reaction } from 'mobx';
 import { log } from '../../../general/modules/log.ts';
 import { Agent_Store } from './store.ts';
 import { Agent_World } from './world.ts';
-import { Agent_Script } from './script.ts';
+import { Script } from './helpers/script.ts';
 
 export class Agent {
     static readonly AGENT_LOG_PREFIX = '[AGENT]';
-
-    static World = Agent_World;
-    static Store = Agent_Store;
-    static Script = Agent_Script;
 }
 
 // Set up reactions

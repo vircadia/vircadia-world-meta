@@ -1,6 +1,6 @@
 import { Primitive } from '../../../../meta.ts';
 
-export namespace Agent_Audio {
+export namespace Audio {
     export const AGENT_AUDIO_LOG_PREFIX = '[AGENT AUDIO]';
 
     export const addIncomingAudioStream = (data: {

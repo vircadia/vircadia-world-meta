@@ -1,9 +1,9 @@
 import { log } from '../../../../general/modules/log.ts';
 import { Agent as AgentMeta } from '../../../../meta.ts';
-import { Agent_Audio } from './audio.ts';
+import { Audio } from './audio.ts';
 
-export namespace Agent_WebRTC {
-    export const AGENT_WEBRTC_LOG_PREFIX = '[AGENT WEBRTC]';
+export namespace WebRTC {
+    export const WEBRTC_LOG_PREFIX = '[WEBRTC]';
 
     // Helper functions
     export const createPeerConnection = (
@@ -59,7 +59,7 @@ export namespace Agent_WebRTC {
     ) => {
         log({
             message:
-                `${Agent_WebRTC.AGENT_WEBRTC_LOG_PREFIX} Received message from agent ${agentId}: ${event.data}`,
+                `${WebRTC.WEBRTC_LOG_PREFIX} Received message from agent ${agentId}: ${event.data}`,
             type: 'info',
         });
         // Implement your logic for handling different types of messages here
@@ -98,7 +98,7 @@ export namespace Agent_WebRTC {
         connection: AgentMeta.I_AgentPeerConnection,
     ) => {
         if (connection.incomingAudioMediaPanner) {
-            Agent_Audio.removeIncomingAudioStream(
+            Audio.removeIncomingAudioStream(
                 connection.incomingAudioMediaPanner,
             );
         }
