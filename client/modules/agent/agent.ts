@@ -2,28 +2,14 @@ import { runInAction, reaction } from 'npm:mobx';
 import { log } from '../../../general/modules/log.ts';
 import { Agent_Store } from './store.ts';
 import { Agent_World } from './world.ts';
+import { Agent_Script } from './script.ts';
 
 export class Agent {
     static readonly AGENT_LOG_PREFIX = '[AGENT]';
 
-    static initialize(data: {
-        iceServers?: RTCIceServer[];
-        debugMode?: boolean;
-    }) {
-        runInAction(() => {
-            Agent_Store.iceServers = data.iceServers ?? [];
-            Agent_Store.debugMode = data.debugMode ?? false;
-        });
-    }
-
-    static setLocalAudioMediaStream(localAudioMediaStream: MediaStream): void {
-        runInAction(() => {
-            Agent_Store.localAudioMediaStream = localAudioMediaStream;
-        });
-    }
-
     static World = Agent_World;
     static Store = Agent_Store;
+    static Script = Agent_Script;
 }
 
 // Set up reactions

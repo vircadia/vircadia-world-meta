@@ -1,7 +1,7 @@
 import { transpile } from 'npm:typescript';
 import { log } from '../../../general/modules/log.ts';
 
-export class Script {
+export class Agent_Script {
     static readonly scriptLogPrefix = '[SCRIPT]';
 
     private static transpile(script: string): string {
@@ -10,15 +10,7 @@ export class Script {
             type: 'info',
         });
 
-        let transpiledScript: string = '';
-
-        if (typeof window !== 'undefined') {
-            // Browser environment
-            transpiledScript = (transpile as (input: string) => string)(script);
-        } else {
-            // Deno environment
-            transpiledScript = (transpile as (input: string) => string)(script);
-        }
+        const transpiledScript: string = (transpile as (input: string) => string)(script);
 
         log({
             message: `${Script.scriptLogPrefix} Transpiled script: ${transpiledScript}`,

@@ -29,11 +29,25 @@ export class Agent_World {
             useWebRTC: boolean;
             useWebAudio: boolean;
         };
+        iceServers?: RTCIceServer[];
+        debugMode?: boolean;
     }): Promise<void> {
         if (Agent_Store.world) {
             throw new Error(
                 `${Agent_World.AGENT_WORLD_LOG_PREFIX} Already connected to a world`,
             );
+        }
+
+        if (data.iceServers) {
+            runInAction(() => {
+                Agent_Store.iceServers = data.iceServers;
+            });
+        }
+
+        if (data.debugMode) {
+            runInAction(() => {
+                Agent_Store.debugMode = data.debugMode;
+            });
         }
 
         Agent_Store.useWebRTC = data.capabilities.useWebRTC;
@@ -361,6 +375,12 @@ export class Agent_World {
                 type: 'error',
             });
         }
+    }
+
+    static setLocalAudioMediaStream(localAudioMediaStream: MediaStream): void {
+        runInAction(() => {
+            Agent_Store.localAudioMediaStream = localAudioMediaStream;
+        });
     }
 
     static Peer = class {
