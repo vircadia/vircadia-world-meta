@@ -1,4 +1,4 @@
-import { SupabaseClient } from '@supabase/supabase-js';
+import type { World_Client } from './client/modules/agent/world_client.ts';
 import { z } from 'zod';
 
 export namespace Primitive {
@@ -170,6 +170,31 @@ export namespace World {
         };
     }
 
+    export interface I_SceneEntityProperties extends I_CommonEntityProperties {
+        vircadia: {
+            name: string;
+            uuid: string;
+            version: string;
+            createdAt: Date;
+            updatedAt: Date;
+            babylonjs: I_CommonEntityProperties['vircadia']['babylonjs'] & {
+                clearColor?: Primitive.I_Color3;
+                ambientColor?: Primitive.I_Color3;
+                gravity?: Primitive.I_Vector3;
+                activeCamera?: string;
+                collisionsEnabled?: boolean;
+                physicsEnabled?: boolean;
+                physicsGravity?: Primitive.I_Vector3;
+                physicsEngine?: string;
+                autoAnimate?: boolean;
+                autoAnimateFrom?: number;
+                autoAnimateTo?: number;
+                autoAnimateLoop?: boolean;
+                autoAnimateSpeed?: number;
+            };
+        };
+    }
+
     export interface I_WorldGLTF {
         vircadia_uuid: string;
         name: string;
@@ -193,21 +218,7 @@ export namespace World {
         name?: string;
         nodes?: any[]; // Consider using a more specific type
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
-            autoClear?: boolean;
-            clearColor?: Primitive.I_Color3;
-            ambientColor?: Primitive.I_Color3;
-            gravity?: Primitive.I_Vector3;
-            activeCamera?: string;
-            collisionsEnabled?: boolean;
-            physicsEnabled?: boolean;
-            physicsGravity?: Primitive.I_Vector3;
-            physicsEngine?: string;
-            autoAnimate?: boolean;
-            autoAnimateFrom?: number;
-            autoAnimateTo?: number;
-            autoAnimateLoop?: boolean;
-            autoAnimateSpeed?: number;
+        extras?: I_SceneEntityProperties & {
             [key: string]: unknown;
         };
         [key: string]: unknown;
@@ -495,7 +506,7 @@ export namespace Agent {
     export interface I_AgentWorldConnection {
         host: string;
         port: number;
-        supabaseClient: SupabaseClient | null;
+        worldClient: World_Client | null;
         agentPeerConnections: { [key: string]: I_AgentPeerConnection };
         presence: Agent.C_Presence;
         audioContext: AudioContext | null;

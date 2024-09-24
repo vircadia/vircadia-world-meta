@@ -2,7 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { reaction, runInAction } from 'mobx';
 import { log } from '../../../general/modules/log.ts';
 import { Agent as AgentMeta, Primitive, Server } from '../../../meta.ts';
-import { Supabase } from '../supabase/supabase.ts';
+import { World_Client } from './world_client.ts';
 import { Agent_Store } from './store.ts';
 import { Audio } from './helpers/audio.ts';
 import { WebRTC } from './helpers/webRTC.ts';
@@ -11,10 +11,8 @@ export class Agent_World {
     static readonly AGENT_WORLD_LOG_PREFIX = '[AGENT_WORLD]';
 
     static readonly connected = () => Agent_Store.world !== null;
-    static readonly databaseConnected = () => Agent_Store.world?.supabaseClient &&
-        Agent_Store.world.supabaseClient.getChannels().length > 0;
-
-    static readonly realtimeConnected = () => Agent_Store.world?.supabaseClient?.realtime.connectionState() ===
+    static readonly databaseConnected = () => Agent_Store.world?.worldClient &&
+        Agent_Store.world.worldClient.getSupabaseClient()?.realtime.connectionState() ===
         'open';
 
     static readonly host = () => Agent_Store.world?.host;
@@ -66,13 +64,13 @@ export class Agent_World {
             );
         }
 
-        let supabaseClient: SupabaseClient | null = null;
+        let worldClient: World_Client | null = null;
         try {
             if (!serverConfigAndStatus.API_URL) {
                 throw new Error('No API URL found');
             }
 
-            supabaseClient = Supabase.createClient({
+            worldClient = new World_Client({
                 url: serverConfigAndStatus.API_URL,
                 key: data.key,
             });
@@ -86,7 +84,7 @@ export class Agent_World {
             Agent_Store.world = {
                 host: data.host,
                 port: data.port,
-                supabaseClient,
+                worldClient,
                 agentPeerConnections: {},
                 presence: new AgentMeta.C_Presence({
                     agentId: data.agentId,
@@ -122,10 +120,18 @@ export class Agent_World {
                     agentId,
                 });
             });
-            if (world.supabaseClient) {
-                world.supabaseClient = Supabase.destroyClient(
-                    world.supabaseClient,
-                );
+            if (world.worldClient) {
+                world.worldClient.destroyClient().then(() => {
+                    world.worldClient = null;
+                })
+                    .catch((error) => {
+                        log({
+                            message:
+                                `${Agent_World.AGENT_WORLD_LOG_PREFIX} Failed to destroy world client: ${error}`,
+                            type: 'error',
+                        });
+                        throw error;
+                    });
             }
             if (world.audioContext) {
                 await Audio.destroyAudioContext(world.audioContext);
@@ -143,17 +149,17 @@ export class Agent_World {
     }
 
     static subscribeToWorld(): void {
-        if (!Agent_Store.world?.supabaseClient) {
+        if (!Agent_Store.world?.worldClient) {
             console.error('Supabase client not initialized');
             return;
         }
 
-        const supabase = Agent_Store.world.supabaseClient;
+        const supabase = Agent_Store.world.worldClient.getSupabaseClient();
 
         // Subscribe to Postgres Changes
         Object.values(AgentMeta.E_Realtime_Postgres_TableChannel).forEach(
             (table) => {
-                supabase.channel(`postgres_changes:${table}`)
+                supabase?.channel(`postgres_changes:${table}`)
                     .on(
                         'postgres_changes',
                         { event: '*', schema: 'public', table },
@@ -174,7 +180,7 @@ export class Agent_World {
         );
 
         // Subscribe to Presence
-        supabase.channel(AgentMeta.E_Realtime_PresenceChannel.AGENT_PRESENCE)
+        supabase?.channel(AgentMeta.E_Realtime_PresenceChannel.AGENT_PRESENCE)
             .on('presence', { event: 'sync' }, () => {
                 // FIXME: This probably won't work as-is, check it later.
                 const state = supabase.channel(
@@ -355,12 +361,13 @@ export class Agent_World {
         const world = Agent_Store.world;
         try {
             if (world?.presence) {
-                await world.supabaseClient?.channel(
+                await world.worldClient?.getSupabaseClient()?.channel(
                     AgentMeta.E_Realtime_PresenceChannel.AGENT_PRESENCE,
-                )?.send({
-                    type: 'presence',
-                    event: JSON.stringify(world.presence),
-                });
+                )
+                    ?.send({
+                        type: 'presence',
+                        event: JSON.stringify(world.presence),
+                    });
             } else {
                 log({
                     message:
@@ -472,7 +479,7 @@ export class Agent_World {
             }
 
             try {
-                await world.supabaseClient?.channel(
+                await world.worldClient?.getSupabaseClient()?.channel(
                     AgentMeta.E_Realtime_BroadcastChannel.AGENT_SIGNAL,
                 )
                     .send({
