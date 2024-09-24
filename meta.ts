@@ -86,6 +86,49 @@ export namespace Environment {
 }
 
 export namespace World {
+    export namespace LOD {
+        export enum E_Mode {
+            DISTANCE = "distance",
+            SIZE = "size",
+        }
+
+        export enum E_Level {
+            LOD0 = "LOD0",
+            LOD1 = "LOD1",
+            LOD2 = "LOD2",
+            LOD3 = "LOD3",
+            LOD4 = "LOD4",
+        }
+    }
+
+    export enum E_BillboardMode {
+        BILLBOARDMODE_NONE = 0,
+        BILLBOARDMODE_X = 1,
+        BILLBOARDMODE_Y = 2,
+        BILLBOARDMODE_Z = 4,
+        BILLBOARDMODE_ALL = 7,
+    }
+
+    export namespace Texture {
+        export enum E_ColorSpace {
+            LINEAR = "linear",
+            SRGB = "sRGB",
+            GAMMA = "gamma",
+        }
+    }
+
+    export namespace Lightmap {
+        export const DATA_MESH_NAME = "vircadia_lightmapData";
+    }
+
+    export namespace Light {
+        export enum E_Mode {
+            DEFAULT = "default",
+            SHADOWSONLY = "shadowsOnly",
+            SPECULAR = "specular",
+        }
+    }
+
     export interface I_CommonEntityProperties {
         vircadia: {
             name: string;
@@ -94,39 +137,37 @@ export namespace World {
             createdAt: Date;
             updatedAt: Date;
             babylonjs: {
-                [key: string]: unknown;
+                lod: {
+                    mode: LOD.E_Mode | null;
+                    auto: boolean | null;
+                    distance: number | null;
+                    size: number | null;
+                    hide: number | null;
+                };
+                billboard: {
+                    mode: E_BillboardMode | null;
+                };
+                lightmap: {
+                    lightmap: string | null;
+                    level: number | null;
+                    color_space: Texture.E_ColorSpace | null;
+                    texcoord: number | null;
+                    use_as_shadowmap: boolean | null;
+                    mode: Light.E_Mode | null;
+                };
+                script: {
+                    agent_scripts: {
+                        script: string;
+                        unitTest: string;
+                    }[];
+                    persistent_scripts: {
+                        runnerAgentId: string;
+                        script: string;
+                        unitTest: string;
+                    }[];
+                };
             };
         };
-    }
-
-    export interface I_BabylonEntityScriptProperties {
-        agent_behaviors: {
-            script: string;
-            unitTest: string;
-        }[];
-        agent_coroutines: {
-            script: string;
-            unitTest: string;
-        }[];
-        agent_actions: {
-            script: string;
-            unitTest: string;
-        }[];
-        persistent_behaviors: {
-            runnerAgentId: string;
-            script: string;
-            unitTest: string;
-        }[];
-        persistent_coroutines: {
-            runnerAgentId: string;
-            script: string;
-            unitTest: string;
-        }[];
-        persistent_actions: {
-            runnerAgentId: string;
-            script: string;
-            unitTest: string;
-        }[];
     }
 
     export interface I_WorldGLTF {
@@ -152,7 +193,7 @@ export namespace World {
         name?: string;
         nodes?: any[]; // Consider using a more specific type
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & I_BabylonEntityScriptProperties & {
+        extras?: I_CommonEntityProperties & {
             autoClear?: boolean;
             clearColor?: Primitive.I_Color3;
             ambientColor?: Primitive.I_Color3;
@@ -186,7 +227,7 @@ export namespace World {
         translation?: number[];
         weights?: any[];
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & I_BabylonEntityScriptProperties & {
+        extras?: I_CommonEntityProperties & {
             [key: string]: unknown;
         };
     }
@@ -293,7 +334,7 @@ export namespace World {
         orthographic?: any; // Consider using a more specific type
         perspective?: any; // Consider using a more specific type
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & I_BabylonEntityScriptProperties & {
+        extras?: I_CommonEntityProperties & {
             [key: string]: unknown;
         };
     }

@@ -5,7 +5,7 @@ import { Agent as AgentMeta, Primitive, Server } from '../../../meta.ts';
 import { Supabase } from '../supabase/supabase.ts';
 import { Agent_Store } from './store.ts';
 import { Audio } from './helpers/audio.ts';
-import { WebRTC } from './helpers/webrtc.ts';
+import { WebRTC } from './helpers/webRTC.ts';
 
 export class Agent_World {
     static readonly AGENT_WORLD_LOG_PREFIX = '[AGENT_WORLD]';
@@ -483,7 +483,7 @@ export class Agent_World {
             } catch (error) {
                 log({
                     message:
-                        `${WebRTC.AGENT_WEBRTC_LOG_PREFIX} Error sending WebRTC signal: ${error}`,
+                        `${WebRTC.WEBRTC_LOG_PREFIX} Error sending WebRTC signal: ${error}`,
                     type: 'error',
                 });
             }
@@ -556,7 +556,7 @@ export class Agent_World {
                 );
                 log({
                     message:
-                        `${WebRTC.AGENT_WEBRTC_LOG_PREFIX} Removed incoming audio stream for agent ${data.agentId} because a new stream was received and is being added now.`,
+                        `${WebRTC.WEBRTC_LOG_PREFIX} Removed incoming audio stream for agent ${data.agentId} because a new stream was received and is being added now.`,
                     type: 'debug',
                 });
             }
@@ -569,7 +569,7 @@ export class Agent_World {
 
             log({
                 message:
-                    `${WebRTC.AGENT_WEBRTC_LOG_PREFIX} Set up incoming audio for agent ${data.agentId}`,
+                    `${WebRTC.WEBRTC_LOG_PREFIX} Set up incoming audio for agent ${data.agentId}`,
                 type: 'info',
             });
         }

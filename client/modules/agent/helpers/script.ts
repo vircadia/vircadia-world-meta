@@ -31,7 +31,7 @@ export class Script {
         return this.transpile(wrappedScript);
     }
 
-    static executeWithContext(script: string, context: Record<string, any>): any {
+    static execute(script: string, context: Record<string, any>): any {
         const contextKeys = Object.keys(context);
         const wrappedAndTranspiledScript = this.wrapAndTranspile(script, contextKeys);
 

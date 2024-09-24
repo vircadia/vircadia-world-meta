@@ -20,13 +20,13 @@ export namespace Supabase {
         return supabaseClient;
     }
 
-    export function destroyClient(supabaseClient: SupabaseClient): null {
+    export async function destroyClient(supabaseClient: SupabaseClient): Promise<null> {
         log({
             message: `Deinitializing Supabase client`,
             type: "info",
         });
         supabaseClient?.realtime.disconnect();
-        supabaseClient?.removeAllChannels();
+        await supabaseClient?.removeAllChannels();
         log({
             message: `Supabase client deinitialized`,
             type: "info",

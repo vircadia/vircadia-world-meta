@@ -116,7 +116,7 @@ export namespace Babylon_JS {
                     throw error;
                 }
 
-                return data.map(world => ({
+                return data.map((world) => ({
                     id: world.vircadia_uuid,
                     name: world.name,
                     version: world.version,
@@ -215,23 +215,23 @@ export namespace Babylon_JS {
             code: string;
             instance: ScriptInstance;
         }
-    
+
         interface ScriptInstance {
             execute: (method: string, ...args: any[]) => any;
             terminate: () => void;
         }
-    
+
         const runningScripts: Map<string, RunningScript> = new Map();
         const sceneObservers: Map<string, Observer<Scene>> = new Map();
         const entityObservers: Map<string, Observer<Node>> = new Map();
-    
+
         export function add(entityId: string, code: string, scene: Scene): string {
             const id = uuidv7.generate();
             const compilerOptions: ts.CompilerOptions = {
                 target: ts.ScriptTarget.ES2020,
                 module: ts.ModuleKind.ES2020,
             };
-    
+
             const compiledCode = ts.transpileModule(code, { compilerOptions });
 
             const script: RunningScript = {
@@ -253,7 +253,7 @@ export namespace Babylon_JS {
 
             return id;
         }
-    
+
         export function remove(id: string): boolean {
             const script = runningScripts.get(id);
             if (script) {
@@ -264,11 +264,11 @@ export namespace Babylon_JS {
             }
             return false;
         }
-    
+
         export function getByEntity(entityId: string, scene: Scene): RunningScript[] {
-            return Array.from(runningScripts.values()).filter(script => script.entityId === entityId && script.sceneUUID === scene.uid);
+            return Array.from(runningScripts.values()).filter((script) => script.entityId === entityId && script.sceneUUID === scene.uid);
         }
-    
+
         export function removeByEntity(entityId: string, scene: Scene): void {
             for (const [id, script] of runningScripts.entries()) {
                 if (script.entityId === entityId && script.sceneUUID === scene.uid) {
@@ -278,15 +278,15 @@ export namespace Babylon_JS {
             }
             removeEntityObserver(entityId, scene);
         }
-    
+
         export function entityHasScripts(entityId: string, scene: Scene): boolean {
-            return Array.from(runningScripts.values()).some(script => script.entityId === entityId && script.sceneUUID === scene.uid);
+            return Array.from(runningScripts.values()).some((script) => script.entityId === entityId && script.sceneUUID === scene.uid);
         }
 
         export function sceneHasScripts(scene: Scene): boolean {
-            return Array.from(runningScripts.values()).some(script => script.sceneUUID === scene.uid);
+            return Array.from(runningScripts.values()).some((script) => script.sceneUUID === scene.uid);
         }
-    
+
         export function getAllScriptIds(): string[] {
             return Array.from(runningScripts.keys());
         }
@@ -385,7 +385,7 @@ export namespace Babylon_JS {
     }
 }
 
-// 2. We will have the following lifecycle methods in scripts, how can we go about 
+// 2. We will have the following lifecycle methods in scripts, how can we go about
 
 // Initialization Methods
 
