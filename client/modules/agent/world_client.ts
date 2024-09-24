@@ -1,6 +1,8 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { World } from '../../../meta.ts';
 import { log } from "../../../general/modules/log.ts";
+import * as BABYLON from 'npm:@babylonjs/core';
+import Script from './helpers/script.ts';
 
 export class World_Client {
     private supabaseClient: SupabaseClient | null = null;
@@ -861,5 +863,20 @@ export class World_Client {
                 }
             }
         };
+    };
+
+    static Script = class {
+        static async executeBabylonScript(script: string, context: {
+            scene: BABYLON.Scene;
+            mesh: BABYLON.Mesh;
+            BABYLON: typeof BABYLON;
+            VIRCADIA_WORLD_CLIENT: typeof World_Client;
+        }): Promise<void> {
+            try {
+                await Script.execute(script, context);
+            } catch (error) {
+                throw new Error(`Error executing script: ${error.message}`);
+            }
+        }
     };
 }

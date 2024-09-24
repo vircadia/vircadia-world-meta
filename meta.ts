@@ -129,6 +129,20 @@ export namespace World {
         }
     }
 
+    export namespace Mutation {
+        export enum E_Type {
+            ADD = "add",
+            UPDATE = "update",
+            DELETE = "delete",
+        }
+
+        export interface I_Mutation {
+            type: E_Type;
+            script: string;
+            unitTest: string;
+        }
+    }
+
     export interface I_CommonEntityProperties {
         vircadia: {
             name: string;
@@ -191,6 +205,19 @@ export namespace World {
                 autoAnimateTo?: number;
                 autoAnimateLoop?: boolean;
                 autoAnimateSpeed?: number;
+            };
+        };
+    }
+
+    export interface I_WorldGLTFProperties extends I_CommonEntityProperties {
+        vircadia: {
+            name: string;
+            uuid: string;
+            version: string;
+            createdAt: Date;
+            updatedAt: Date;
+            babylonjs: I_CommonEntityProperties['vircadia']['babylonjs'] & {
+                mutations: Mutation.I_Mutation[];
             };
         };
     }
