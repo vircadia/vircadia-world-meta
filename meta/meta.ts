@@ -1,4 +1,4 @@
-import type { World_Client } from './client/modules/agent/world_client.ts';
+import type { World_Client } from '../../client/agent/world_client.ts';
 import { z } from 'zod';
 
 export namespace Primitive {
