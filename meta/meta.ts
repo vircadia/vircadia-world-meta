@@ -233,7 +233,7 @@ export namespace World {
         extensionsUsed?: string[];
         extensionsRequired?: string[];
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
+        extras?: I_WorldGLTFProperties & {
             [key: string]: unknown;
         };
         asset: any; // Consider creating a more specific type for asset
