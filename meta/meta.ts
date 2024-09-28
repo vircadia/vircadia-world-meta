@@ -421,10 +421,12 @@ export namespace World {
             count: number;
             indices: {
                 bufferView: string;
+                byteOffset?: number;
                 componentType: number;
             };
             values: {
                 bufferView: string;
+                byteOffset?: number;
             };
         };
         extensions?: Record<string, unknown>;
