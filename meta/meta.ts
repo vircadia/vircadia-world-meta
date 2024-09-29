@@ -1,5 +1,5 @@
-import type { World_Client } from '../../client/agent/world_client.ts';
-import { z } from 'zod';
+import { z } from "zod";
+import type { World_Client } from "../../client/agent/world_client.ts";
 
 export namespace Primitive {
     export const S_Vector3 = z.object({
@@ -62,16 +62,16 @@ export namespace Primitive {
 }
 
 export namespace Environment {
-    const ENVIRONMENT_PREFIX = 'VIRCADIA_WORLD';
-    const ENVIRONMENT_SERVER_PREFIX = 'SERVER';
+    const ENVIRONMENT_PREFIX = "VIRCADIA_WORLD";
+    const ENVIRONMENT_SERVER_PREFIX = "SERVER";
 
     export enum ENVIRONMENT_VARIABLE {
         SERVER_DEBUG =
-        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_DEBUG`,
+            `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_DEBUG`,
         SERVER_CADDY_HOST =
-        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_CADDY_HOST`,
+            `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_CADDY_HOST`,
         SERVER_CADDY_PORT =
-        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_CADDY_PORT`,
+            `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_CADDY_PORT`,
     }
 }
 
@@ -181,7 +181,7 @@ export namespace World {
             version: string;
             createdAt: Date;
             updatedAt: Date;
-            babylonjs: I_CommonEntityProperties['vircadia']['babylonjs'] & {
+            babylonjs: I_CommonEntityProperties["vircadia"]["babylonjs"] & {
                 clearColor?: Primitive.I_Color3;
                 ambientColor?: Primitive.I_Color3;
                 gravity?: Primitive.I_Vector3;
@@ -206,7 +206,7 @@ export namespace World {
             version: string;
             createdAt: Date;
             updatedAt: Date;
-            babylonjs: I_CommonEntityProperties['vircadia']['babylonjs'] & {
+            babylonjs: I_CommonEntityProperties["vircadia"]["babylonjs"] & {
                 mutations: Mutation.I_Mutation[];
             };
         };
@@ -281,7 +281,7 @@ export namespace World {
         occlusionTexture?: any;
         emissiveTexture?: any;
         emissiveFactor?: number[];
-        alphaMode?: 'OPAQUE' | 'MASK' | 'BLEND';
+        alphaMode?: "OPAQUE" | "MASK" | "BLEND";
         alphaCutoff?: number;
         doubleSided?: boolean;
         extensions?: Record<string, unknown>;
@@ -358,7 +358,7 @@ export namespace World {
         vircadia_uuid: string;
         vircadia_world_uuid: string;
         name?: string;
-        type: 'perspective' | 'orthographic';
+        type: "perspective" | "orthographic";
         orthographic?: any; // Consider using a more specific type
         perspective?: any; // Consider using a more specific type
         extensions?: Record<string, unknown>;
@@ -404,7 +404,7 @@ export namespace World {
         componentType: number;
         normalized?: boolean;
         count: number;
-        type: 'SCALAR' | 'VEC2' | 'VEC3' | 'VEC4' | 'MAT2' | 'MAT3' | 'MAT4';
+        type: "SCALAR" | "VEC2" | "VEC3" | "VEC4" | "MAT2" | "MAT3" | "MAT4";
         max?: any[];
         min?: any[];
         sparse?: {
@@ -425,51 +425,48 @@ export namespace World {
         };
     }
 
-    export namespace Mutation {
+    export enum E_Table {
+        WORLD_GLTF = "world_gltf",
+        SCENES = "scenes",
+        NODES = "nodes",
+        MESHES = "meshes",
+        MATERIALS = "materials",
+        TEXTURES = "textures",
+        IMAGES = "images",
+        SAMPLERS = "samplers",
+        ANIMATIONS = "animations",
+        SKINS = "skins",
+        CAMERAS = "cameras",
+        BUFFERS = "buffers",
+        BUFFER_VIEWS = "buffer_views",
+        ACCESSORS = "accessors",
+    }
+
+    export enum E_Realtime_BroadcastChannel {
+        AGENT_SIGNAL = "agent_signal",
+    }
+
+    export enum E_Realtime_PresenceChannel {
+        AGENT_PRESENCE = "agent_presence",
     }
 }
 
 export namespace Agent {
     export namespace WebRTC {
         export enum E_SignalType {
-            AGENT_Offer = 'agent-agent-offer-packet',
-            AGENT_Answer = 'agent-agent-answer-packet',
-            AGENT_ICE_Candidate = 'agent-agent-ice-candidate-packet',
+            AGENT_Offer = "agent-agent-offer-packet",
+            AGENT_Answer = "agent-agent-answer-packet",
+            AGENT_ICE_Candidate = "agent-agent-ice-candidate-packet",
         }
     }
 
     export namespace Audio {
         export const DEFAULT_PANNER_OPTIONS: PannerOptions = {
-            panningModel: 'HRTF',
-            distanceModel: 'inverse',
+            panningModel: "HRTF",
+            distanceModel: "inverse",
             refDistance: 1,
             maxDistance: 10000,
         };
-    }
-
-    export enum E_Tables {
-        WORLD_GLTF = 'world_gltf',
-        SCENES = 'scenes',
-        NODES = 'nodes',
-        MESHES = 'meshes',
-        MATERIALS = 'materials',
-        TEXTURES = 'textures',
-        IMAGES = 'images',
-        SAMPLERS = 'samplers',
-        ANIMATIONS = 'animations',
-        SKINS = 'skins',
-        CAMERAS = 'cameras',
-        BUFFERS = 'buffers',
-        BUFFER_VIEWS = 'buffer_views',
-        ACCESSORS = 'accessors',
-    }
-
-    export enum E_Realtime_BroadcastChannel {
-        AGENT_SIGNAL = 'agent_signal',
-    }
-
-    export enum E_Realtime_PresenceChannel {
-        AGENT_PRESENCE = 'agent_presence',
     }
 
     const MetadataSchema = z.object({
@@ -534,15 +531,10 @@ export namespace Agent {
 
 export namespace Server {
     export enum E_ProxySubdomain {
-        SUPABASE_API = 'supabase-api',
-        SUPABASE_STORAGE = 'supabase-storage',
-        SUPABASE_GRAPHQL = 'supabase-graphql',
-        SUPABASE_INBUCKET = 'supabase-inbucket',
-        SUPABASE_STUDIO = 'supabase-studio',
-    }
-
-    export interface I_REQUEST_ConfigAndStatusResponse {
-        API_URL: string | null;
-        STORAGE_URL: string | null;
+        SUPABASE_API = "supabase-api",
+        SUPABASE_STORAGE = "supabase-storage",
+        SUPABASE_GRAPHQL = "supabase-graphql",
+        SUPABASE_INBUCKET = "supabase-inbucket",
+        SUPABASE_STUDIO = "supabase-studio",
     }
 }

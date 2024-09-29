@@ -268,15 +268,8 @@ class World_Accessor(BaseModel):
     sparse: Optional[Dict[str, Any]] = None
     extensions: Optional[Dict[str, Any]] = None
     extras: World_CommonEntityProperties = Field(..., alias="vircadia")
-
-# Agent-related classes and enums
-
-class Agent_WebRTCSignalType(str, Enum):
-    AGENT_Offer = 'agent-agent-offer-packet'
-    AGENT_Answer = 'agent-agent-answer-packet'
-    AGENT_ICE_Candidate = 'agent-agent-ice-candidate-packet'
-
-class Agent_RealtimePostgresTableChannel(str, Enum):
+    
+class World_Table(str, Enum):
     WORLD_GLTF = 'world_gltf'
     SCENES = 'scenes'
     NODES = 'nodes'
@@ -292,11 +285,18 @@ class Agent_RealtimePostgresTableChannel(str, Enum):
     BUFFER_VIEWS = 'buffer_views'
     ACCESSORS = 'accessors'
 
-class Agent_RealtimeBroadcastChannel(str, Enum):
+class World_RealtimeBroadcastChannel(str, Enum):
     AGENT_SIGNAL = 'agent_signal'
 
-class Agent_RealtimePresenceChannel(str, Enum):
+class World_RealtimePresenceChannel(str, Enum):
     AGENT_PRESENCE = 'agent_presence'
+
+# Agent-related classes and enums
+
+class Agent_WebRTCSignalType(str, Enum):
+    AGENT_Offer = 'agent-agent-offer-packet'
+    AGENT_Answer = 'agent-agent-answer-packet'
+    AGENT_ICE_Candidate = 'agent-agent-ice-candidate-packet'
 
 class Agent_Presence(BaseModel):
     agentId: str
@@ -305,24 +305,14 @@ class Agent_Presence(BaseModel):
     lastUpdated: str
 
 # Server-related classes and enums
-
-class Server_GeneralEndpoint(str, Enum):
-    CONFIG_AND_STATUS = '/api/v1/config-and-status'
-
 class Server_ProxySubdomain(str, Enum):
     SUPABASE_API = 'supabase-api'
     SUPABASE_STORAGE = 'supabase-storage'
     SUPABASE_GRAPHQL = 'supabase-graphql'
     SUPABASE_INBUCKET = 'supabase-inbucket'
     SUPABASE_STUDIO = 'supabase-studio'
-    GENERAL = 'general'
-
-class Server_ConfigAndStatusResponse(BaseModel):
-    API_URL: Optional[str] = None
-    STORAGE_URL: Optional[str] = None
 
 # Constants
-Server_GENERAL_ENDPOINT_BASE = '/api/v1'
 Agent_DEFAULT_PANNER_OPTIONS = {
     'panningModel': 'HRTF',
     'distanceModel': 'inverse',
