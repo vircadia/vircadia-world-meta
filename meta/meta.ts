@@ -68,16 +68,6 @@ export namespace Environment {
     export enum ENVIRONMENT_VARIABLE {
         SERVER_DEBUG =
         `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_DEBUG`,
-        SERVER_OAK_HOST =
-        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_OAK_HOST`,
-        SERVER_OAK_PORT =
-        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_OAK_PORT`,
-        SERVER_OAK_ALLOWED_ORIGINS =
-        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_OAK_ALLOWED_ORIGINS`,
-        SERVER_OAK_ALLOWED_METHODS_REQ =
-        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_OAK_ALLOWED_METHODS_REQ`,
-        SERVER_OAK_ALLOWED_HEADERS_REQ =
-        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_OAK_ALLOWED_HEADERS_REQ`,
         SERVER_CADDY_HOST =
         `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_CADDY_HOST`,
         SERVER_CADDY_PORT =
@@ -543,19 +533,12 @@ export namespace Agent {
 }
 
 export namespace Server {
-    export const GENERAL_ENDPOINT_BASE = '/api/v1';
-
-    export enum E_GeneralEndpoint {
-        CONFIG_AND_STATUS = `${GENERAL_ENDPOINT_BASE}/config-and-status`,
-    }
-
     export enum E_ProxySubdomain {
         SUPABASE_API = 'supabase-api',
         SUPABASE_STORAGE = 'supabase-storage',
         SUPABASE_GRAPHQL = 'supabase-graphql',
         SUPABASE_INBUCKET = 'supabase-inbucket',
         SUPABASE_STUDIO = 'supabase-studio',
-        GENERAL = 'general',
     }
 
     export interface I_REQUEST_ConfigAndStatusResponse {
