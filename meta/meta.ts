@@ -447,7 +447,7 @@ export namespace Agent {
         };
     }
 
-    export enum E_Realtime_Postgres_TableChannel {
+    export enum E_Tables {
         WORLD_GLTF = 'world_gltf',
         SCENES = 'scenes',
         NODES = 'nodes',
