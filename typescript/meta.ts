@@ -1,5 +1,5 @@
+// deno-lint-ignore-file no-namespace
 import { z } from "zod";
-import type { World_Client } from "../../client/agent/world_client.ts";
 
 export namespace Primitive {
     export const S_Vector3 = z.object({
