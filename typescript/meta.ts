@@ -61,20 +61,6 @@ export namespace Primitive {
     }
 }
 
-export namespace Environment {
-    const ENVIRONMENT_PREFIX = "VIRCADIA_WORLD";
-    const ENVIRONMENT_SERVER_PREFIX = "SERVER";
-
-    export enum ENVIRONMENT_VARIABLE {
-        SERVER_DEBUG =
-        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_DEBUG`,
-        SERVER_CADDY_HOST =
-        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_CADDY_HOST`,
-        SERVER_CADDY_PORT =
-        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_CADDY_PORT`,
-    }
-}
-
 export namespace World {
     export namespace LOD {
         export enum E_Mode {
