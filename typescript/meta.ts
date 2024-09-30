@@ -67,11 +67,11 @@ export namespace Environment {
 
     export enum ENVIRONMENT_VARIABLE {
         SERVER_DEBUG =
-            `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_DEBUG`,
+        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_DEBUG`,
         SERVER_CADDY_HOST =
-            `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_CADDY_HOST`,
+        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_CADDY_HOST`,
         SERVER_CADDY_PORT =
-            `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_CADDY_PORT`,
+        `${ENVIRONMENT_PREFIX}_${ENVIRONMENT_SERVER_PREFIX}_CADDY_PORT`,
     }
 }
 
@@ -506,26 +506,6 @@ export namespace Agent {
             const parsedData = MetadataSchema.parse(obj);
             return new C_Presence(parsedData);
         }
-    }
-
-    export interface I_AgentPeerConnection {
-        rtcConnection: RTCPeerConnection | null;
-        rtcConnectionOffer: RTCSessionDescriptionInit | null;
-        rtcConnectionAnswer: RTCSessionDescriptionInit | null;
-        rtcConnectionIceCandidate: RTCIceCandidateInit | null;
-        rtcDataChannel: RTCDataChannel | null;
-        incomingAudioMediaStream: MediaStream | null;
-        incomingAudioMediaPanner: PannerNode | null;
-        presence: Agent.C_Presence | null;
-    }
-
-    export interface I_AgentWorldConnection {
-        host: string;
-        port: number;
-        worldClient: World_Client | null;
-        agentPeerConnections: { [key: string]: I_AgentPeerConnection };
-        presence: Agent.C_Presence;
-        audioContext: AudioContext | null;
     }
 }
 
