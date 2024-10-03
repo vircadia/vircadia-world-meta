@@ -139,22 +139,23 @@ export namespace World {
     }
 
     export interface I_BaseCommonEntityProperties {
-        name: string;
-        version: string;
-        createdAt: Date;
-        updatedAt: Date;
+        vircadia: {
+            name: string;
+            version: string;
+            createdAt: Date;
+            updatedAt: Date;
+        };
     }
 
-    export interface I_CommonEntityProperties
-        extends I_BaseCommonEntityProperties {
-        vircadia: {
+    export interface I_CommonEntityProperties extends I_BaseCommonEntityProperties {
+        vircadia: I_BaseCommonEntityProperties['vircadia'] & {
             babylonjs: I_CommonEntityBabylonProperties;
         };
     }
 
     export interface I_SceneEntityProperties extends I_CommonEntityProperties {
-        vircadia: {
-            babylonjs: I_CommonEntityProperties["vircadia"]["babylonjs"] & {
+        vircadia: I_CommonEntityProperties['vircadia'] & {
+            babylonjs: I_CommonEntityProperties['vircadia']['babylonjs'] & {
                 clearColor?: Primitive.I_Color3;
                 ambientColor?: Primitive.I_Color3;
                 gravity?: Primitive.I_Vector3;
@@ -172,13 +173,7 @@ export namespace World {
         };
     }
 
-    export interface I_WorldGLTFProperties {
-        vircadia: {
-            name: string;
-            version: string;
-            createdAt: Date;
-            updatedAt: Date;
-        };
+    export interface I_WorldGLTFProperties extends I_BaseCommonEntityProperties {
     }
 
     export interface I_WorldGLTF {

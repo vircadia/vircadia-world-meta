@@ -74,18 +74,26 @@ class World_BabylonJS(BaseModel):
     lightmap: World_Lightmap
     script: Dict[str, Union[List[World_AgentScript], List[World_PersistentScript]]]
 
-class World_CommonEntityProperties(BaseModel):
-    name: str
-    version: str
-    createdAt: datetime
-    updatedAt: datetime
-    vircadia: Dict[str, Any] = Field(default_factory=dict)
+class World_BaseCommonEntityProperties(BaseModel):
+    vircadia: Dict[str, Any] = Field(
+        default_factory=lambda: {
+            "name": "",
+            "version": "",
+            "createdAt": datetime.now(),
+            "updatedAt": datetime.now()
+        }
+    )
 
-class World_SceneEntityProperties(World_CommonEntityProperties):
-    vircadia: Dict[str, Any] = Field(default_factory=dict)
-
-    class Config:
-        extra = "allow"
+class World_CommonEntityProperties(World_BaseCommonEntityProperties):
+    vircadia: Dict[str, Any] = Field(
+        default_factory=lambda: {
+            "name": "",
+            "version": "",
+            "createdAt": datetime.now(),
+            "updatedAt": datetime.now(),
+            "babylonjs": {}
+        }
+    )
 
     @property
     def babylonjs(self) -> Dict[str, Any]:
@@ -93,9 +101,35 @@ class World_SceneEntityProperties(World_CommonEntityProperties):
 
     @babylonjs.setter
     def babylonjs(self, value: Dict[str, Any]):
-        if "vircadia" not in self.dict():
-            self.vircadia = {}
         self.vircadia["babylonjs"] = value
+
+class World_SceneEntityProperties(World_CommonEntityProperties):
+    vircadia: Dict[str, Any] = Field(
+        default_factory=lambda: {
+            "name": "",
+            "version": "",
+            "createdAt": datetime.now(),
+            "updatedAt": datetime.now(),
+            "babylonjs": {
+                "clearColor": None,
+                "ambientColor": None,
+                "gravity": None,
+                "activeCamera": None,
+                "collisionsEnabled": None,
+                "physicsEnabled": None,
+                "physicsGravity": None,
+                "physicsEngine": None,
+                "autoAnimate": None,
+                "autoAnimateFrom": None,
+                "autoAnimateTo": None,
+                "autoAnimateLoop": None,
+                "autoAnimateSpeed": None
+            }
+        }
+    )
+
+    class Config:
+        extra = "allow"
 
     # Scene-specific properties
     @property
@@ -150,11 +184,8 @@ class World_SceneEntityProperties(World_CommonEntityProperties):
     def autoAnimateSpeed(self) -> Optional[float]:
         return self.babylonjs.get("autoAnimateSpeed")
 
-class World_WorldGLTFProperties(BaseModel):
-    name: str
-    version: str
-    createdAt: datetime
-    updatedAt: datetime
+class World_WorldGLTFProperties(World_BaseCommonEntityProperties):
+    pass
 
 class World_WorldGLTF(BaseModel):
     vircadia_uuid: str
