@@ -77,14 +77,6 @@ export namespace World {
                 LOD3 = "LOD3",
                 LOD4 = "LOD4",
             }
-
-            export interface I_Properties {
-                mode: LOD.E_Mode | null;
-                auto: boolean | null;
-                distance: number | null;
-                size: number | null;
-                hide: number | null;
-            }
         }
 
         export namespace Billboard {
@@ -113,65 +105,21 @@ export namespace World {
                 SHADOWSONLY = "shadowsOnly",
                 SPECULAR = "specular",
             }
-
-            export interface I_Properties {
-                lightmap: string | null;
-                level: number | null;
-                color_space: Texture.E_ColorSpace | null;
-                texcoord: number | null;
-                use_as_shadowmap: boolean | null;
-                mode: Light.E_Mode | null;
-            }
         }
 
         export namespace Script {
-            export interface I_Properties {
-                agent_scripts: {
-                    script: string;
-                    unitTest: string;
-                }[];
-                persistent_scripts: {
-                    runnerAgentId: string;
-                    script: string;
-                    unitTest: string;
-                }[];
+            export interface I_AgentScript {
+                script: string;
+                unitTest: string;
+            }
+
+            export interface I_PersistentScript {
+                runnerAgentId: string;
+                script: string;
+                unitTest: string;
             }
         }
     }
-
-    export interface I_CommonEntityProperties {
-        vircadia?: Partial<{
-            name: string;
-            version: string;
-            createdAt: string;
-            updatedAt: string;
-            babylonjs?: any;
-        }>;
-    }
-
-    export interface I_SceneEntityProperties extends I_CommonEntityProperties {
-        vircadia: I_CommonEntityProperties["vircadia"] & {
-            babylonjs?: {
-                scene?: Partial<{
-                    clearColor?: Primitive.I_Color3;
-                    ambientColor?: Primitive.I_Color3;
-                    gravity?: Primitive.I_Vector3;
-                    activeCamera?: string;
-                    collisionsEnabled?: boolean;
-                    physicsEnabled?: boolean;
-                    physicsGravity?: Primitive.I_Vector3;
-                    physicsEngine?: string;
-                    autoAnimate?: boolean;
-                    autoAnimateFrom?: number;
-                    autoAnimateTo?: number;
-                    autoAnimateLoop?: boolean;
-                    autoAnimateSpeed?: number;
-                }>;
-            };
-        };
-    }
-
-    export interface I_WorldGLTFProperties extends I_CommonEntityProperties {}
 
     export interface I_WorldGLTF {
         vircadia_uuid: string;
@@ -182,10 +130,15 @@ export namespace World {
         extensionsUsed?: string[];
         extensionsRequired?: string[];
         extensions?: Record<string, unknown>;
-        extras?: I_WorldGLTFProperties & {
+        asset: any; // Consider creating a more specific type for asset
+        extras?: {
             [key: string]: unknown;
         };
-        asset: any; // Consider creating a more specific type for asset
+        // Vircadia World properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
     }
 
     export interface I_Scene {
@@ -194,10 +147,30 @@ export namespace World {
         name?: string;
         nodes?: any[]; // Consider using a more specific type
         extensions?: Record<string, unknown>;
-        extras?: I_SceneEntityProperties & {
+        extras?: {
             [key: string]: unknown;
         };
-        [key: string]: unknown;
+
+        // Vircadia Scene properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js Scene properties
+        vircadia_babylonjs_scene_clearColor?: Primitive.I_Color3;
+        vircadia_babylonjs_scene_ambientColor?: Primitive.I_Color3;
+        vircadia_babylonjs_scene_gravity?: Primitive.I_Vector3;
+        vircadia_babylonjs_scene_activeCamera?: string;
+        vircadia_babylonjs_scene_collisionsEnabled?: boolean;
+        vircadia_babylonjs_scene_physicsEnabled?: boolean;
+        vircadia_babylonjs_scene_physicsGravity?: Primitive.I_Vector3;
+        vircadia_babylonjs_scene_physicsEngine?: string;
+        vircadia_babylonjs_scene_autoAnimate?: boolean;
+        vircadia_babylonjs_scene_autoAnimateFrom?: number;
+        vircadia_babylonjs_scene_autoAnimateTo?: number;
+        vircadia_babylonjs_scene_autoAnimateLoop?: boolean;
+        vircadia_babylonjs_scene_autoAnimateSpeed?: number;
     }
 
     export interface I_Node {
@@ -214,9 +187,44 @@ export namespace World {
         translation?: number[];
         weights?: any[];
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
+        extras?: {
             [key: string]: unknown;
         };
+
+        // Vircadia Node properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js LOD properties
+        vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
+        vircadia_babylonjs_lod_auto?: boolean;
+        vircadia_babylonjs_lod_distance?: number;
+        vircadia_babylonjs_lod_size?: number;
+        vircadia_babylonjs_lod_hide?: number;
+
+        // Babylon.js Billboard properties
+        vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
+
+        // Babylon.js Light properties
+        vircadia_babylonjs_light_lightmap?: string;
+        vircadia_babylonjs_light_level?: number;
+        vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
+        vircadia_babylonjs_light_texcoord?: number;
+        vircadia_babylonjs_light_use_as_shadowmap?: boolean;
+        vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
+
+        // Babylon.js Script properties
+        vircadia_babylonjs_script_agent_scripts?: {
+            script: string;
+            unitTest: string;
+        }[];
+        vircadia_babylonjs_script_persistent_scripts?: {
+            runnerAgentId: string;
+            script: string;
+            unitTest: string;
+        }[];
     }
 
     export interface I_Mesh {
@@ -226,9 +234,32 @@ export namespace World {
         primitives: any[]; // Consider using a more specific type
         weights?: any[];
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
-            [key: string]: unknown;
-        };
+
+        // Base properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js properties
+        vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
+        vircadia_babylonjs_lod_auto?: boolean;
+        vircadia_babylonjs_lod_distance?: number;
+        vircadia_babylonjs_lod_size?: number;
+        vircadia_babylonjs_lod_hide?: number;
+        vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
+        vircadia_babylonjs_light_lightmap?: string;
+        vircadia_babylonjs_light_level?: number;
+        vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
+        vircadia_babylonjs_light_texcoord?: number;
+        vircadia_babylonjs_light_use_as_shadowmap?: boolean;
+        vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
+        vircadia_babylonjs_script_agent_scripts?:
+            Babylon.Script.I_AgentScript[];
+        vircadia_babylonjs_script_persistent_scripts?:
+            Babylon.Script.I_PersistentScript[];
+
+        extras?: Record<string, unknown>;
     }
 
     export interface I_Material {
@@ -244,9 +275,32 @@ export namespace World {
         alphaCutoff?: number;
         doubleSided?: boolean;
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
-            [key: string]: unknown;
-        };
+
+        // Base properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js properties
+        vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
+        vircadia_babylonjs_lod_auto?: boolean;
+        vircadia_babylonjs_lod_distance?: number;
+        vircadia_babylonjs_lod_size?: number;
+        vircadia_babylonjs_lod_hide?: number;
+        vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
+        vircadia_babylonjs_light_lightmap?: string;
+        vircadia_babylonjs_light_level?: number;
+        vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
+        vircadia_babylonjs_light_texcoord?: number;
+        vircadia_babylonjs_light_use_as_shadowmap?: boolean;
+        vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
+        vircadia_babylonjs_script_agent_scripts?:
+            Babylon.Script.I_AgentScript[];
+        vircadia_babylonjs_script_persistent_scripts?:
+            Babylon.Script.I_PersistentScript[];
+
+        extras?: Record<string, unknown>;
     }
 
     export interface I_Texture {
@@ -256,9 +310,32 @@ export namespace World {
         sampler?: string;
         source?: string;
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
-            [key: string]: unknown;
-        };
+
+        // Base properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js properties
+        vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
+        vircadia_babylonjs_lod_auto?: boolean;
+        vircadia_babylonjs_lod_distance?: number;
+        vircadia_babylonjs_lod_size?: number;
+        vircadia_babylonjs_lod_hide?: number;
+        vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
+        vircadia_babylonjs_light_lightmap?: string;
+        vircadia_babylonjs_light_level?: number;
+        vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
+        vircadia_babylonjs_light_texcoord?: number;
+        vircadia_babylonjs_light_use_as_shadowmap?: boolean;
+        vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
+        vircadia_babylonjs_script_agent_scripts?:
+            Babylon.Script.I_AgentScript[];
+        vircadia_babylonjs_script_persistent_scripts?:
+            Babylon.Script.I_PersistentScript[];
+
+        extras?: Record<string, unknown>;
     }
 
     export interface I_Image {
@@ -269,9 +346,32 @@ export namespace World {
         mimeType?: string;
         bufferView?: string;
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
-            [key: string]: unknown;
-        };
+
+        // Base properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js properties
+        vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
+        vircadia_babylonjs_lod_auto?: boolean;
+        vircadia_babylonjs_lod_distance?: number;
+        vircadia_babylonjs_lod_size?: number;
+        vircadia_babylonjs_lod_hide?: number;
+        vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
+        vircadia_babylonjs_light_lightmap?: string;
+        vircadia_babylonjs_light_level?: number;
+        vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
+        vircadia_babylonjs_light_texcoord?: number;
+        vircadia_babylonjs_light_use_as_shadowmap?: boolean;
+        vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
+        vircadia_babylonjs_script_agent_scripts?:
+            Babylon.Script.I_AgentScript[];
+        vircadia_babylonjs_script_persistent_scripts?:
+            Babylon.Script.I_PersistentScript[];
+
+        extras?: Record<string, unknown>;
     }
 
     export interface I_Sampler {
@@ -283,9 +383,32 @@ export namespace World {
         wrapS?: number;
         wrapT?: number;
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
-            [key: string]: unknown;
-        };
+
+        // Base properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js properties
+        vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
+        vircadia_babylonjs_lod_auto?: boolean;
+        vircadia_babylonjs_lod_distance?: number;
+        vircadia_babylonjs_lod_size?: number;
+        vircadia_babylonjs_lod_hide?: number;
+        vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
+        vircadia_babylonjs_light_lightmap?: string;
+        vircadia_babylonjs_light_level?: number;
+        vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
+        vircadia_babylonjs_light_texcoord?: number;
+        vircadia_babylonjs_light_use_as_shadowmap?: boolean;
+        vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
+        vircadia_babylonjs_script_agent_scripts?:
+            Babylon.Script.I_AgentScript[];
+        vircadia_babylonjs_script_persistent_scripts?:
+            Babylon.Script.I_PersistentScript[];
+
+        extras?: Record<string, unknown>;
     }
 
     export interface I_Animation {
@@ -295,9 +418,32 @@ export namespace World {
         channels: any[]; // Consider using a more specific type
         samplers: any[]; // Consider using a more specific type
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
-            [key: string]: unknown;
-        };
+
+        // Base properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js properties
+        vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
+        vircadia_babylonjs_lod_auto?: boolean;
+        vircadia_babylonjs_lod_distance?: number;
+        vircadia_babylonjs_lod_size?: number;
+        vircadia_babylonjs_lod_hide?: number;
+        vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
+        vircadia_babylonjs_light_lightmap?: string;
+        vircadia_babylonjs_light_level?: number;
+        vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
+        vircadia_babylonjs_light_texcoord?: number;
+        vircadia_babylonjs_light_use_as_shadowmap?: boolean;
+        vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
+        vircadia_babylonjs_script_agent_scripts?:
+            Babylon.Script.I_AgentScript[];
+        vircadia_babylonjs_script_persistent_scripts?:
+            Babylon.Script.I_PersistentScript[];
+
+        extras?: Record<string, unknown>;
     }
 
     export interface I_Skin {
@@ -308,9 +454,32 @@ export namespace World {
         skeleton?: string;
         joints: any[]; // Consider using a more specific type
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
-            [key: string]: unknown;
-        };
+
+        // Base properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js properties
+        vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
+        vircadia_babylonjs_lod_auto?: boolean;
+        vircadia_babylonjs_lod_distance?: number;
+        vircadia_babylonjs_lod_size?: number;
+        vircadia_babylonjs_lod_hide?: number;
+        vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
+        vircadia_babylonjs_light_lightmap?: string;
+        vircadia_babylonjs_light_level?: number;
+        vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
+        vircadia_babylonjs_light_texcoord?: number;
+        vircadia_babylonjs_light_use_as_shadowmap?: boolean;
+        vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
+        vircadia_babylonjs_script_agent_scripts?:
+            Babylon.Script.I_AgentScript[];
+        vircadia_babylonjs_script_persistent_scripts?:
+            Babylon.Script.I_PersistentScript[];
+
+        extras?: Record<string, unknown>;
     }
 
     export interface I_Camera {
@@ -321,9 +490,32 @@ export namespace World {
         orthographic?: any; // Consider using a more specific type
         perspective?: any; // Consider using a more specific type
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
-            [key: string]: unknown;
-        };
+
+        // Base properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js properties
+        vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
+        vircadia_babylonjs_lod_auto?: boolean;
+        vircadia_babylonjs_lod_distance?: number;
+        vircadia_babylonjs_lod_size?: number;
+        vircadia_babylonjs_lod_hide?: number;
+        vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
+        vircadia_babylonjs_light_lightmap?: string;
+        vircadia_babylonjs_light_level?: number;
+        vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
+        vircadia_babylonjs_light_texcoord?: number;
+        vircadia_babylonjs_light_use_as_shadowmap?: boolean;
+        vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
+        vircadia_babylonjs_script_agent_scripts?:
+            Babylon.Script.I_AgentScript[];
+        vircadia_babylonjs_script_persistent_scripts?:
+            Babylon.Script.I_PersistentScript[];
+
+        extras?: Record<string, unknown>;
     }
 
     export interface I_Buffer {
@@ -334,9 +526,32 @@ export namespace World {
         byteLength: number;
         data?: Uint8Array; // Assuming BYTEA is represented as Uint8Array in TypeScript
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
-            [key: string]: unknown;
-        };
+
+        // Base properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js properties
+        vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
+        vircadia_babylonjs_lod_auto?: boolean;
+        vircadia_babylonjs_lod_distance?: number;
+        vircadia_babylonjs_lod_size?: number;
+        vircadia_babylonjs_lod_hide?: number;
+        vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
+        vircadia_babylonjs_light_lightmap?: string;
+        vircadia_babylonjs_light_level?: number;
+        vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
+        vircadia_babylonjs_light_texcoord?: number;
+        vircadia_babylonjs_light_use_as_shadowmap?: boolean;
+        vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
+        vircadia_babylonjs_script_agent_scripts?:
+            Babylon.Script.I_AgentScript[];
+        vircadia_babylonjs_script_persistent_scripts?:
+            Babylon.Script.I_PersistentScript[];
+
+        extras?: Record<string, unknown>;
     }
 
     export interface I_BufferView {
@@ -349,9 +564,32 @@ export namespace World {
         byteStride?: number;
         target?: number;
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
-            [key: string]: unknown;
-        };
+
+        // Base properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js properties
+        vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
+        vircadia_babylonjs_lod_auto?: boolean;
+        vircadia_babylonjs_lod_distance?: number;
+        vircadia_babylonjs_lod_size?: number;
+        vircadia_babylonjs_lod_hide?: number;
+        vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
+        vircadia_babylonjs_light_lightmap?: string;
+        vircadia_babylonjs_light_level?: number;
+        vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
+        vircadia_babylonjs_light_texcoord?: number;
+        vircadia_babylonjs_light_use_as_shadowmap?: boolean;
+        vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
+        vircadia_babylonjs_script_agent_scripts?:
+            Babylon.Script.I_AgentScript[];
+        vircadia_babylonjs_script_persistent_scripts?:
+            Babylon.Script.I_PersistentScript[];
+
+        extras?: Record<string, unknown>;
     }
 
     export interface I_Accessor {
@@ -379,13 +617,46 @@ export namespace World {
             };
         };
         extensions?: Record<string, unknown>;
-        extras?: I_CommonEntityProperties & {
-            [key: string]: unknown;
-        };
+
+        // Base properties
+
+        vircadia_version?: string;
+        vircadia_createdat?: string;
+        vircadia_updatedat?: string;
+
+        // Babylon.js properties
+        vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
+        vircadia_babylonjs_lod_auto?: boolean;
+        vircadia_babylonjs_lod_distance?: number;
+        vircadia_babylonjs_lod_size?: number;
+        vircadia_babylonjs_lod_hide?: number;
+        vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
+        vircadia_babylonjs_light_lightmap?: string;
+        vircadia_babylonjs_light_level?: number;
+        vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
+        vircadia_babylonjs_light_texcoord?: number;
+        vircadia_babylonjs_light_use_as_shadowmap?: boolean;
+        vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
+        vircadia_babylonjs_script_agent_scripts?:
+            Babylon.Script.I_AgentScript[];
+        vircadia_babylonjs_script_persistent_scripts?:
+            Babylon.Script.I_PersistentScript[];
+
+        extras?: Record<string, unknown>;
+    }
+
+    export interface I_UserProfile {
+        id: string;
+        username: string;
+        full_name: string;
+        role: Agent.Profile.E_Role;
+        created_at: string;
+        updated_at: string;
     }
 
     export enum E_Table {
         WORLD_GLTF = "world_gltf",
+        AGENT_PROFILES = "agent_profiles",
         SCENES = "scenes",
         NODES = "nodes",
         MESHES = "meshes",
@@ -411,6 +682,14 @@ export namespace World {
 }
 
 export namespace Agent {
+    export namespace Profile {
+        export enum E_Role {
+            GUEST = "guest",
+            MEMBER = "member",
+            ADMIN = "admin",
+        }
+    }
+
     export namespace WebRTC {
         export enum E_SignalType {
             AGENT_Offer = "agent-agent-offer-packet",
