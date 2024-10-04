@@ -63,127 +63,120 @@ export namespace Primitive {
 }
 
 export namespace World {
-    export namespace LOD {
-        export enum E_Mode {
-            DISTANCE = "distance",
-            SIZE = "size",
+    export namespace Babylon {
+        export namespace LOD {
+            export enum E_Mode {
+                DISTANCE = "distance",
+                SIZE = "size",
+            }
+
+            export enum E_Level {
+                LOD0 = "LOD0",
+                LOD1 = "LOD1",
+                LOD2 = "LOD2",
+                LOD3 = "LOD3",
+                LOD4 = "LOD4",
+            }
+
+            export interface I_Properties {
+                mode: LOD.E_Mode | null;
+                auto: boolean | null;
+                distance: number | null;
+                size: number | null;
+                hide: number | null;
+            }
         }
 
-        export enum E_Level {
-            LOD0 = "LOD0",
-            LOD1 = "LOD1",
-            LOD2 = "LOD2",
-            LOD3 = "LOD3",
-            LOD4 = "LOD4",
+        export namespace Billboard {
+            export enum E_Mode {
+                BILLBOARDMODE_NONE = 0,
+                BILLBOARDMODE_X = 1,
+                BILLBOARDMODE_Y = 2,
+                BILLBOARDMODE_Z = 4,
+                BILLBOARDMODE_ALL = 7,
+            }
+        }
+
+        export namespace Texture {
+            export enum E_ColorSpace {
+                LINEAR = "linear",
+                SRGB = "sRGB",
+                GAMMA = "gamma",
+            }
+        }
+
+        export namespace Light {
+            export const LIGHTMAP_DATA_MESH_NAME = "vircadia_lightmapData";
+
+            export enum E_Mode {
+                DEFAULT = "default",
+                SHADOWSONLY = "shadowsOnly",
+                SPECULAR = "specular",
+            }
+
+            export interface I_Properties {
+                lightmap: string | null;
+                level: number | null;
+                color_space: Texture.E_ColorSpace | null;
+                texcoord: number | null;
+                use_as_shadowmap: boolean | null;
+                mode: Light.E_Mode | null;
+            }
+        }
+
+        export namespace Script {
+            export interface I_Properties {
+                agent_scripts: {
+                    script: string;
+                    unitTest: string;
+                }[];
+                persistent_scripts: {
+                    runnerAgentId: string;
+                    script: string;
+                    unitTest: string;
+                }[];
+            }
         }
     }
 
-    export enum E_BillboardMode {
-        BILLBOARDMODE_NONE = 0,
-        BILLBOARDMODE_X = 1,
-        BILLBOARDMODE_Y = 2,
-        BILLBOARDMODE_Z = 4,
-        BILLBOARDMODE_ALL = 7,
-    }
-
-    export namespace Texture {
-        export enum E_ColorSpace {
-            LINEAR = "linear",
-            SRGB = "sRGB",
-            GAMMA = "gamma",
-        }
-    }
-
-    export namespace Lightmap {
-        export const DATA_MESH_NAME = "vircadia_lightmapData";
-    }
-
-    export namespace Light {
-        export enum E_Mode {
-            DEFAULT = "default",
-            SHADOWSONLY = "shadowsOnly",
-            SPECULAR = "specular",
-        }
-    }
-
-    export interface I_CommonEntityBabylonProperties {
-        lod: {
-            mode: LOD.E_Mode | null;
-            auto: boolean | null;
-            distance: number | null;
-            size: number | null;
-            hide: number | null;
-        };
-        billboard: {
-            mode: E_BillboardMode | null;
-        };
-        lightmap: {
-            lightmap: string | null;
-            level: number | null;
-            color_space: Texture.E_ColorSpace | null;
-            texcoord: number | null;
-            use_as_shadowmap: boolean | null;
-            mode: Light.E_Mode | null;
-        };
-        script: {
-            agent_scripts: {
-                script: string;
-                unitTest: string;
-            }[];
-            persistent_scripts: {
-                runnerAgentId: string;
-                script: string;
-                unitTest: string;
-            }[];
-        };
-    }
-
-    export interface I_BaseCommonEntityProperties {
-        vircadia: {
+    export interface I_CommonEntityProperties {
+        vircadia?: Partial<{
             name: string;
             version: string;
-            createdAt: Date;
-            updatedAt: Date;
-        };
-    }
-
-    export interface I_CommonEntityProperties
-        extends I_BaseCommonEntityProperties {
-        vircadia: I_BaseCommonEntityProperties["vircadia"] & {
-            babylonjs?: I_CommonEntityBabylonProperties;
-        };
+            createdAt: string;
+            updatedAt: string;
+            babylonjs?: any;
+        }>;
     }
 
     export interface I_SceneEntityProperties extends I_CommonEntityProperties {
         vircadia: I_CommonEntityProperties["vircadia"] & {
-            babylonjs: I_CommonEntityProperties["vircadia"]["babylonjs"] & {
-                clearColor?: Primitive.I_Color3;
-                ambientColor?: Primitive.I_Color3;
-                gravity?: Primitive.I_Vector3;
-                activeCamera?: string;
-                collisionsEnabled?: boolean;
-                physicsEnabled?: boolean;
-                physicsGravity?: Primitive.I_Vector3;
-                physicsEngine?: string;
-                autoAnimate?: boolean;
-                autoAnimateFrom?: number;
-                autoAnimateTo?: number;
-                autoAnimateLoop?: boolean;
-                autoAnimateSpeed?: number;
+            babylonjs?: {
+                scene?: Partial<{
+                    clearColor?: Primitive.I_Color3;
+                    ambientColor?: Primitive.I_Color3;
+                    gravity?: Primitive.I_Vector3;
+                    activeCamera?: string;
+                    collisionsEnabled?: boolean;
+                    physicsEnabled?: boolean;
+                    physicsGravity?: Primitive.I_Vector3;
+                    physicsEngine?: string;
+                    autoAnimate?: boolean;
+                    autoAnimateFrom?: number;
+                    autoAnimateTo?: number;
+                    autoAnimateLoop?: boolean;
+                    autoAnimateSpeed?: number;
+                }>;
             };
         };
     }
 
-    export interface I_WorldGLTFProperties
-        extends I_BaseCommonEntityProperties {
-    }
+    export interface I_WorldGLTFProperties extends I_CommonEntityProperties {}
 
     export interface I_WorldGLTF {
         vircadia_uuid: string;
         name: string;
         version: string;
-        created_at: Date;
-        updated_at: Date;
         metadata: any; // Consider creating a more specific type for metadata
         defaultScene?: string;
         extensionsUsed?: string[];
