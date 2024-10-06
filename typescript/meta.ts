@@ -590,6 +590,127 @@ export namespace World {
         ACCESSORS_METADATA = "accessors_metadata",
     }
 
+    export enum E_Table_Mutation {
+        // Agent Mutations
+        CREATE_AGENT_PROFILE = "create_agent_profile",
+        UPDATE_AGENT_PROFILE = "update_agent_profile",
+        DELETE_AGENT_PROFILE = "delete_agent_profile",
+
+        // World GLTF Mutations
+        CREATE_WORLD_GLTF = "create_world_gltf",
+        UPDATE_WORLD_GLTF = "update_world_gltf",
+        DELETE_WORLD_GLTF = "delete_world_gltf",
+
+        // Scene Mutations
+        CREATE_SCENE = "create_scene",
+        UPDATE_SCENE = "update_scene",
+        DELETE_SCENE = "delete_scene",
+
+        // Node Mutations
+        CREATE_NODE = "create_node",
+        UPDATE_NODE = "update_node",
+        DELETE_NODE = "delete_node",
+
+        // Mesh Mutations
+        CREATE_MESH = "create_mesh",
+        UPDATE_MESH = "update_mesh",
+        DELETE_MESH = "delete_mesh",
+
+        // Material Mutations
+        CREATE_MATERIAL = "create_material",
+        UPDATE_MATERIAL = "update_material",
+        DELETE_MATERIAL = "delete_material",
+
+        // Texture Mutations
+        CREATE_TEXTURE = "create_texture",
+        UPDATE_TEXTURE = "update_texture",
+        DELETE_TEXTURE = "delete_texture",
+
+        // Image Mutations
+        CREATE_IMAGE = "create_image",
+        UPDATE_IMAGE = "update_image",
+        DELETE_IMAGE = "delete_image",
+
+        // Sampler Mutations
+        CREATE_SAMPLER = "create_sampler",
+        UPDATE_SAMPLER = "update_sampler",
+        DELETE_SAMPLER = "delete_sampler",
+
+        // Animation Mutations
+        CREATE_ANIMATION = "create_animation",
+        UPDATE_ANIMATION = "update_animation",
+        DELETE_ANIMATION = "delete_animation",
+
+        // Skin Mutations
+        CREATE_SKIN = "create_skin",
+        UPDATE_SKIN = "update_skin",
+        DELETE_SKIN = "delete_skin",
+
+        // Camera Mutations
+        CREATE_CAMERA = "create_camera",
+        UPDATE_CAMERA = "update_camera",
+        DELETE_CAMERA = "delete_camera",
+
+        // Buffer Mutations
+        CREATE_BUFFER = "create_buffer",
+        UPDATE_BUFFER = "update_buffer",
+        DELETE_BUFFER = "delete_buffer",
+
+        // Buffer View Mutations
+        CREATE_BUFFER_VIEW = "create_buffer_view",
+        UPDATE_BUFFER_VIEW = "update_buffer_view",
+        DELETE_BUFFER_VIEW = "delete_buffer_view",
+
+        // Accessor Mutations
+        CREATE_ACCESSOR = "create_accessor",
+        UPDATE_ACCESSOR = "update_accessor",
+        DELETE_ACCESSOR = "delete_accessor",
+
+        // Metadata Mutations
+        CREATE_WORLD_GLTF_METADATA = "create_world_gltf_metadata",
+        UPDATE_WORLD_GLTF_METADATA = "update_world_gltf_metadata",
+        DELETE_WORLD_GLTF_METADATA = "delete_world_gltf_metadata",
+        CREATE_SCENE_METADATA = "create_scene_metadata",
+        UPDATE_SCENE_METADATA = "update_scene_metadata",
+        DELETE_SCENE_METADATA = "delete_scene_metadata",
+        CREATE_NODE_METADATA = "create_node_metadata",
+        UPDATE_NODE_METADATA = "update_node_metadata",
+        DELETE_NODE_METADATA = "delete_node_metadata",
+        CREATE_MESH_METADATA = "create_mesh_metadata",
+        UPDATE_MESH_METADATA = "update_mesh_metadata",
+        DELETE_MESH_METADATA = "delete_mesh_metadata",
+        CREATE_MATERIAL_METADATA = "create_material_metadata",
+        UPDATE_MATERIAL_METADATA = "update_material_metadata",
+        DELETE_MATERIAL_METADATA = "delete_material_metadata",
+        CREATE_TEXTURE_METADATA = "create_texture_metadata",
+        UPDATE_TEXTURE_METADATA = "update_texture_metadata",
+        DELETE_TEXTURE_METADATA = "delete_texture_metadata",
+        CREATE_IMAGE_METADATA = "create_image_metadata",
+        UPDATE_IMAGE_METADATA = "update_image_metadata",
+        DELETE_IMAGE_METADATA = "delete_image_metadata",
+        CREATE_SAMPLER_METADATA = "create_sampler_metadata",
+        UPDATE_SAMPLER_METADATA = "update_sampler_metadata",
+        DELETE_SAMPLER_METADATA = "delete_sampler_metadata",
+        CREATE_ANIMATION_METADATA = "create_animation_metadata",
+        UPDATE_ANIMATION_METADATA = "update_animation_metadata",
+        DELETE_ANIMATION_METADATA = "delete_animation_metadata",
+        CREATE_SKIN_METADATA = "create_skin_metadata",
+        UPDATE_SKIN_METADATA = "update_skin_metadata",
+        DELETE_SKIN_METADATA = "delete_skin_metadata",
+        CREATE_CAMERA_METADATA = "create_camera_metadata",
+        UPDATE_CAMERA_METADATA = "update_camera_metadata",
+        DELETE_CAMERA_METADATA = "delete_camera_metadata",
+        CREATE_BUFFER_METADATA = "create_buffer_metadata",
+        UPDATE_BUFFER_METADATA = "update_buffer_metadata",
+        DELETE_BUFFER_METADATA = "delete_buffer_metadata",
+        CREATE_BUFFER_VIEW_METADATA = "create_buffer_view_metadata",
+        UPDATE_BUFFER_VIEW_METADATA = "update_buffer_view_metadata",
+        DELETE_BUFFER_VIEW_METADATA = "delete_buffer_view_metadata",
+        CREATE_ACCESSOR_METADATA = "create_accessor_metadata",
+        UPDATE_ACCESSOR_METADATA = "update_accessor_metadata",
+        DELETE_ACCESSOR_METADATA = "delete_accessor_metadata",
+    }
+
     export enum E_Realtime_BroadcastChannel {
         AGENT_SIGNAL = "agent_signal",
     }
