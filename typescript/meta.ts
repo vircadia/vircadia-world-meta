@@ -106,19 +106,6 @@ export namespace World {
                 SPECULAR = "specular",
             }
         }
-
-        export namespace Script {
-            export interface I_AgentScript {
-                script: string;
-                unitTest: string;
-            }
-
-            export interface I_PersistentScript {
-                runnerAgentId: string;
-                script: string;
-                unitTest: string;
-            }
-        }
     }
 
     interface I_Base_WorldGLTF_Table_Properties {
@@ -202,15 +189,8 @@ export namespace World {
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
 
         // Babylon.js Script properties
-        vircadia_babylonjs_script_agent_scripts?: {
-            script: string;
-            unitTest: string;
-        }[];
-        vircadia_babylonjs_script_persistent_scripts?: {
-            runnerAgentId: string;
-            script: string;
-            unitTest: string;
-        }[];
+        vircadia_babylonjs_script_agent_scripts?: string[];
+        vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Mesh extends I_Base_WorldGLTF_Table_Properties {
@@ -233,10 +213,10 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?:
-            Babylon.Script.I_AgentScript[];
-        vircadia_babylonjs_script_persistent_scripts?:
-            Babylon.Script.I_PersistentScript[];
+
+        // Babylon.js Script properties
+        vircadia_babylonjs_script_agent_scripts?: string[];
+        vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Material
@@ -266,10 +246,10 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?:
-            Babylon.Script.I_AgentScript[];
-        vircadia_babylonjs_script_persistent_scripts?:
-            Babylon.Script.I_PersistentScript[];
+
+        // Babylon.js Script properties
+        vircadia_babylonjs_script_agent_scripts?: string[];
+        vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Texture extends I_Base_WorldGLTF_Table_Properties {
@@ -292,10 +272,10 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?:
-            Babylon.Script.I_AgentScript[];
-        vircadia_babylonjs_script_persistent_scripts?:
-            Babylon.Script.I_PersistentScript[];
+
+        // Babylon.js Script properties
+        vircadia_babylonjs_script_agent_scripts?: string[];
+        vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Image extends I_Base_WorldGLTF_Table_Properties {
@@ -319,10 +299,10 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?:
-            Babylon.Script.I_AgentScript[];
-        vircadia_babylonjs_script_persistent_scripts?:
-            Babylon.Script.I_PersistentScript[];
+
+        // Babylon.js Script properties
+        vircadia_babylonjs_script_agent_scripts?: string[];
+        vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Sampler extends I_Base_WorldGLTF_Table_Properties {
@@ -347,10 +327,10 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?:
-            Babylon.Script.I_AgentScript[];
-        vircadia_babylonjs_script_persistent_scripts?:
-            Babylon.Script.I_PersistentScript[];
+
+        // Babylon.js Script properties
+        vircadia_babylonjs_script_agent_scripts?: string[];
+        vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Animation
@@ -374,10 +354,10 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?:
-            Babylon.Script.I_AgentScript[];
-        vircadia_babylonjs_script_persistent_scripts?:
-            Babylon.Script.I_PersistentScript[];
+
+        // Babylon.js Script properties
+        vircadia_babylonjs_script_agent_scripts?: string[];
+        vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Skin extends I_Base_WorldGLTF_Table_Properties {
@@ -401,10 +381,10 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?:
-            Babylon.Script.I_AgentScript[];
-        vircadia_babylonjs_script_persistent_scripts?:
-            Babylon.Script.I_PersistentScript[];
+
+        // Babylon.js Script properties
+        vircadia_babylonjs_script_agent_scripts?: string[];
+        vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Camera extends I_Base_WorldGLTF_Table_Properties {
@@ -428,10 +408,10 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?:
-            Babylon.Script.I_AgentScript[];
-        vircadia_babylonjs_script_persistent_scripts?:
-            Babylon.Script.I_PersistentScript[];
+
+        // Babylon.js Script properties
+        vircadia_babylonjs_script_agent_scripts?: string[];
+        vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Buffer extends I_Base_WorldGLTF_Table_Properties {
@@ -455,10 +435,10 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?:
-            Babylon.Script.I_AgentScript[];
-        vircadia_babylonjs_script_persistent_scripts?:
-            Babylon.Script.I_PersistentScript[];
+
+        // Babylon.js Script properties
+        vircadia_babylonjs_script_agent_scripts?: string[];
+        vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_BufferView
@@ -485,10 +465,10 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?:
-            Babylon.Script.I_AgentScript[];
-        vircadia_babylonjs_script_persistent_scripts?:
-            Babylon.Script.I_PersistentScript[];
+
+        // Babylon.js Script properties
+        vircadia_babylonjs_script_agent_scripts?: string[];
+        vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Accessor
@@ -530,10 +510,10 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?:
-            Babylon.Script.I_AgentScript[];
-        vircadia_babylonjs_script_persistent_scripts?:
-            Babylon.Script.I_PersistentScript[];
+
+        // Babylon.js Script properties
+        vircadia_babylonjs_script_agent_scripts?: string[];
+        vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_UserProfile {

@@ -1,330 +1,545 @@
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import List, Optional, Any, Dict, Union
 from datetime import datetime
 from pydantic import BaseModel, Field
 
-class Primitive_Vector3(BaseModel):
-    x: float = Field(default=0)
-    y: float = Field(default=0)
-    z: float = Field(default=0)
+class Primitive:
+    class Vector3(BaseModel):
+        x: float = Field(default=0)
+        y: float = Field(default=0)
+        z: float = Field(default=0)
 
-class Primitive_Color3(BaseModel):
-    r: float = Field(default=0)
-    g: float = Field(default=0)
-    b: float = Field(default=0)
+    class Color3(BaseModel):
+        r: float = Field(default=0)
+        g: float = Field(default=0)
+        b: float = Field(default=0)
 
-class World_LODMode(str, Enum):
-    DISTANCE = "distance"
-    SIZE = "size"
+class World:
+    class Babylon:
+        class LOD:
+            class Mode(str, Enum):
+                DISTANCE = "distance"
+                SIZE = "size"
 
-class World_LODLevel(str, Enum):
-    LOD0 = "LOD0"
-    LOD1 = "LOD1"
-    LOD2 = "LOD2"
-    LOD3 = "LOD3"
-    LOD4 = "LOD4"
+            class Level(str, Enum):
+                LOD0 = "LOD0"
+                LOD1 = "LOD1"
+                LOD2 = "LOD2"
+                LOD3 = "LOD3"
+                LOD4 = "LOD4"
 
-class World_BillboardMode(int, Enum):
-    BILLBOARDMODE_NONE = 0
-    BILLBOARDMODE_X = 1
-    BILLBOARDMODE_Y = 2
-    BILLBOARDMODE_Z = 4
-    BILLBOARDMODE_ALL = 7
+        class Billboard:
+            class Mode(IntEnum):
+                BILLBOARDMODE_NONE = 0
+                BILLBOARDMODE_X = 1
+                BILLBOARDMODE_Y = 2
+                BILLBOARDMODE_Z = 4
+                BILLBOARDMODE_ALL = 7
 
-class World_TextureColorSpace(str, Enum):
-    LINEAR = "linear"
-    SRGB = "sRGB"
-    GAMMA = "gamma"
+        class Texture:
+            class ColorSpace(str, Enum):
+                LINEAR = "linear"
+                SRGB = "sRGB"
+                GAMMA = "gamma"
 
-class World_LightMode(str, Enum):
-    DEFAULT = "default"
-    SHADOWSONLY = "shadowsOnly"
-    SPECULAR = "specular"
+        class Light:
+            LIGHTMAP_DATA_MESH_NAME = "vircadia_lightmapData"
 
-class World_LOD(BaseModel):
-    mode: Optional[World_LODMode] = None
-    auto: Optional[bool] = None
-    distance: Optional[float] = None
-    size: Optional[float] = None
-    hide: Optional[float] = None
+            class Mode(str, Enum):
+                DEFAULT = "default"
+                SHADOWSONLY = "shadowsOnly"
+                SPECULAR = "specular"
 
-class World_Billboard(BaseModel):
-    mode: Optional[World_BillboardMode] = None
+    class BaseWorldGLTFTableProperties(BaseModel):
+        name: Optional[str] = None
+        extras: Optional[Dict[str, Any]] = None
+        vircadiaUuid: Optional[str] = None
+        vircadiaVersion: Optional[str] = None
+        vircadiaCreatedat: Optional[datetime] = None
+        vircadiaUpdatedat: Optional[datetime] = None
 
-class World_Lightmap(BaseModel):
-    lightmap: Optional[str] = None
-    level: Optional[int] = None
-    color_space: Optional[World_TextureColorSpace] = None
-    texcoord: Optional[int] = None
-    use_as_shadowmap: Optional[bool] = None
-    mode: Optional[World_LightMode] = None
+    class TableWorldGLTF(BaseWorldGLTFTableProperties):
+        name: str
+        version: str
+        metadata: Any
+        defaultScene: Optional[str] = None
+        extensionsUsed: Optional[List[str]] = None
+        extensionsRequired: Optional[List[str]] = None
+        extensions: Optional[Dict[str, Any]] = None
+        asset: Any
 
-class World_AgentScript(BaseModel):
-    script: str
-    unitTest: str
+    class TableScene(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        nodes: Optional[List[Any]] = None
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsSceneClearColor: Optional[Primitive.Color3] = None
+        vircadiaBabylonjsSceneAmbientColor: Optional[Primitive.Color3] = None
+        vircadiaBabylonjsSceneGravity: Optional[Primitive.Vector3] = None
+        vircadiaBabylonjsSceneActiveCamera: Optional[str] = None
+        vircadiaBabylonjsSceneCollisionsEnabled: Optional[bool] = None
+        vircadiaBabylonjsScenePhysicsEnabled: Optional[bool] = None
+        vircadiaBabylonjsScenePhysicsGravity: Optional[Primitive.Vector3] = None
+        vircadiaBabylonjsScenePhysicsEngine: Optional[str] = None
+        vircadiaBabylonjsSceneAutoAnimate: Optional[bool] = None
+        vircadiaBabylonjsSceneAutoAnimateFrom: Optional[float] = None
+        vircadiaBabylonjsSceneAutoAnimateTo: Optional[float] = None
+        vircadiaBabylonjsSceneAutoAnimateLoop: Optional[bool] = None
+        vircadiaBabylonjsSceneAutoAnimateSpeed: Optional[float] = None
 
-class World_PersistentScript(BaseModel):
-    runnerAgentId: str
-    script: str
-    unitTest: str
+    class TableNode(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        camera: Optional[str] = None
+        children: Optional[List[Any]] = None
+        skin: Optional[str] = None
+        matrix: Optional[List[float]] = None
+        mesh: Optional[str] = None
+        rotation: Optional[List[float]] = None
+        scale: Optional[List[float]] = None
+        translation: Optional[List[float]] = None
+        weights: Optional[List[Any]] = None
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsLodMode: Optional[Babylon.LOD.Mode] = None
+        vircadiaBabylonjsLodAuto: Optional[bool] = None
+        vircadiaBabylonjsLodDistance: Optional[float] = None
+        vircadiaBabylonjsLodSize: Optional[float] = None
+        vircadiaBabylonjsLodHide: Optional[float] = None
+        vircadiaBabylonjsBillboardMode: Optional[Babylon.Billboard.Mode] = None
+        vircadiaBabylonjsLightLightmap: Optional[str] = None
+        vircadiaBabylonjsLightLevel: Optional[float] = None
+        vircadiaBabylonjsLightColorSpace: Optional[Babylon.Texture.ColorSpace] = None
+        vircadiaBabylonjsLightTexcoord: Optional[int] = None
+        vircadiaBabylonjsLightUseAsShadowmap: Optional[bool] = None
+        vircadiaBabylonjsLightMode: Optional[Babylon.Light.Mode] = None
+        vircadiaBabylonjsScriptAgentScripts: Optional[List[str]] = None
+        vircadiaBabylonjsScriptPersistentScripts: Optional[List[str]] = None
 
-class World_BabylonJS(BaseModel):
-    lod: Optional[World_LOD] = None
-    billboard: Optional[World_Billboard] = None
-    lightmap: Optional[World_Lightmap] = None
-    script: Optional[Dict[str, Union[List[World_AgentScript], List[World_PersistentScript]]]] = None
+    class TableMesh(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        primitives: List[Any]
+        weights: Optional[List[Any]] = None
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsLodMode: Optional[Babylon.LOD.Mode] = None
+        vircadiaBabylonjsLodAuto: Optional[bool] = None
+        vircadiaBabylonjsLodDistance: Optional[float] = None
+        vircadiaBabylonjsLodSize: Optional[float] = None
+        vircadiaBabylonjsLodHide: Optional[float] = None
+        vircadiaBabylonjsBillboardMode: Optional[Babylon.Billboard.Mode] = None
+        vircadiaBabylonjsLightLightmap: Optional[str] = None
+        vircadiaBabylonjsLightLevel: Optional[float] = None
+        vircadiaBabylonjsLightColorSpace: Optional[Babylon.Texture.ColorSpace] = None
+        vircadiaBabylonjsLightTexcoord: Optional[int] = None
+        vircadiaBabylonjsLightUseAsShadowmap: Optional[bool] = None
+        vircadiaBabylonjsLightMode: Optional[Babylon.Light.Mode] = None
+        vircadiaBabylonjsScriptAgentScripts: Optional[List[str]] = None
+        vircadiaBabylonjsScriptPersistentScripts: Optional[List[str]] = None
 
-class World_CommonEntityProperties(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    vircadia_version: Optional[str] = None
-    vircadia_createdat: Optional[datetime] = None
-    vircadia_updatedat: Optional[datetime] = None
-    name: Optional[str] = None
-    extras: Optional[Dict[str, Any]] = None
-    vircadia_babylonjs_lod_mode: Optional[str] = None
-    vircadia_babylonjs_lod_auto: Optional[bool] = None
-    vircadia_babylonjs_lod_distance: Optional[float] = None
-    vircadia_babylonjs_lod_size: Optional[float] = None
-    vircadia_babylonjs_lod_hide: Optional[float] = None
-    vircadia_babylonjs_billboard_mode: Optional[int] = None
-    vircadia_babylonjs_light_lightmap: Optional[str] = None
-    vircadia_babylonjs_light_level: Optional[float] = None
-    vircadia_babylonjs_light_color_space: Optional[str] = None
-    vircadia_babylonjs_light_texcoord: Optional[int] = None
-    vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
-    vircadia_babylonjs_light_mode: Optional[str] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[Dict[str, Any]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[Dict[str, Any]] = None
+    class TableMaterial(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        pbrMetallicRoughness: Optional[Any] = None
+        normalTexture: Optional[Any] = None
+        occlusionTexture: Optional[Any] = None
+        emissiveTexture: Optional[Any] = None
+        emissiveFactor: Optional[List[float]] = None
+        alphaMode: Optional[str] = None
+        alphaCutoff: Optional[float] = None
+        doubleSided: Optional[bool] = None
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsLodMode: Optional[Babylon.LOD.Mode] = None
+        vircadiaBabylonjsLodAuto: Optional[bool] = None
+        vircadiaBabylonjsLodDistance: Optional[float] = None
+        vircadiaBabylonjsLodSize: Optional[float] = None
+        vircadiaBabylonjsLodHide: Optional[float] = None
+        vircadiaBabylonjsBillboardMode: Optional[Babylon.Billboard.Mode] = None
+        vircadiaBabylonjsLightLightmap: Optional[str] = None
+        vircadiaBabylonjsLightLevel: Optional[float] = None
+        vircadiaBabylonjsLightColorSpace: Optional[Babylon.Texture.ColorSpace] = None
+        vircadiaBabylonjsLightTexcoord: Optional[int] = None
+        vircadiaBabylonjsLightUseAsShadowmap: Optional[bool] = None
+        vircadiaBabylonjsLightMode: Optional[Babylon.Light.Mode] = None
+        vircadiaBabylonjsScriptAgentScripts: Optional[List[str]] = None
+        vircadiaBabylonjsScriptPersistentScripts: Optional[List[str]] = None
 
-class World_SceneEntityProperties(World_CommonEntityProperties):
-    clearColor: Optional[Primitive_Color3] = None
-    ambientColor: Optional[Primitive_Color3] = None
-    gravity: Optional[Primitive_Vector3] = None
-    activeCamera: Optional[str] = None
-    collisionsEnabled: Optional[bool] = None
-    physicsEnabled: Optional[bool] = None
-    physicsGravity: Optional[Primitive_Vector3] = None
-    physicsEngine: Optional[str] = None
-    autoAnimate: Optional[bool] = None
-    autoAnimateFrom: Optional[int] = None
-    autoAnimateTo: Optional[int] = None
-    autoAnimateLoop: Optional[bool] = None
-    autoAnimateSpeed: Optional[float] = None
+    class TableTexture(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        sampler: Optional[str] = None
+        source: Optional[str] = None
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsLodMode: Optional[Babylon.LOD.Mode] = None
+        vircadiaBabylonjsLodAuto: Optional[bool] = None
+        vircadiaBabylonjsLodDistance: Optional[float] = None
+        vircadiaBabylonjsLodSize: Optional[float] = None
+        vircadiaBabylonjsLodHide: Optional[float] = None
+        vircadiaBabylonjsBillboardMode: Optional[Babylon.Billboard.Mode] = None
+        vircadiaBabylonjsLightLightmap: Optional[str] = None
+        vircadiaBabylonjsLightLevel: Optional[float] = None
+        vircadiaBabylonjsLightColorSpace: Optional[Babylon.Texture.ColorSpace] = None
+        vircadiaBabylonjsLightTexcoord: Optional[int] = None
+        vircadiaBabylonjsLightUseAsShadowmap: Optional[bool] = None
+        vircadiaBabylonjsLightMode: Optional[Babylon.Light.Mode] = None
+        vircadiaBabylonjsScriptAgentScripts: Optional[List[str]] = None
+        vircadiaBabylonjsScriptPersistentScripts: Optional[List[str]] = None
 
-class World_WorldGLTF(BaseModel):
-    vircadia_uuid: str
-    name: str
-    version: str
-    vircadia_createdat: datetime
-    vircadia_updatedat: datetime
-    metadata: Any
-    defaultScene: Optional[str] = None
-    extensionsUsed: Optional[List[str]] = None
-    extensionsRequired: Optional[List[str]] = None
-    extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[Dict[str, Any]] = None
-    asset: Any
-    vircadia_version: Optional[str] = None
+    class TableImage(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        uri: Optional[str] = None
+        mimeType: Optional[str] = None
+        bufferView: Optional[str] = None
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsLodMode: Optional[Babylon.LOD.Mode] = None
+        vircadiaBabylonjsLodAuto: Optional[bool] = None
+        vircadiaBabylonjsLodDistance: Optional[float] = None
+        vircadiaBabylonjsLodSize: Optional[float] = None
+        vircadiaBabylonjsLodHide: Optional[float] = None
+        vircadiaBabylonjsBillboardMode: Optional[Babylon.Billboard.Mode] = None
+        vircadiaBabylonjsLightLightmap: Optional[str] = None
+        vircadiaBabylonjsLightLevel: Optional[float] = None
+        vircadiaBabylonjsLightColorSpace: Optional[Babylon.Texture.ColorSpace] = None
+        vircadiaBabylonjsLightTexcoord: Optional[int] = None
+        vircadiaBabylonjsLightUseAsShadowmap: Optional[bool] = None
+        vircadiaBabylonjsLightMode: Optional[Babylon.Light.Mode] = None
+        vircadiaBabylonjsScriptAgentScripts: Optional[List[str]] = None
+        vircadiaBabylonjsScriptPersistentScripts: Optional[List[str]] = None
 
-class World_Scene(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
-    nodes: Optional[List[Any]] = None
-    extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[Dict[str, Any]] = None
-    vircadia_version: Optional[str] = None
-    vircadia_createdat: Optional[datetime] = None
-    vircadia_updatedat: Optional[datetime] = None
-    vircadia_babylonjs_scene_clearColor: Optional[Dict[str, float]] = None
-    vircadia_babylonjs_scene_ambientColor: Optional[Dict[str, float]] = None
-    vircadia_babylonjs_scene_gravity: Optional[Dict[str, float]] = None
-    vircadia_babylonjs_scene_activeCamera: Optional[str] = None
-    vircadia_babylonjs_scene_collisionsEnabled: Optional[bool] = None
-    vircadia_babylonjs_scene_physicsEnabled: Optional[bool] = None
-    vircadia_babylonjs_scene_physicsGravity: Optional[Dict[str, float]] = None
-    vircadia_babylonjs_scene_physicsEngine: Optional[str] = None
-    vircadia_babylonjs_scene_autoAnimate: Optional[bool] = None
-    vircadia_babylonjs_scene_autoAnimateFrom: Optional[float] = None
-    vircadia_babylonjs_scene_autoAnimateTo: Optional[float] = None
-    vircadia_babylonjs_scene_autoAnimateLoop: Optional[bool] = None
-    vircadia_babylonjs_scene_autoAnimateSpeed: Optional[float] = None
+    class TableSampler(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        magFilter: Optional[int] = None
+        minFilter: Optional[int] = None
+        wrapS: Optional[int] = None
+        wrapT: Optional[int] = None
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsLodMode: Optional[Babylon.LOD.Mode] = None
+        vircadiaBabylonjsLodAuto: Optional[bool] = None
+        vircadiaBabylonjsLodDistance: Optional[float] = None
+        vircadiaBabylonjsLodSize: Optional[float] = None
+        vircadiaBabylonjsLodHide: Optional[float] = None
+        vircadiaBabylonjsBillboardMode: Optional[Babylon.Billboard.Mode] = None
+        vircadiaBabylonjsLightLightmap: Optional[str] = None
+        vircadiaBabylonjsLightLevel: Optional[float] = None
+        vircadiaBabylonjsLightColorSpace: Optional[Babylon.Texture.ColorSpace] = None
+        vircadiaBabylonjsLightTexcoord: Optional[int] = None
+        vircadiaBabylonjsLightUseAsShadowmap: Optional[bool] = None
+        vircadiaBabylonjsLightMode: Optional[Babylon.Light.Mode] = None
+        vircadiaBabylonjsScriptAgentScripts: Optional[List[str]] = None
+        vircadiaBabylonjsScriptPersistentScripts: Optional[List[str]] = None
 
-class World_Node(World_CommonEntityProperties):
-    camera: Optional[str] = None
-    children: Optional[List[Any]] = None
-    skin: Optional[str] = None
-    matrix: Optional[List[float]] = None
-    mesh: Optional[str] = None
-    rotation: Optional[List[float]] = None
-    scale: Optional[List[float]] = None
-    translation: Optional[List[float]] = None
-    weights: Optional[List[Any]] = None
-    extensions: Optional[Dict[str, Any]] = None
+    class TableAnimation(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        channels: List[Any]
+        samplers: List[Any]
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsLodMode: Optional[Babylon.LOD.Mode] = None
+        vircadiaBabylonjsLodAuto: Optional[bool] = None
+        vircadiaBabylonjsLodDistance: Optional[float] = None
+        vircadiaBabylonjsLodSize: Optional[float] = None
+        vircadiaBabylonjsLodHide: Optional[float] = None
+        vircadiaBabylonjsBillboardMode: Optional[Babylon.Billboard.Mode] = None
+        vircadiaBabylonjsLightLightmap: Optional[str] = None
+        vircadiaBabylonjsLightLevel: Optional[float] = None
+        vircadiaBabylonjsLightColorSpace: Optional[Babylon.Texture.ColorSpace] = None
+        vircadiaBabylonjsLightTexcoord: Optional[int] = None
+        vircadiaBabylonjsLightUseAsShadowmap: Optional[bool] = None
+        vircadiaBabylonjsLightMode: Optional[Babylon.Light.Mode] = None
+        vircadiaBabylonjsScriptAgentScripts: Optional[List[str]] = None
+        vircadiaBabylonjsScriptPersistentScripts: Optional[List[str]] = None
 
-class World_Mesh(World_CommonEntityProperties):
-    primitives: List[Any]
-    weights: Optional[List[Any]] = None
-    extensions: Optional[Dict[str, Any]] = None
+    class TableSkin(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        inverseBindMatrices: Optional[str] = None
+        skeleton: Optional[str] = None
+        joints: List[Any]
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsLodMode: Optional[Babylon.LOD.Mode] = None
+        vircadiaBabylonjsLodAuto: Optional[bool] = None
+        vircadiaBabylonjsLodDistance: Optional[float] = None
+        vircadiaBabylonjsLodSize: Optional[float] = None
+        vircadiaBabylonjsLodHide: Optional[float] = None
+        vircadiaBabylonjsBillboardMode: Optional[Babylon.Billboard.Mode] = None
+        vircadiaBabylonjsLightLightmap: Optional[str] = None
+        vircadiaBabylonjsLightLevel: Optional[float] = None
+        vircadiaBabylonjsLightColorSpace: Optional[Babylon.Texture.ColorSpace] = None
+        vircadiaBabylonjsLightTexcoord: Optional[int] = None
+        vircadiaBabylonjsLightUseAsShadowmap: Optional[bool] = None
+        vircadiaBabylonjsLightMode: Optional[Babylon.Light.Mode] = None
+        vircadiaBabylonjsScriptAgentScripts: Optional[List[str]] = None
+        vircadiaBabylonjsScriptPersistentScripts: Optional[List[str]] = None
 
-class World_Material(World_CommonEntityProperties):
-    pbrMetallicRoughness: Optional[Any] = None
-    normalTexture: Optional[Any] = None
-    occlusionTexture: Optional[Any] = None
-    emissiveTexture: Optional[Any] = None
-    emissiveFactor: Optional[List[float]] = None
-    alphaMode: Optional[str] = None
-    alphaCutoff: Optional[float] = None
-    doubleSided: Optional[bool] = None
-    extensions: Optional[Dict[str, Any]] = None
+    class TableCamera(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        type: str
+        orthographic: Optional[Any] = None
+        perspective: Optional[Any] = None
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsLodMode: Optional[Babylon.LOD.Mode] = None
+        vircadiaBabylonjsLodAuto: Optional[bool] = None
+        vircadiaBabylonjsLodDistance: Optional[float] = None
+        vircadiaBabylonjsLodSize: Optional[float] = None
+        vircadiaBabylonjsLodHide: Optional[float] = None
+        vircadiaBabylonjsBillboardMode: Optional[Babylon.Billboard.Mode] = None
+        vircadiaBabylonjsLightLightmap: Optional[str] = None
+        vircadiaBabylonjsLightLevel: Optional[float] = None
+        vircadiaBabylonjsLightColorSpace: Optional[Babylon.Texture.ColorSpace] = None
+        vircadiaBabylonjsLightTexcoord: Optional[int] = None
+        vircadiaBabylonjsLightUseAsShadowmap: Optional[bool] = None
+        vircadiaBabylonjsLightMode: Optional[Babylon.Light.Mode] = None
+        vircadiaBabylonjsScriptAgentScripts: Optional[List[str]] = None
+        vircadiaBabylonjsScriptPersistentScripts: Optional[List[str]] = None
 
-class World_Texture(World_CommonEntityProperties):
-    sampler: Optional[str] = None
-    source: Optional[str] = None
-    extensions: Optional[Dict[str, Any]] = None
+    class TableBuffer(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        uri: Optional[str] = None
+        byteLength: int
+        data: Optional[bytes] = None
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsLodMode: Optional[Babylon.LOD.Mode] = None
+        vircadiaBabylonjsLodAuto: Optional[bool] = None
+        vircadiaBabylonjsLodDistance: Optional[float] = None
+        vircadiaBabylonjsLodSize: Optional[float] = None
+        vircadiaBabylonjsLodHide: Optional[float] = None
+        vircadiaBabylonjsBillboardMode: Optional[Babylon.Billboard.Mode] = None
+        vircadiaBabylonjsLightLightmap: Optional[str] = None
+        vircadiaBabylonjsLightLevel: Optional[float] = None
+        vircadiaBabylonjsLightColorSpace: Optional[Babylon.Texture.ColorSpace] = None
+        vircadiaBabylonjsLightTexcoord: Optional[int] = None
+        vircadiaBabylonjsLightUseAsShadowmap: Optional[bool] = None
+        vircadiaBabylonjsLightMode: Optional[Babylon.Light.Mode] = None
+        vircadiaBabylonjsScriptAgentScripts: Optional[List[str]] = None
+        vircadiaBabylonjsScriptPersistentScripts: Optional[List[str]] = None
 
-class World_Image(World_CommonEntityProperties):
-    uri: Optional[str] = None
-    mimeType: Optional[str] = None
-    bufferView: Optional[str] = None
-    extensions: Optional[Dict[str, Any]] = None
+    class TableBufferView(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        buffer: str
+        byteOffset: Optional[int] = None
+        byteLength: int
+        byteStride: Optional[int] = None
+        target: Optional[int] = None
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsLodMode: Optional[Babylon.LOD.Mode] = None
+        vircadiaBabylonjsLodAuto: Optional[bool] = None
+        vircadiaBabylonjsLodDistance: Optional[float] = None
+        vircadiaBabylonjsLodSize: Optional[float] = None
+        vircadiaBabylonjsLodHide: Optional[float] = None
+        vircadiaBabylonjsBillboardMode: Optional[Babylon.Billboard.Mode] = None
+        vircadiaBabylonjsLightLightmap: Optional[str] = None
+        vircadiaBabylonjsLightLevel: Optional[float] = None
+        vircadiaBabylonjsLightColorSpace: Optional[Babylon.Texture.ColorSpace] = None
+        vircadiaBabylonjsLightTexcoord: Optional[int] = None
+        vircadiaBabylonjsLightUseAsShadowmap: Optional[bool] = None
+        vircadiaBabylonjsLightMode: Optional[Babylon.Light.Mode] = None
+        vircadiaBabylonjsScriptAgentScripts: Optional[List[str]] = None
+        vircadiaBabylonjsScriptPersistentScripts: Optional[List[str]] = None
 
-class World_Sampler(World_CommonEntityProperties):
-    magFilter: Optional[int] = None
-    minFilter: Optional[int] = None
-    wrapS: Optional[int] = None
-    wrapT: Optional[int] = None
-    extensions: Optional[Dict[str, Any]] = None
+    class TableAccessor(BaseWorldGLTFTableProperties):
+        vircadiaWorldUuid: str
+        bufferView: Optional[str] = None
+        byteOffset: Optional[int] = None
+        componentType: int
+        normalized: Optional[bool] = None
+        count: int
+        type: str
+        max: Optional[List[Any]] = None
+        min: Optional[List[Any]] = None
+        sparse: Optional[Dict[str, Any]] = None
+        extensions: Optional[Dict[str, Any]] = None
+        vircadiaBabylonjsLodMode: Optional[Babylon.LOD.Mode] = None
+        vircadiaBabylonjsLodAuto: Optional[bool] = None
+        vircadiaBabylonjsLodDistance: Optional[float] = None
+        vircadiaBabylonjsLodSize: Optional[float] = None
+        vircadiaBabylonjsLodHide: Optional[float] = None
+        vircadiaBabylonjsBillboardMode: Optional[Babylon.Billboard.Mode] = None
+        vircadiaBabylonjsLightLightmap: Optional[str] = None
+        vircadiaBabylonjsLightLevel: Optional[float] = None
+        vircadiaBabylonjsLightColorSpace: Optional[Babylon.Texture.ColorSpace] = None
+        vircadiaBabylonjsLightTexcoord: Optional[int] = None
+        vircadiaBabylonjsLightUseAsShadowmap: Optional[bool] = None
+        vircadiaBabylonjsLightMode: Optional[Babylon.Light.Mode] = None
+        vircadiaBabylonjsScriptAgentScripts: Optional[List[str]] = None
+        vircadiaBabylonjsScriptPersistentScripts: Optional[List[str]] = None
 
-class World_Animation(World_CommonEntityProperties):
-    channels: List[Any]
-    samplers: List[Any]
-    extensions: Optional[Dict[str, Any]] = None
+    class TableUserProfile(BaseModel):
+        id: str
+        username: str
+        fullName: str
+        role: 'Agent.Profile.Role'
+        createdAt: datetime
+        updatedAt: datetime
 
-class World_Skin(World_CommonEntityProperties):
-    inverseBindMatrices: Optional[str] = None
-    skeleton: Optional[str] = None
-    joints: List[Any]
-    extensions: Optional[Dict[str, Any]] = None
+    class TableMetadata(BaseModel):
+        metadataId: str
+        parentId: str
+        key: str
+        valuesText: Optional[List[str]] = None
+        valuesNumeric: Optional[List[float]] = None
+        valuesBoolean: Optional[List[bool]] = None
+        valuesTimestamp: Optional[List[datetime]] = None
+        createdat: datetime
+        updatedat: datetime
 
-class World_Camera(World_CommonEntityProperties):
-    type: str
-    orthographic: Optional[Any] = None
-    perspective: Optional[Any] = None
-    extensions: Optional[Dict[str, Any]] = None
+    class Table(str, Enum):
+        WORLD_GLTF = 'world_gltf'
+        AGENT_PROFILES = 'agent_profiles'
+        SCENES = 'scenes'
+        NODES = 'nodes'
+        MESHES = 'meshes'
+        MATERIALS = 'materials'
+        TEXTURES = 'textures'
+        IMAGES = 'images'
+        SAMPLERS = 'samplers'
+        ANIMATIONS = 'animations'
+        SKINS = 'skins'
+        CAMERAS = 'cameras'
+        BUFFERS = 'buffers'
+        BUFFER_VIEWS = 'buffer_views'
+        ACCESSORS = 'accessors'
+        WORLD_GLTF_METADATA = 'world_gltf_metadata'
+        SCENES_METADATA = 'scenes_metadata'
+        NODES_METADATA = 'nodes_metadata'
+        MESHES_METADATA = 'meshes_metadata'
+        MATERIALS_METADATA = 'materials_metadata'
+        TEXTURES_METADATA = 'textures_metadata'
+        IMAGES_METADATA = 'images_metadata'
+        SAMPLERS_METADATA = 'samplers_metadata'
+        ANIMATIONS_METADATA = 'animations_metadata'
+        SKINS_METADATA = 'skins_metadata'
+        CAMERAS_METADATA = 'cameras_metadata'
+        BUFFERS_METADATA = 'buffers_metadata'
+        BUFFER_VIEWS_METADATA = 'buffer_views_metadata'
+        ACCESSORS_METADATA = 'accessors_metadata'
 
-class World_Buffer(World_CommonEntityProperties):
-    uri: Optional[str] = None
-    byteLength: int
-    data: Optional[bytes] = None
-    extensions: Optional[Dict[str, Any]] = None
+    class TableMutation(str, Enum):
+        CREATE_AGENT_PROFILE = "create_agent_profile"
+        UPDATE_AGENT_PROFILE = "update_agent_profile"
+        DELETE_AGENT_PROFILE = "delete_agent_profile"
+        CREATE_WORLD_GLTF = "create_world_gltf"
+        UPDATE_WORLD_GLTF = "update_world_gltf"
+        DELETE_WORLD_GLTF = "delete_world_gltf"
+        CREATE_SCENE = "create_scene"
+        UPDATE_SCENE = "update_scene"
+        DELETE_SCENE = "delete_scene"
+        CREATE_NODE = "create_node"
+        UPDATE_NODE = "update_node"
+        DELETE_NODE = "delete_node"
+        CREATE_MESH = "create_mesh"
+        UPDATE_MESH = "update_mesh"
+        DELETE_MESH = "delete_mesh"
+        CREATE_MATERIAL = "create_material"
+        UPDATE_MATERIAL = "update_material"
+        DELETE_MATERIAL = "delete_material"
+        CREATE_TEXTURE = "create_texture"
+        UPDATE_TEXTURE = "update_texture"
+        DELETE_TEXTURE = "delete_texture"
+        CREATE_IMAGE = "create_image"
+        UPDATE_IMAGE = "update_image"
+        DELETE_IMAGE = "delete_image"
+        CREATE_SAMPLER = "create_sampler"
+        UPDATE_SAMPLER = "update_sampler"
+        DELETE_SAMPLER = "delete_sampler"
+        CREATE_ANIMATION = "create_animation"
+        UPDATE_ANIMATION = "update_animation"
+        DELETE_ANIMATION = "delete_animation"
+        CREATE_SKIN = "create_skin"
+        UPDATE_SKIN = "update_skin"
+        DELETE_SKIN = "delete_skin"
+        CREATE_CAMERA = "create_camera"
+        UPDATE_CAMERA = "update_camera"
+        DELETE_CAMERA = "delete_camera"
+        CREATE_BUFFER = "create_buffer"
+        UPDATE_BUFFER = "update_buffer"
+        DELETE_BUFFER = "delete_buffer"
+        CREATE_BUFFER_VIEW = "create_buffer_view"
+        UPDATE_BUFFER_VIEW = "update_buffer_view"
+        DELETE_BUFFER_VIEW = "delete_buffer_view"
+        CREATE_ACCESSOR = "create_accessor"
+        UPDATE_ACCESSOR = "update_accessor"
+        DELETE_ACCESSOR = "delete_accessor"
+        CREATE_WORLD_GLTF_METADATA = "create_world_gltf_metadata"
+        UPDATE_WORLD_GLTF_METADATA = "update_world_gltf_metadata"
+        DELETE_WORLD_GLTF_METADATA = "delete_world_gltf_metadata"
+        CREATE_SCENE_METADATA = "create_scene_metadata"
+        UPDATE_SCENE_METADATA = "update_scene_metadata"
+        DELETE_SCENE_METADATA = "delete_scene_metadata"
+        CREATE_NODE_METADATA = "create_node_metadata"
+        UPDATE_NODE_METADATA = "update_node_metadata"
+        DELETE_NODE_METADATA = "delete_node_metadata"
+        CREATE_MESH_METADATA = "create_mesh_metadata"
+        UPDATE_MESH_METADATA = "update_mesh_metadata"
+        DELETE_MESH_METADATA = "delete_mesh_metadata"
+        CREATE_MATERIAL_METADATA = "create_material_metadata"
+        UPDATE_MATERIAL_METADATA = "update_material_metadata"
+        DELETE_MATERIAL_METADATA = "delete_material_metadata"
+        CREATE_TEXTURE_METADATA = "create_texture_metadata"
+        UPDATE_TEXTURE_METADATA = "update_texture_metadata"
+        DELETE_TEXTURE_METADATA = "delete_texture_metadata"
+        CREATE_IMAGE_METADATA = "create_image_metadata"
+        UPDATE_IMAGE_METADATA = "update_image_metadata"
+        DELETE_IMAGE_METADATA = "delete_image_metadata"
+        CREATE_SAMPLER_METADATA = "create_sampler_metadata"
+        UPDATE_SAMPLER_METADATA = "update_sampler_metadata"
+        DELETE_SAMPLER_METADATA = "delete_sampler_metadata"
+        CREATE_ANIMATION_METADATA = "create_animation_metadata"
+        UPDATE_ANIMATION_METADATA = "update_animation_metadata"
+        DELETE_ANIMATION_METADATA = "delete_animation_metadata"
+        CREATE_SKIN_METADATA = "create_skin_metadata"
+        UPDATE_SKIN_METADATA = "update_skin_metadata"
+        DELETE_SKIN_METADATA = "delete_skin_metadata"
+        CREATE_CAMERA_METADATA = "create_camera_metadata"
+        UPDATE_CAMERA_METADATA = "update_camera_metadata"
+        DELETE_CAMERA_METADATA = "delete_camera_metadata"
+        CREATE_BUFFER_METADATA = "create_buffer_metadata"
+        UPDATE_BUFFER_METADATA = "update_buffer_metadata"
+        DELETE_BUFFER_METADATA = "delete_buffer_metadata"
+        CREATE_BUFFER_VIEW_METADATA = "create_buffer_view_metadata"
+        UPDATE_BUFFER_VIEW_METADATA = "update_buffer_view_metadata"
+        DELETE_BUFFER_VIEW_METADATA = "delete_buffer_view_metadata"
+        CREATE_ACCESSOR_METADATA = "create_accessor_metadata"
+        UPDATE_ACCESSOR_METADATA = "update_accessor_metadata"
+        DELETE_ACCESSOR_METADATA = "delete_accessor_metadata"
 
-class World_BufferView(World_CommonEntityProperties):
-    buffer: str
-    byteOffset: Optional[int] = None
-    byteLength: int
-    byteStride: Optional[int] = None
-    target: Optional[int] = None
-    extensions: Optional[Dict[str, Any]] = None
+    class RealtimeBroadcastChannel(str, Enum):
+        AGENT_SIGNAL = "agent_signal"
 
-class World_Accessor(World_CommonEntityProperties):
-    bufferView: Optional[str] = None
-    byteOffset: Optional[int] = None
-    componentType: int
-    normalized: Optional[bool] = None
-    count: int
-    type: str
-    max: Optional[List[Any]] = None
-    min: Optional[List[Any]] = None
-    sparse: Optional[Dict[str, Any]] = None
-    extensions: Optional[Dict[str, Any]] = None
+    class RealtimePresenceChannel(str, Enum):
+        AGENT_PRESENCE = "agent_presence"
 
-class World_UserProfile(BaseModel):
-    id: str
-    username: str
-    full_name: str
-    role: 'Agent_Profile_Role'
-    created_at: datetime
-    updated_at: datetime
+class Agent:
+    class Profile:
+        class Role(str, Enum):
+            GUEST = "guest"
+            MEMBER = "member"
+            ADMIN = "admin"
 
-class World_Metadata(BaseModel):
-    metadata_id: str
-    parent_id: str
-    key: str
-    values_text: Optional[List[str]] = None
-    values_numeric: Optional[List[float]] = None
-    values_boolean: Optional[List[bool]] = None
-    values_timestamp: Optional[List[datetime]] = None
-    createdat: datetime
-    updatedat: datetime
+    class WebRTC:
+        class SignalType(str, Enum):
+            AGENT_OFFER = "agent-agent-offer-packet"
+            AGENT_ANSWER = "agent-agent-answer-packet"
+            AGENT_ICE_CANDIDATE = "agent-agent-ice-candidate-packet"
 
-class World_Table(str, Enum):
-    WORLD_GLTF = 'world_gltf'
-    AGENT_PROFILES = 'agent_profiles'
-    SCENES = 'scenes'
-    NODES = 'nodes'
-    MESHES = 'meshes'
-    MATERIALS = 'materials'
-    TEXTURES = 'textures'
-    IMAGES = 'images'
-    SAMPLERS = 'samplers'
-    ANIMATIONS = 'animations'
-    SKINS = 'skins'
-    CAMERAS = 'cameras'
-    BUFFERS = 'buffers'
-    BUFFER_VIEWS = 'buffer_views'
-    ACCESSORS = 'accessors'
-    WORLD_GLTF_METADATA = 'world_gltf_metadata'
-    SCENES_METADATA = 'scenes_metadata'
-    NODES_METADATA = 'nodes_metadata'
-    MESHES_METADATA = 'meshes_metadata'
-    MATERIALS_METADATA = 'materials_metadata'
-    TEXTURES_METADATA = 'textures_metadata'
-    IMAGES_METADATA = 'images_metadata'
-    SAMPLERS_METADATA = 'samplers_metadata'
-    ANIMATIONS_METADATA = 'animations_metadata'
-    SKINS_METADATA = 'skins_metadata'
-    CAMERAS_METADATA = 'cameras_metadata'
-    BUFFERS_METADATA = 'buffers_metadata'
-    BUFFER_VIEWS_METADATA = 'buffer_views_metadata'
-    ACCESSORS_METADATA = 'accessors_metadata'
+    class Audio:
+        DEFAULT_PANNER_OPTIONS = {
+            "panningModel": "HRTF",
+            "distanceModel": "inverse",
+            "refDistance": 1,
+            "maxDistance": 10000,
+        }
 
-class World_RealtimeBroadcastChannel(str, Enum):
-    AGENT_SIGNAL = 'agent_signal'
+    class Presence(BaseModel):
+        agentId: str
+        position: Primitive.Vector3
+        orientation: Primitive.Vector3
+        lastUpdated: datetime
 
-class World_RealtimePresenceChannel(str, Enum):
-    AGENT_PRESENCE = 'agent_presence'
+        @classmethod
+        def parse(cls, obj: Dict[str, Any]) -> 'Presence':
+            return cls(
+                agentId=obj['agentId'],
+                position=Primitive.Vector3(**obj['position']),
+                orientation=Primitive.Vector3(**obj['orientation']),
+                lastUpdated=datetime.fromisoformat(obj['lastUpdated'])
+            )
 
-class Agent_Profile_Role(str, Enum):
-    GUEST = 'guest'
-    MEMBER = 'member'
-    ADMIN = 'admin'
-
-class Agent_WebRTCSignalType(str, Enum):
-    AGENT_Offer = 'agent-agent-offer-packet'
-    AGENT_Answer = 'agent-agent-answer-packet'
-    AGENT_ICE_Candidate = 'agent-agent-ice-candidate-packet'
-
-class Agent_Presence(BaseModel):
-    agentId: str
-    position: Primitive_Vector3
-    orientation: Primitive_Vector3
-    lastUpdated: datetime
-
-class Server_ProxySubdomain(str, Enum):
-    SUPABASE_API = 'supabase-api'
-    SUPABASE_STORAGE = 'supabase-storage'
-    SUPABASE_GRAPHQL = 'supabase-graphql'
-    SUPABASE_INBUCKET = 'supabase-inbucket'
-    SUPABASE_STUDIO = 'supabase-studio'
-
-# Constants
-Agent_DEFAULT_PANNER_OPTIONS = {
-    'panningModel': 'HRTF',
-    'distanceModel': 'inverse',
-    'refDistance': 1,
-    'maxDistance': 10000,
-}
-
-World_Lightmap_DATA_MESH_NAME = "vircadia_lightmapData"
+class Server:
+    class ProxySubdomain(str, Enum):
+        SUPABASE_API = "supabase-api"
+        SUPABASE_STORAGE = "supabase-storage"
+        SUPABASE_GRAPHQL = "supabase-graphql"
+        SUPABASE_INBUCKET = "supabase-inbucket"
+        SUPABASE_STUDIO = "supabase-studio"
