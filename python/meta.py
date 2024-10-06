@@ -69,137 +69,63 @@ class World_PersistentScript(BaseModel):
     unitTest: str
 
 class World_BabylonJS(BaseModel):
-    lod: World_LOD
-    billboard: World_Billboard
-    lightmap: World_Lightmap
-    script: Dict[str, Union[List[World_AgentScript], List[World_PersistentScript]]]
+    lod: Optional[World_LOD] = None
+    billboard: Optional[World_Billboard] = None
+    lightmap: Optional[World_Lightmap] = None
+    script: Optional[Dict[str, Union[List[World_AgentScript], List[World_PersistentScript]]]] = None
 
-class World_BaseCommonEntityProperties(BaseModel):
-    vircadia: Dict[str, Any] = Field(
-        default_factory=lambda: {
-            "name": "",
-            "version": "",
-            "createdAt": datetime.now(),
-            "updatedAt": datetime.now()
-        }
-    )
-
-class World_CommonEntityProperties(World_BaseCommonEntityProperties):
-    vircadia: Dict[str, Any] = Field(
-        default_factory=lambda: {
-            "name": "",
-            "version": "",
-            "createdAt": datetime.now(),
-            "updatedAt": datetime.now(),
-            "babylonjs": {}
-        }
-    )
-
-    @property
-    def babylonjs(self) -> Dict[str, Any]:
-        return self.vircadia.get("babylonjs", {})
-
-    @babylonjs.setter
-    def babylonjs(self, value: Dict[str, Any]):
-        self.vircadia["babylonjs"] = value
+class World_CommonEntityProperties(BaseModel):
+    vircadia_uuid: str
+    vircadia_world_uuid: str
+    vircadia_version: Optional[str] = None
+    vircadia_createdat: Optional[datetime] = None
+    vircadia_updatedat: Optional[datetime] = None
+    name: Optional[str] = None
+    extras: Optional[Dict[str, Any]] = None
+    vircadia_babylonjs_lod_mode: Optional[str] = None
+    vircadia_babylonjs_lod_auto: Optional[bool] = None
+    vircadia_babylonjs_lod_distance: Optional[float] = None
+    vircadia_babylonjs_lod_size: Optional[float] = None
+    vircadia_babylonjs_lod_hide: Optional[float] = None
+    vircadia_babylonjs_billboard_mode: Optional[int] = None
+    vircadia_babylonjs_light_lightmap: Optional[str] = None
+    vircadia_babylonjs_light_level: Optional[float] = None
+    vircadia_babylonjs_light_color_space: Optional[str] = None
+    vircadia_babylonjs_light_texcoord: Optional[int] = None
+    vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
+    vircadia_babylonjs_light_mode: Optional[str] = None
+    vircadia_babylonjs_script_agent_scripts: Optional[Dict[str, Any]] = None
+    vircadia_babylonjs_script_persistent_scripts: Optional[Dict[str, Any]] = None
 
 class World_SceneEntityProperties(World_CommonEntityProperties):
-    vircadia: Dict[str, Any] = Field(
-        default_factory=lambda: {
-            "name": "",
-            "version": "",
-            "createdAt": datetime.now(),
-            "updatedAt": datetime.now(),
-            "babylonjs": {
-                "clearColor": None,
-                "ambientColor": None,
-                "gravity": None,
-                "activeCamera": None,
-                "collisionsEnabled": None,
-                "physicsEnabled": None,
-                "physicsGravity": None,
-                "physicsEngine": None,
-                "autoAnimate": None,
-                "autoAnimateFrom": None,
-                "autoAnimateTo": None,
-                "autoAnimateLoop": None,
-                "autoAnimateSpeed": None
-            }
-        }
-    )
-
-    class Config:
-        extra = "allow"
-
-    # Scene-specific properties
-    @property
-    def clearColor(self) -> Optional[Primitive_Color3]:
-        return self.babylonjs.get("clearColor")
-
-    @property
-    def ambientColor(self) -> Optional[Primitive_Color3]:
-        return self.babylonjs.get("ambientColor")
-
-    @property
-    def gravity(self) -> Optional[Primitive_Vector3]:
-        return self.babylonjs.get("gravity")
-
-    @property
-    def activeCamera(self) -> Optional[str]:
-        return self.babylonjs.get("activeCamera")
-
-    @property
-    def collisionsEnabled(self) -> Optional[bool]:
-        return self.babylonjs.get("collisionsEnabled")
-
-    @property
-    def physicsEnabled(self) -> Optional[bool]:
-        return self.babylonjs.get("physicsEnabled")
-
-    @property
-    def physicsGravity(self) -> Optional[Primitive_Vector3]:
-        return self.babylonjs.get("physicsGravity")
-
-    @property
-    def physicsEngine(self) -> Optional[str]:
-        return self.babylonjs.get("physicsEngine")
-
-    @property
-    def autoAnimate(self) -> Optional[bool]:
-        return self.babylonjs.get("autoAnimate")
-
-    @property
-    def autoAnimateFrom(self) -> Optional[int]:
-        return self.babylonjs.get("autoAnimateFrom")
-
-    @property
-    def autoAnimateTo(self) -> Optional[int]:
-        return self.babylonjs.get("autoAnimateTo")
-
-    @property
-    def autoAnimateLoop(self) -> Optional[bool]:
-        return self.babylonjs.get("autoAnimateLoop")
-
-    @property
-    def autoAnimateSpeed(self) -> Optional[float]:
-        return self.babylonjs.get("autoAnimateSpeed")
-
-class World_WorldGLTFProperties(World_BaseCommonEntityProperties):
-    pass
+    clearColor: Optional[Primitive_Color3] = None
+    ambientColor: Optional[Primitive_Color3] = None
+    gravity: Optional[Primitive_Vector3] = None
+    activeCamera: Optional[str] = None
+    collisionsEnabled: Optional[bool] = None
+    physicsEnabled: Optional[bool] = None
+    physicsGravity: Optional[Primitive_Vector3] = None
+    physicsEngine: Optional[str] = None
+    autoAnimate: Optional[bool] = None
+    autoAnimateFrom: Optional[int] = None
+    autoAnimateTo: Optional[int] = None
+    autoAnimateLoop: Optional[bool] = None
+    autoAnimateSpeed: Optional[float] = None
 
 class World_WorldGLTF(BaseModel):
     vircadia_uuid: str
     name: str
     version: str
-    created_at: datetime
-    updated_at: datetime
+    vircadia_createdat: datetime
+    vircadia_updatedat: datetime
     metadata: Any
     defaultScene: Optional[str] = None
     extensionsUsed: Optional[List[str]] = None
     extensionsRequired: Optional[List[str]] = None
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_WorldGLTFProperties] = None
+    extras: Optional[Dict[str, Any]] = None
     asset: Any
+    vircadia_version: Optional[str] = None
 
 class World_Scene(BaseModel):
     vircadia_uuid: str
@@ -207,12 +133,25 @@ class World_Scene(BaseModel):
     name: Optional[str] = None
     nodes: Optional[List[Any]] = None
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_SceneEntityProperties] = None
+    extras: Optional[Dict[str, Any]] = None
+    vircadia_version: Optional[str] = None
+    vircadia_createdat: Optional[datetime] = None
+    vircadia_updatedat: Optional[datetime] = None
+    vircadia_babylonjs_scene_clearColor: Optional[Dict[str, float]] = None
+    vircadia_babylonjs_scene_ambientColor: Optional[Dict[str, float]] = None
+    vircadia_babylonjs_scene_gravity: Optional[Dict[str, float]] = None
+    vircadia_babylonjs_scene_activeCamera: Optional[str] = None
+    vircadia_babylonjs_scene_collisionsEnabled: Optional[bool] = None
+    vircadia_babylonjs_scene_physicsEnabled: Optional[bool] = None
+    vircadia_babylonjs_scene_physicsGravity: Optional[Dict[str, float]] = None
+    vircadia_babylonjs_scene_physicsEngine: Optional[str] = None
+    vircadia_babylonjs_scene_autoAnimate: Optional[bool] = None
+    vircadia_babylonjs_scene_autoAnimateFrom: Optional[float] = None
+    vircadia_babylonjs_scene_autoAnimateTo: Optional[float] = None
+    vircadia_babylonjs_scene_autoAnimateLoop: Optional[bool] = None
+    vircadia_babylonjs_scene_autoAnimateSpeed: Optional[float] = None
 
-class World_Node(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
+class World_Node(World_CommonEntityProperties):
     camera: Optional[str] = None
     children: Optional[List[Any]] = None
     skin: Optional[str] = None
@@ -223,21 +162,13 @@ class World_Node(BaseModel):
     translation: Optional[List[float]] = None
     weights: Optional[List[Any]] = None
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_CommonEntityProperties] = None
 
-class World_Mesh(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
+class World_Mesh(World_CommonEntityProperties):
     primitives: List[Any]
     weights: Optional[List[Any]] = None
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_CommonEntityProperties] = None
 
-class World_Material(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
+class World_Material(World_CommonEntityProperties):
     pbrMetallicRoughness: Optional[Any] = None
     normalTexture: Optional[Any] = None
     occlusionTexture: Optional[Any] = None
@@ -247,93 +178,57 @@ class World_Material(BaseModel):
     alphaCutoff: Optional[float] = None
     doubleSided: Optional[bool] = None
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_CommonEntityProperties] = None
 
-class World_Texture(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
+class World_Texture(World_CommonEntityProperties):
     sampler: Optional[str] = None
     source: Optional[str] = None
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_CommonEntityProperties] = None
 
-class World_Image(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
+class World_Image(World_CommonEntityProperties):
     uri: Optional[str] = None
     mimeType: Optional[str] = None
     bufferView: Optional[str] = None
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_CommonEntityProperties] = None
 
-class World_Sampler(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
+class World_Sampler(World_CommonEntityProperties):
     magFilter: Optional[int] = None
     minFilter: Optional[int] = None
     wrapS: Optional[int] = None
     wrapT: Optional[int] = None
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_CommonEntityProperties] = None
 
-class World_Animation(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
+class World_Animation(World_CommonEntityProperties):
     channels: List[Any]
     samplers: List[Any]
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_CommonEntityProperties] = None
 
-class World_Skin(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
+class World_Skin(World_CommonEntityProperties):
     inverseBindMatrices: Optional[str] = None
     skeleton: Optional[str] = None
     joints: List[Any]
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_CommonEntityProperties] = None
 
-class World_Camera(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
+class World_Camera(World_CommonEntityProperties):
     type: str
     orthographic: Optional[Any] = None
     perspective: Optional[Any] = None
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_CommonEntityProperties] = None
 
-class World_Buffer(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
+class World_Buffer(World_CommonEntityProperties):
     uri: Optional[str] = None
     byteLength: int
     data: Optional[bytes] = None
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_CommonEntityProperties] = None
 
-class World_BufferView(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
+class World_BufferView(World_CommonEntityProperties):
     buffer: str
     byteOffset: Optional[int] = None
     byteLength: int
     byteStride: Optional[int] = None
     target: Optional[int] = None
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_CommonEntityProperties] = None
 
-class World_Accessor(BaseModel):
-    vircadia_uuid: str
-    vircadia_world_uuid: str
-    name: Optional[str] = None
+class World_Accessor(World_CommonEntityProperties):
     bufferView: Optional[str] = None
     byteOffset: Optional[int] = None
     componentType: int
@@ -344,10 +239,29 @@ class World_Accessor(BaseModel):
     min: Optional[List[Any]] = None
     sparse: Optional[Dict[str, Any]] = None
     extensions: Optional[Dict[str, Any]] = None
-    extras: Optional[World_CommonEntityProperties] = None
+
+class World_UserProfile(BaseModel):
+    id: str
+    username: str
+    full_name: str
+    role: 'Agent_Profile_Role'
+    created_at: datetime
+    updated_at: datetime
+
+class World_Metadata(BaseModel):
+    metadata_id: str
+    parent_id: str
+    key: str
+    values_text: Optional[List[str]] = None
+    values_numeric: Optional[List[float]] = None
+    values_boolean: Optional[List[bool]] = None
+    values_timestamp: Optional[List[datetime]] = None
+    createdat: datetime
+    updatedat: datetime
 
 class World_Table(str, Enum):
     WORLD_GLTF = 'world_gltf'
+    AGENT_PROFILES = 'agent_profiles'
     SCENES = 'scenes'
     NODES = 'nodes'
     MESHES = 'meshes'
@@ -361,6 +275,20 @@ class World_Table(str, Enum):
     BUFFERS = 'buffers'
     BUFFER_VIEWS = 'buffer_views'
     ACCESSORS = 'accessors'
+    WORLD_GLTF_METADATA = 'world_gltf_metadata'
+    SCENES_METADATA = 'scenes_metadata'
+    NODES_METADATA = 'nodes_metadata'
+    MESHES_METADATA = 'meshes_metadata'
+    MATERIALS_METADATA = 'materials_metadata'
+    TEXTURES_METADATA = 'textures_metadata'
+    IMAGES_METADATA = 'images_metadata'
+    SAMPLERS_METADATA = 'samplers_metadata'
+    ANIMATIONS_METADATA = 'animations_metadata'
+    SKINS_METADATA = 'skins_metadata'
+    CAMERAS_METADATA = 'cameras_metadata'
+    BUFFERS_METADATA = 'buffers_metadata'
+    BUFFER_VIEWS_METADATA = 'buffer_views_metadata'
+    ACCESSORS_METADATA = 'accessors_metadata'
 
 class World_RealtimeBroadcastChannel(str, Enum):
     AGENT_SIGNAL = 'agent_signal'
@@ -368,7 +296,10 @@ class World_RealtimeBroadcastChannel(str, Enum):
 class World_RealtimePresenceChannel(str, Enum):
     AGENT_PRESENCE = 'agent_presence'
 
-# Agent-related classes and enums
+class Agent_Profile_Role(str, Enum):
+    GUEST = 'guest'
+    MEMBER = 'member'
+    ADMIN = 'admin'
 
 class Agent_WebRTCSignalType(str, Enum):
     AGENT_Offer = 'agent-agent-offer-packet'
@@ -379,9 +310,8 @@ class Agent_Presence(BaseModel):
     agentId: str
     position: Primitive_Vector3
     orientation: Primitive_Vector3
-    lastUpdated: str
+    lastUpdated: datetime
 
-# Server-related classes and enums
 class Server_ProxySubdomain(str, Enum):
     SUPABASE_API = 'supabase-api'
     SUPABASE_STORAGE = 'supabase-storage'
@@ -397,5 +327,4 @@ Agent_DEFAULT_PANNER_OPTIONS = {
     'maxDistance': 10000,
 }
 
-# Constants
 World_Lightmap_DATA_MESH_NAME = "vircadia_lightmapData"
