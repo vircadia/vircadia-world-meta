@@ -109,36 +109,29 @@ export namespace World {
     }
 
     interface I_Base_WorldGLTF_Table_Properties {
-        name?: string;
-        lextras?: {
-            [key: string]: unknown;
-        };
-
         vircadia_uuid?: string;
         vircadia_version?: string;
         vircadia_createdat?: string;
         vircadia_updatedat?: string;
+        gltf_name?: string;
+        gltf_extensions?: Record<string, unknown>;
+        gltf_extras?: Record<string, unknown>;
     }
 
     export interface I_Table_WorldGLTF
         extends I_Base_WorldGLTF_Table_Properties {
-        name: string;
-        version: string;
-        metadata: any; // Consider creating a more specific type for metadata
-        defaultScene?: string;
-        extensionsUsed?: string[];
-        extensionsRequired?: string[];
-        extensions?: Record<string, unknown>;
-        asset: any; // Consider creating a more specific type for asset
+        vircadia_name: string;
+        vircadia_metadata: any;
+        gltf_extensionsUsed?: string[];
+        gltf_extensionsRequired?: string[];
+        gltf_asset: any;
+        gltf_scene?: number;
     }
 
     export interface I_Table_Scene extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        nodes?: any[]; // Consider using a more specific type
-        extensions?: Record<string, unknown>;
+        gltf_nodes?: any[];
 
-        // Babylon.js Scene properties
         vircadia_babylonjs_scene_clearColor?: Primitive.I_Color3;
         vircadia_babylonjs_scene_ambientColor?: Primitive.I_Color3;
         vircadia_babylonjs_scene_gravity?: Primitive.I_Vector3;
@@ -156,51 +149,37 @@ export namespace World {
 
     export interface I_Table_Node extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        camera?: string;
-        children?: any[]; // Consider using a more specific type
-        skin?: string;
-        matrix?: number[];
-        mesh?: string;
-        rotation?: number[];
-        scale?: number[];
-        translation?: number[];
-        weights?: any[];
-        extensions?: Record<string, unknown>;
+        gltf_camera?: string;
+        gltf_children?: any[];
+        gltf_skin?: string;
+        gltf_matrix?: number[];
+        gltf_mesh?: string;
+        gltf_rotation?: number[];
+        gltf_scale?: number[];
+        gltf_translation?: number[];
+        gltf_weights?: any[];
 
-        vircadia_updatedat?: string;
-
-        // Babylon.js LOD properties
         vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
         vircadia_babylonjs_lod_auto?: boolean;
         vircadia_babylonjs_lod_distance?: number;
         vircadia_babylonjs_lod_size?: number;
         vircadia_babylonjs_lod_hide?: number;
-
-        // Babylon.js Billboard properties
         vircadia_babylonjs_billboard_mode?: Babylon.Billboard.E_Mode;
-
-        // Babylon.js Light properties
         vircadia_babylonjs_light_lightmap?: string;
         vircadia_babylonjs_light_level?: number;
         vircadia_babylonjs_light_color_space?: Babylon.Texture.E_ColorSpace;
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-
-        // Babylon.js Script properties
         vircadia_babylonjs_script_agent_scripts?: string[];
         vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Mesh extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        primitives: any[]; // Consider using a more specific type
-        weights?: any[];
-        extensions?: Record<string, unknown>;
+        gltf_primitives: any[];
+        gltf_weights?: any[];
 
-        // Babylon.js properties
         vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
         vircadia_babylonjs_lod_auto?: boolean;
         vircadia_babylonjs_lod_distance?: number;
@@ -213,8 +192,6 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-
-        // Babylon.js Script properties
         vircadia_babylonjs_script_agent_scripts?: string[];
         vircadia_babylonjs_script_persistent_scripts?: string[];
     }
@@ -222,18 +199,15 @@ export namespace World {
     export interface I_Table_Material
         extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        pbrMetallicRoughness?: any; // Consider using a more specific type
-        normalTexture?: any;
-        occlusionTexture?: any;
-        emissiveTexture?: any;
-        emissiveFactor?: number[];
-        alphaMode?: "OPAQUE" | "MASK" | "BLEND";
-        alphaCutoff?: number;
-        doubleSided?: boolean;
-        extensions?: Record<string, unknown>;
+        gltf_pbrMetallicRoughness?: any;
+        gltf_normalTexture?: any;
+        gltf_occlusionTexture?: any;
+        gltf_emissiveTexture?: any;
+        gltf_emissiveFactor?: number[];
+        gltf_alphaMode?: "OPAQUE" | "MASK" | "BLEND";
+        gltf_alphaCutoff?: number;
+        gltf_doubleSided?: boolean;
 
-        // Babylon.js properties
         vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
         vircadia_babylonjs_lod_auto?: boolean;
         vircadia_babylonjs_lod_distance?: number;
@@ -246,20 +220,15 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-
-        // Babylon.js Script properties
         vircadia_babylonjs_script_agent_scripts?: string[];
         vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Texture extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        sampler?: string;
-        source?: string;
-        extensions?: Record<string, unknown>;
+        gltf_sampler?: string;
+        gltf_source?: string;
 
-        // Babylon.js properties
         vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
         vircadia_babylonjs_lod_auto?: boolean;
         vircadia_babylonjs_lod_distance?: number;
@@ -272,21 +241,16 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-
-        // Babylon.js Script properties
         vircadia_babylonjs_script_agent_scripts?: string[];
         vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Image extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        uri?: string;
-        mimeType?: string;
-        bufferView?: string;
-        extensions?: Record<string, unknown>;
+        gltf_uri?: string;
+        gltf_mimeType?: string;
+        gltf_bufferView?: string;
 
-        // Babylon.js properties
         vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
         vircadia_babylonjs_lod_auto?: boolean;
         vircadia_babylonjs_lod_distance?: number;
@@ -299,22 +263,17 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-
-        // Babylon.js Script properties
         vircadia_babylonjs_script_agent_scripts?: string[];
         vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Sampler extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        magFilter?: number;
-        minFilter?: number;
-        wrapS?: number;
-        wrapT?: number;
-        extensions?: Record<string, unknown>;
+        gltf_magFilter?: number;
+        gltf_minFilter?: number;
+        gltf_wrapS?: number;
+        gltf_wrapT?: number;
 
-        // Babylon.js properties
         vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
         vircadia_babylonjs_lod_auto?: boolean;
         vircadia_babylonjs_lod_distance?: number;
@@ -327,8 +286,6 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-
-        // Babylon.js Script properties
         vircadia_babylonjs_script_agent_scripts?: string[];
         vircadia_babylonjs_script_persistent_scripts?: string[];
     }
@@ -336,12 +293,9 @@ export namespace World {
     export interface I_Table_Animation
         extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        channels: any[]; // Consider using a more specific type
-        samplers: any[]; // Consider using a more specific type
-        extensions?: Record<string, unknown>;
+        gltf_channels: any[];
+        gltf_samplers: any[];
 
-        // Babylon.js properties
         vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
         vircadia_babylonjs_lod_auto?: boolean;
         vircadia_babylonjs_lod_distance?: number;
@@ -354,21 +308,16 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-
-        // Babylon.js Script properties
         vircadia_babylonjs_script_agent_scripts?: string[];
         vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Skin extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        inverseBindMatrices?: string;
-        skeleton?: string;
-        joints: any[]; // Consider using a more specific type
-        extensions?: Record<string, unknown>;
+        gltf_inverseBindMatrices?: string;
+        gltf_skeleton?: string;
+        gltf_joints: any[];
 
-        // Babylon.js properties
         vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
         vircadia_babylonjs_lod_auto?: boolean;
         vircadia_babylonjs_lod_distance?: number;
@@ -381,21 +330,16 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-
-        // Babylon.js Script properties
         vircadia_babylonjs_script_agent_scripts?: string[];
         vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Camera extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        type: "perspective" | "orthographic";
-        orthographic?: any; // Consider using a more specific type
-        perspective?: any; // Consider using a more specific type
-        extensions?: Record<string, unknown>;
+        gltf_type: "perspective" | "orthographic";
+        gltf_orthographic?: any;
+        gltf_perspective?: any;
 
-        // Babylon.js properties
         vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
         vircadia_babylonjs_lod_auto?: boolean;
         vircadia_babylonjs_lod_distance?: number;
@@ -408,21 +352,15 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-
-        // Babylon.js Script properties
         vircadia_babylonjs_script_agent_scripts?: string[];
         vircadia_babylonjs_script_persistent_scripts?: string[];
     }
 
     export interface I_Table_Buffer extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        uri?: string;
-        byteLength: number;
-        data?: Uint8Array; // Assuming BYTEA is represented as Uint8Array in TypeScript
-        extensions?: Record<string, unknown>;
+        gltf_uri?: string;
+        gltf_byteLength: number;
 
-        // Babylon.js properties
         vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
         vircadia_babylonjs_lod_auto?: boolean;
         vircadia_babylonjs_lod_distance?: number;
@@ -435,8 +373,6 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-
-        // Babylon.js Script properties
         vircadia_babylonjs_script_agent_scripts?: string[];
         vircadia_babylonjs_script_persistent_scripts?: string[];
     }
@@ -444,15 +380,12 @@ export namespace World {
     export interface I_Table_BufferView
         extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        buffer: string;
-        byteOffset?: number;
-        byteLength: number;
-        byteStride?: number;
-        target?: number;
-        extensions?: Record<string, unknown>;
+        gltf_buffer: string;
+        gltf_byteOffset?: number;
+        gltf_byteLength: number;
+        gltf_byteStride?: number;
+        gltf_target?: number;
 
-        // Babylon.js properties
         vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
         vircadia_babylonjs_lod_auto?: boolean;
         vircadia_babylonjs_lod_distance?: number;
@@ -465,8 +398,6 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-
-        // Babylon.js Script properties
         vircadia_babylonjs_script_agent_scripts?: string[];
         vircadia_babylonjs_script_persistent_scripts?: string[];
     }
@@ -474,16 +405,22 @@ export namespace World {
     export interface I_Table_Accessor
         extends I_Base_WorldGLTF_Table_Properties {
         vircadia_world_uuid: string;
-        name?: string;
-        bufferView?: string;
-        byteOffset?: number;
-        componentType: number;
-        normalized?: boolean;
-        count: number;
-        type: "SCALAR" | "VEC2" | "VEC3" | "VEC4" | "MAT2" | "MAT3" | "MAT4";
-        max?: any[];
-        min?: any[];
-        sparse?: {
+        gltf_bufferView?: string;
+        gltf_byteOffset?: number;
+        gltf_componentType: number;
+        gltf_normalized?: boolean;
+        gltf_count: number;
+        gltf_type:
+            | "SCALAR"
+            | "VEC2"
+            | "VEC3"
+            | "VEC4"
+            | "MAT2"
+            | "MAT3"
+            | "MAT4";
+        gltf_max?: any[];
+        gltf_min?: any[];
+        gltf_sparse?: {
             count: number;
             indices: {
                 bufferView: string;
@@ -495,9 +432,7 @@ export namespace World {
                 byteOffset?: number;
             };
         };
-        extensions?: Record<string, unknown>;
 
-        // Babylon.js properties
         vircadia_babylonjs_lod_mode?: Babylon.LOD.E_Mode;
         vircadia_babylonjs_lod_auto?: boolean;
         vircadia_babylonjs_lod_distance?: number;
@@ -510,8 +445,6 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-
-        // Babylon.js Script properties
         vircadia_babylonjs_script_agent_scripts?: string[];
         vircadia_babylonjs_script_persistent_scripts?: string[];
     }
@@ -526,48 +459,47 @@ export namespace World {
     }
 
     export interface I_Table_Metadata {
-        metadata_id: string; // UUID
-        parent_id: string; // UUID of the parent table (e.g., world_gltf_id, scene_id, etc.)
+        metadata_id: string;
         key: string;
-        value_text?: string[];
-        value_numeric?: number[];
-        value_boolean?: boolean[];
-        value_timestamp?: string[]; // ISO 8601 timestamp
-        createdat: string; // ISO 8601 timestamp
-        updatedat: string; // ISO 8601 timestamp
+        values_text?: string[];
+        values_numeric?: number[];
+        values_boolean?: boolean[];
+        values_timestamp?: string[];
+        createdat: string;
+        updatedat: string;
     }
 
     export enum E_Table {
         WORLD_GLTF = "world_gltf",
         AGENT_PROFILES = "agent_profiles",
-        SCENES = "scenes",
-        NODES = "nodes",
-        MESHES = "meshes",
-        MATERIALS = "materials",
-        TEXTURES = "textures",
-        IMAGES = "images",
-        SAMPLERS = "samplers",
-        ANIMATIONS = "animations",
-        SKINS = "skins",
-        CAMERAS = "cameras",
-        BUFFERS = "buffers",
-        BUFFER_VIEWS = "buffer_views",
-        ACCESSORS = "accessors",
+        SCENES = "world_gltf_scenes",
+        NODES = "world_gltf_nodes",
+        MESHES = "world_gltf_meshes",
+        MATERIALS = "world_gltf_materials",
+        TEXTURES = "world_gltf_textures",
+        IMAGES = "world_gltf_images",
+        SAMPLERS = "world_gltf_samplers",
+        ANIMATIONS = "world_gltf_animations",
+        SKINS = "world_gltf_skins",
+        CAMERAS = "world_gltf_cameras",
+        BUFFERS = "world_gltf_buffers",
+        BUFFER_VIEWS = "world_gltf_buffer_views",
+        ACCESSORS = "world_gltf_accessors",
         // Add metadata tables
         WORLD_GLTF_METADATA = "world_gltf_metadata",
-        SCENES_METADATA = "scenes_metadata",
-        NODES_METADATA = "nodes_metadata",
-        MESHES_METADATA = "meshes_metadata",
-        MATERIALS_METADATA = "materials_metadata",
-        TEXTURES_METADATA = "textures_metadata",
-        IMAGES_METADATA = "images_metadata",
-        SAMPLERS_METADATA = "samplers_metadata",
-        ANIMATIONS_METADATA = "animations_metadata",
-        SKINS_METADATA = "skins_metadata",
-        CAMERAS_METADATA = "cameras_metadata",
-        BUFFERS_METADATA = "buffers_metadata",
-        BUFFER_VIEWS_METADATA = "buffer_views_metadata",
-        ACCESSORS_METADATA = "accessors_metadata",
+        SCENES_METADATA = "world_gltf_scenes_metadata",
+        NODES_METADATA = "world_gltf_nodes_metadata",
+        MESHES_METADATA = "world_gltf_meshes_metadata",
+        MATERIALS_METADATA = "world_gltf_materials_metadata",
+        TEXTURES_METADATA = "world_gltf_textures_metadata",
+        IMAGES_METADATA = "world_gltf_images_metadata",
+        SAMPLERS_METADATA = "world_gltf_samplers_metadata",
+        ANIMATIONS_METADATA = "world_gltf_animations_metadata",
+        SKINS_METADATA = "world_gltf_skins_metadata",
+        CAMERAS_METADATA = "world_gltf_cameras_metadata",
+        BUFFERS_METADATA = "world_gltf_buffers_metadata",
+        BUFFER_VIEWS_METADATA = "world_gltf_buffer_views_metadata",
+        ACCESSORS_METADATA = "world_gltf_accessors_metadata",
     }
 
     export enum E_Table_Mutation {
@@ -690,22 +622,14 @@ export namespace World {
         UPDATE_ACCESSOR_METADATA = "update_accessor_metadata",
         DELETE_ACCESSOR_METADATA = "delete_accessor_metadata",
     }
-
-    export enum E_Realtime_BroadcastChannel {
-        AGENT_SIGNAL = "agent_signal",
-    }
-
-    export enum E_Realtime_PresenceChannel {
-        AGENT_PRESENCE = "agent_presence",
-    }
 }
 
 export namespace Agent {
     export namespace Profile {
         export enum E_Role {
+            ADMIN = "admin",
             GUEST = "guest",
             MEMBER = "member",
-            ADMIN = "admin",
         }
     }
 

@@ -2,17 +2,7 @@ from enum import Enum
 from typing import List, Dict, Any, Optional, Union
 from datetime import datetime
 from pydantic import BaseModel, Field
-
-class Primitive:
-    class Vector3(BaseModel):
-        x: float
-        y: float
-        z: float
-
-    class Color3(BaseModel):
-        r: float
-        g: float
-        b: float
+from primitive import Vector3, Color3
 
 class Babylon:
     class LOD:
@@ -50,35 +40,32 @@ class Babylon:
             SPECULAR = "specular"
 
 class BaseWorldGLTFTableProperties(BaseModel):
-    name: Optional[str] = None
-    lextras: Optional[Dict[str, Any]] = None
     vircadia_uuid: Optional[str] = None
     vircadia_version: Optional[str] = None
     vircadia_createdat: Optional[datetime] = None
     vircadia_updatedat: Optional[datetime] = None
+    gltf_name: Optional[str] = None
+    gltf_extensions: Optional[Dict[str, Any]] = None
+    gltf_extras: Optional[Dict[str, Any]] = None
 
 class TableWorldGLTF(BaseWorldGLTFTableProperties):
-    name: str = ""
-    version: str
-    metadata: Any
-    defaultScene: Optional[str] = None
-    extensionsUsed: Optional[List[str]] = None
-    extensionsRequired: Optional[List[str]] = None
-    extensions: Optional[Dict[str, Any]] = None
-    asset: Any
+    vircadia_name: str
+    vircadia_metadata: Any
+    gltf_extensionsUsed: Optional[List[str]] = None
+    gltf_extensionsRequired: Optional[List[str]] = None
+    gltf_asset: Any
+    gltf_scene: Optional[int] = None
 
 class TableScene(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    nodes: Optional[List[Any]] = None
-    extensions: Optional[Dict[str, Any]] = None
-    vircadia_babylonjs_scene_clearColor: Optional[Primitive.Color3] = None
-    vircadia_babylonjs_scene_ambientColor: Optional[Primitive.Color3] = None
-    vircadia_babylonjs_scene_gravity: Optional[Primitive.Vector3] = None
+    gltf_nodes: Optional[List[Any]] = None
+    vircadia_babylonjs_scene_clearColor: Optional[Color3] = None
+    vircadia_babylonjs_scene_ambientColor: Optional[Color3] = None
+    vircadia_babylonjs_scene_gravity: Optional[Vector3] = None
     vircadia_babylonjs_scene_activeCamera: Optional[str] = None
     vircadia_babylonjs_scene_collisionsEnabled: Optional[bool] = None
     vircadia_babylonjs_scene_physicsEnabled: Optional[bool] = None
-    vircadia_babylonjs_scene_physicsGravity: Optional[Primitive.Vector3] = None
+    vircadia_babylonjs_scene_physicsGravity: Optional[Vector3] = None
     vircadia_babylonjs_scene_physicsEngine: Optional[str] = None
     vircadia_babylonjs_scene_autoAnimate: Optional[bool] = None
     vircadia_babylonjs_scene_autoAnimateFrom: Optional[float] = None
@@ -88,18 +75,15 @@ class TableScene(BaseWorldGLTFTableProperties):
 
 class TableNode(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    camera: Optional[str] = None
-    children: Optional[List[Any]] = None
-    skin: Optional[str] = None
-    matrix: Optional[List[float]] = None
-    mesh: Optional[str] = None
-    rotation: Optional[List[float]] = None
-    scale: Optional[List[float]] = None
-    translation: Optional[List[float]] = None
-    weights: Optional[List[Any]] = None
-    extensions: Optional[Dict[str, Any]] = None
-    vircadia_updatedat: Optional[datetime] = None
+    gltf_camera: Optional[str] = None
+    gltf_children: Optional[List[Any]] = None
+    gltf_skin: Optional[str] = None
+    gltf_matrix: Optional[List[float]] = None
+    gltf_mesh: Optional[str] = None
+    gltf_rotation: Optional[List[float]] = None
+    gltf_scale: Optional[List[float]] = None
+    gltf_translation: Optional[List[float]] = None
+    gltf_weights: Optional[List[Any]] = None
     vircadia_babylonjs_lod_mode: Optional[Babylon.LOD.Mode] = None
     vircadia_babylonjs_lod_auto: Optional[bool] = None
     vircadia_babylonjs_lod_distance: Optional[float] = None
@@ -117,10 +101,8 @@ class TableNode(BaseWorldGLTFTableProperties):
 
 class TableMesh(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    primitives: List[Any]
-    weights: Optional[List[Any]] = None
-    extensions: Optional[Dict[str, Any]] = None
+    gltf_primitives: List[Any]
+    gltf_weights: Optional[List[Any]] = None
     vircadia_babylonjs_lod_mode: Optional[Babylon.LOD.Mode] = None
     vircadia_babylonjs_lod_auto: Optional[bool] = None
     vircadia_babylonjs_lod_distance: Optional[float] = None
@@ -138,16 +120,14 @@ class TableMesh(BaseWorldGLTFTableProperties):
 
 class TableMaterial(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    pbrMetallicRoughness: Optional[Any] = None
-    normalTexture: Optional[Any] = None
-    occlusionTexture: Optional[Any] = None
-    emissiveTexture: Optional[Any] = None
-    emissiveFactor: Optional[List[float]] = None
-    alphaMode: Optional[str] = Field(None, pattern="^(OPAQUE|MASK|BLEND)$")
-    alphaCutoff: Optional[float] = None
-    doubleSided: Optional[bool] = None
-    extensions: Optional[Dict[str, Any]] = None
+    gltf_pbrMetallicRoughness: Optional[Any] = None
+    gltf_normalTexture: Optional[Any] = None
+    gltf_occlusionTexture: Optional[Any] = None
+    gltf_emissiveTexture: Optional[Any] = None
+    gltf_emissiveFactor: Optional[List[float]] = None
+    gltf_alphaMode: Optional[str] = Field(None, pattern="^(OPAQUE|MASK|BLEND)$")
+    gltf_alphaCutoff: Optional[float] = None
+    gltf_doubleSided: Optional[bool] = None
     vircadia_babylonjs_lod_mode: Optional[Babylon.LOD.Mode] = None
     vircadia_babylonjs_lod_auto: Optional[bool] = None
     vircadia_babylonjs_lod_distance: Optional[float] = None
@@ -165,10 +145,8 @@ class TableMaterial(BaseWorldGLTFTableProperties):
 
 class TableTexture(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    sampler: Optional[str] = None
-    source: Optional[str] = None
-    extensions: Optional[Dict[str, Any]] = None
+    gltf_sampler: Optional[str] = None
+    gltf_source: Optional[str] = None
     vircadia_babylonjs_lod_mode: Optional[Babylon.LOD.Mode] = None
     vircadia_babylonjs_lod_auto: Optional[bool] = None
     vircadia_babylonjs_lod_distance: Optional[float] = None
@@ -186,11 +164,9 @@ class TableTexture(BaseWorldGLTFTableProperties):
 
 class TableImage(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    uri: Optional[str] = None
-    mimeType: Optional[str] = None
-    bufferView: Optional[str] = None
-    extensions: Optional[Dict[str, Any]] = None
+    gltf_uri: Optional[str] = None
+    gltf_mimeType: Optional[str] = None
+    gltf_bufferView: Optional[str] = None
     vircadia_babylonjs_lod_mode: Optional[Babylon.LOD.Mode] = None
     vircadia_babylonjs_lod_auto: Optional[bool] = None
     vircadia_babylonjs_lod_distance: Optional[float] = None
@@ -208,12 +184,10 @@ class TableImage(BaseWorldGLTFTableProperties):
 
 class TableSampler(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    magFilter: Optional[int] = None
-    minFilter: Optional[int] = None
-    wrapS: Optional[int] = None
-    wrapT: Optional[int] = None
-    extensions: Optional[Dict[str, Any]] = None
+    gltf_magFilter: Optional[int] = None
+    gltf_minFilter: Optional[int] = None
+    gltf_wrapS: Optional[int] = None
+    gltf_wrapT: Optional[int] = None
     vircadia_babylonjs_lod_mode: Optional[Babylon.LOD.Mode] = None
     vircadia_babylonjs_lod_auto: Optional[bool] = None
     vircadia_babylonjs_lod_distance: Optional[float] = None
@@ -231,10 +205,8 @@ class TableSampler(BaseWorldGLTFTableProperties):
 
 class TableAnimation(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    channels: List[Any]
-    samplers: List[Any]
-    extensions: Optional[Dict[str, Any]] = None
+    gltf_channels: List[Any]
+    gltf_samplers: List[Any]
     vircadia_babylonjs_lod_mode: Optional[Babylon.LOD.Mode] = None
     vircadia_babylonjs_lod_auto: Optional[bool] = None
     vircadia_babylonjs_lod_distance: Optional[float] = None
@@ -252,11 +224,9 @@ class TableAnimation(BaseWorldGLTFTableProperties):
 
 class TableSkin(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    inverseBindMatrices: Optional[str] = None
-    skeleton: Optional[str] = None
-    joints: List[Any]
-    extensions: Optional[Dict[str, Any]] = None
+    gltf_inverseBindMatrices: Optional[str] = None
+    gltf_skeleton: Optional[str] = None
+    gltf_joints: List[Any]
     vircadia_babylonjs_lod_mode: Optional[Babylon.LOD.Mode] = None
     vircadia_babylonjs_lod_auto: Optional[bool] = None
     vircadia_babylonjs_lod_distance: Optional[float] = None
@@ -274,11 +244,9 @@ class TableSkin(BaseWorldGLTFTableProperties):
 
 class TableCamera(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    type: str = Field(..., pattern="^(perspective|orthographic)$")
-    orthographic: Optional[Any] = None
-    perspective: Optional[Any] = None
-    extensions: Optional[Dict[str, Any]] = None
+    gltf_type: str = Field(..., pattern="^(perspective|orthographic)$")
+    gltf_orthographic: Optional[Any] = None
+    gltf_perspective: Optional[Any] = None
     vircadia_babylonjs_lod_mode: Optional[Babylon.LOD.Mode] = None
     vircadia_babylonjs_lod_auto: Optional[bool] = None
     vircadia_babylonjs_lod_distance: Optional[float] = None
@@ -296,11 +264,8 @@ class TableCamera(BaseWorldGLTFTableProperties):
 
 class TableBuffer(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    uri: Optional[str] = None
-    byteLength: int
-    data: Optional[bytes] = None
-    extensions: Optional[Dict[str, Any]] = None
+    gltf_uri: Optional[str] = None
+    gltf_byteLength: int
     vircadia_babylonjs_lod_mode: Optional[Babylon.LOD.Mode] = None
     vircadia_babylonjs_lod_auto: Optional[bool] = None
     vircadia_babylonjs_lod_distance: Optional[float] = None
@@ -318,13 +283,11 @@ class TableBuffer(BaseWorldGLTFTableProperties):
 
 class TableBufferView(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    buffer: str
-    byteOffset: Optional[int] = None
-    byteLength: int
-    byteStride: Optional[int] = None
-    target: Optional[int] = None
-    extensions: Optional[Dict[str, Any]] = None
+    gltf_buffer: str
+    gltf_byteOffset: Optional[int] = None
+    gltf_byteLength: int
+    gltf_byteStride: Optional[int] = None
+    gltf_target: Optional[int] = None
     vircadia_babylonjs_lod_mode: Optional[Babylon.LOD.Mode] = None
     vircadia_babylonjs_lod_auto: Optional[bool] = None
     vircadia_babylonjs_lod_distance: Optional[float] = None
@@ -342,17 +305,15 @@ class TableBufferView(BaseWorldGLTFTableProperties):
 
 class TableAccessor(BaseWorldGLTFTableProperties):
     vircadia_world_uuid: str
-    name: Optional[str] = None
-    bufferView: Optional[str] = None
-    byteOffset: Optional[int] = None
-    componentType: int
-    normalized: Optional[bool] = None
-    count: int
-    type: str = Field(..., pattern="^(SCALAR|VEC2|VEC3|VEC4|MAT2|MAT3|MAT4)$")
-    max: Optional[List[Any]] = None
-    min: Optional[List[Any]] = None
-    sparse: Optional[Dict[str, Any]] = None
-    extensions: Optional[Dict[str, Any]] = None
+    gltf_bufferView: Optional[str] = None
+    gltf_byteOffset: Optional[int] = None
+    gltf_componentType: int
+    gltf_normalized: Optional[bool] = None
+    gltf_count: int
+    gltf_type: str = Field(..., pattern="^(SCALAR|VEC2|VEC3|VEC4|MAT2|MAT3|MAT4)$")
+    gltf_max: Optional[List[Any]] = None
+    gltf_min: Optional[List[Any]] = None
+    gltf_sparse: Optional[Dict[str, Any]] = None
     vircadia_babylonjs_lod_mode: Optional[Babylon.LOD.Mode] = None
     vircadia_babylonjs_lod_auto: Optional[bool] = None
     vircadia_babylonjs_lod_distance: Optional[float] = None
@@ -372,51 +333,50 @@ class TableUserProfile(BaseModel):
     id: str
     username: str
     full_name: str
-    role: str  # Assuming Agent.Profile.E_Role is a string enum
+    role: str
     created_at: datetime
     updated_at: datetime
 
 class TableMetadata(BaseModel):
     metadata_id: str
-    parent_id: str
     key: str
-    value_text: Optional[List[str]] = None
-    value_numeric: Optional[List[float]] = None
-    value_boolean: Optional[List[bool]] = None
-    value_timestamp: Optional[List[datetime]] = None
+    values_text: Optional[List[str]] = None
+    values_numeric: Optional[List[float]] = None
+    values_boolean: Optional[List[bool]] = None
+    values_timestamp: Optional[List[datetime]] = None
     createdat: datetime
     updatedat: datetime
 
 class Table(str, Enum):
     WORLD_GLTF = "world_gltf"
     AGENT_PROFILES = "agent_profiles"
-    SCENES = "scenes"
-    NODES = "nodes"
-    MESHES = "meshes"
-    MATERIALS = "materials"
-    TEXTURES = "textures"
-    IMAGES = "images"
-    SAMPLERS = "samplers"
-    ANIMATIONS = "animations"
-    SKINS = "skins"
-    CAMERAS = "cameras"
-    BUFFERS = "buffers"
-    BUFFER_VIEWS = "buffer_views"
-    ACCESSORS = "accessors"
+    SCENES = "world_gltf_scenes"
+    NODES = "world_gltf_nodes"
+    MESHES = "world_gltf_meshes"
+    MATERIALS = "world_gltf_materials"
+    TEXTURES = "world_gltf_textures"
+    IMAGES = "world_gltf_images"
+    SAMPLERS = "world_gltf_samplers"
+    ANIMATIONS = "world_gltf_animations"
+    SKINS = "world_gltf_skins"
+    CAMERAS = "world_gltf_cameras"
+    BUFFERS = "world_gltf_buffers"
+    BUFFER_VIEWS = "world_gltf_buffer_views"
+    ACCESSORS = "world_gltf_accessors"
     WORLD_GLTF_METADATA = "world_gltf_metadata"
-    SCENES_METADATA = "scenes_metadata"
-    NODES_METADATA = "nodes_metadata"
-    MESHES_METADATA = "meshes_metadata"
-    MATERIALS_METADATA = "materials_metadata"
-    TEXTURES_METADATA = "textures_metadata"
-    IMAGES_METADATA = "images_metadata"
-    SAMPLERS_METADATA = "samplers_metadata"
-    ANIMATIONS_METADATA = "animations_metadata"
-    SKINS_METADATA = "skins_metadata"
-    CAMERAS_METADATA = "cameras_metadata"
-    BUFFERS_METADATA = "buffers_metadata"
-    BUFFER_VIEWS_METADATA = "buffer_views_metadata"
-    ACCESSORS_METADATA = "accessors_metadata"
+    SCENES_METADATA = "world_gltf_scenes_metadata"
+    NODES_METADATA = "world_gltf_nodes_metadata"
+    MESHES_METADATA = "world_gltf_meshes_metadata"
+    MATERIALS_METADATA = "world_gltf_materials_metadata"
+    TEXTURES_METADATA = "world_gltf_textures_metadata"
+    IMAGES_METADATA = "world_gltf_images_metadata"
+    SAMPLERS_METADATA = "world_gltf_samplers_metadata"
+    ANIMATIONS_METADATA = "world_gltf_animations_metadata"
+    SKINS_METADATA = "world_gltf_skins_metadata"
+    CAMERAS_METADATA = "world_gltf_cameras_metadata"
+    BUFFERS_METADATA = "world_gltf_buffers_metadata"
+    BUFFER_VIEWS_METADATA = "world_gltf_buffer_views_metadata"
+    ACCESSORS_METADATA = "world_gltf_accessors_metadata"
 
 class TableMutation(str, Enum):
     CREATE_AGENT_PROFILE = "create_agent_profile"
@@ -506,9 +466,3 @@ class TableMutation(str, Enum):
     CREATE_ACCESSOR_METADATA = "create_accessor_metadata"
     UPDATE_ACCESSOR_METADATA = "update_accessor_metadata"
     DELETE_ACCESSOR_METADATA = "delete_accessor_metadata"
-
-class RealtimeBroadcastChannel(str, Enum):
-    AGENT_SIGNAL = "agent_signal"
-
-class RealtimePresenceChannel(str, Enum):
-    AGENT_PRESENCE = "agent_presence"
