@@ -1,10 +1,8 @@
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict
-
-from pydantic import BaseModel
-from primitive import Vector3
-
+from dataclasses import dataclass
+from .primitive import Vector3, Color3
 
 class Profile:
     class Role(str, Enum):
@@ -26,7 +24,8 @@ class Audio:
         "maxDistance": 10000,
     }
 
-class Presence(BaseModel):
+@dataclass
+class Presence:
     agentId: str
     position: Vector3
     orientation: Vector3
