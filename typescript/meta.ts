@@ -171,8 +171,12 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?: string[];
-        vircadia_babylonjs_script_persistent_scripts?: string[];
+        vircadia_babylonjs_script_agent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_repo_url?: string;
+        vircadia_babylonjs_script_persistent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_repo_url?: string;
     }
 
     export interface I_Table_Mesh extends I_Base_WorldGLTF_Table_Properties {
@@ -192,8 +196,12 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?: string[];
-        vircadia_babylonjs_script_persistent_scripts?: string[];
+        vircadia_babylonjs_script_agent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_repo_url?: string;
+        vircadia_babylonjs_script_persistent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_repo_url?: string;
     }
 
     export interface I_Table_Material
@@ -220,8 +228,12 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?: string[];
-        vircadia_babylonjs_script_persistent_scripts?: string[];
+        vircadia_babylonjs_script_agent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_repo_url?: string;
+        vircadia_babylonjs_script_persistent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_repo_url?: string;
     }
 
     export interface I_Table_Texture extends I_Base_WorldGLTF_Table_Properties {
@@ -241,8 +253,12 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?: string[];
-        vircadia_babylonjs_script_persistent_scripts?: string[];
+        vircadia_babylonjs_script_agent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_repo_url?: string;
+        vircadia_babylonjs_script_persistent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_repo_url?: string;
     }
 
     export interface I_Table_Image extends I_Base_WorldGLTF_Table_Properties {
@@ -263,8 +279,12 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?: string[];
-        vircadia_babylonjs_script_persistent_scripts?: string[];
+        vircadia_babylonjs_script_agent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_repo_url?: string;
+        vircadia_babylonjs_script_persistent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_repo_url?: string;
     }
 
     export interface I_Table_Sampler extends I_Base_WorldGLTF_Table_Properties {
@@ -286,8 +306,12 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?: string[];
-        vircadia_babylonjs_script_persistent_scripts?: string[];
+        vircadia_babylonjs_script_agent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_repo_url?: string;
+        vircadia_babylonjs_script_persistent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_repo_url?: string;
     }
 
     export interface I_Table_Animation
@@ -308,8 +332,12 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?: string[];
-        vircadia_babylonjs_script_persistent_scripts?: string[];
+        vircadia_babylonjs_script_agent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_repo_url?: string;
+        vircadia_babylonjs_script_persistent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_repo_url?: string;
     }
 
     export interface I_Table_Skin extends I_Base_WorldGLTF_Table_Properties {
@@ -330,8 +358,12 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?: string[];
-        vircadia_babylonjs_script_persistent_scripts?: string[];
+        vircadia_babylonjs_script_agent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_repo_url?: string;
+        vircadia_babylonjs_script_persistent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_repo_url?: string;
     }
 
     export interface I_Table_Camera extends I_Base_WorldGLTF_Table_Properties {
@@ -352,8 +384,12 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?: string[];
-        vircadia_babylonjs_script_persistent_scripts?: string[];
+        vircadia_babylonjs_script_agent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_repo_url?: string;
+        vircadia_babylonjs_script_persistent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_repo_url?: string;
     }
 
     export interface I_Table_Buffer extends I_Base_WorldGLTF_Table_Properties {
@@ -373,8 +409,12 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?: string[];
-        vircadia_babylonjs_script_persistent_scripts?: string[];
+        vircadia_babylonjs_script_agent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_repo_url?: string;
+        vircadia_babylonjs_script_persistent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_repo_url?: string;
     }
 
     export interface I_Table_BufferView
@@ -398,8 +438,12 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?: string[];
-        vircadia_babylonjs_script_persistent_scripts?: string[];
+        vircadia_babylonjs_script_agent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_repo_url?: string;
+        vircadia_babylonjs_script_persistent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_repo_url?: string;
     }
 
     export interface I_Table_Accessor
@@ -445,8 +489,12 @@ export namespace World {
         vircadia_babylonjs_light_texcoord?: number;
         vircadia_babylonjs_light_use_as_shadowmap?: boolean;
         vircadia_babylonjs_light_mode?: Babylon.Light.E_Mode;
-        vircadia_babylonjs_script_agent_scripts?: string[];
-        vircadia_babylonjs_script_persistent_scripts?: string[];
+        vircadia_babylonjs_script_agent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_file_url?: string;
+        vircadia_babylonjs_script_agent_script_git_repo_url?: string;
+        vircadia_babylonjs_script_persistent_script_raw_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_file_url?: string;
+        vircadia_babylonjs_script_persistent_script_git_repo_url?: string;
     }
 
     export interface I_Table_UserProfile {

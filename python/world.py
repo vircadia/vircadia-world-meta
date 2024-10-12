@@ -100,8 +100,12 @@ class TableNode(BaseWorldGLTFTableProperties):
     vircadia_babylonjs_light_texcoord: Optional[int] = None
     vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
     vircadia_babylonjs_light_mode: Optional[Babylon.Light.Mode] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[List[str]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[List[str]] = None
+    vircadia_babylonjs_script_agent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_repo_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_repo_url: Optional[str] = None
 
 @dataclass
 class TableMesh(BaseWorldGLTFTableProperties):
@@ -120,8 +124,12 @@ class TableMesh(BaseWorldGLTFTableProperties):
     vircadia_babylonjs_light_texcoord: Optional[int] = None
     vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
     vircadia_babylonjs_light_mode: Optional[Babylon.Light.Mode] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[List[str]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[List[str]] = None
+    vircadia_babylonjs_script_agent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_repo_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_repo_url: Optional[str] = None
 
 @dataclass
 class TableMaterial(BaseWorldGLTFTableProperties):
@@ -146,8 +154,12 @@ class TableMaterial(BaseWorldGLTFTableProperties):
     vircadia_babylonjs_light_texcoord: Optional[int] = None
     vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
     vircadia_babylonjs_light_mode: Optional[Babylon.Light.Mode] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[List[str]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[List[str]] = None
+    vircadia_babylonjs_script_agent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_repo_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_repo_url: Optional[str] = None
 
 @dataclass
 class TableTexture(BaseWorldGLTFTableProperties):
@@ -166,8 +178,12 @@ class TableTexture(BaseWorldGLTFTableProperties):
     vircadia_babylonjs_light_texcoord: Optional[int] = None
     vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
     vircadia_babylonjs_light_mode: Optional[Babylon.Light.Mode] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[List[str]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[List[str]] = None
+    vircadia_babylonjs_script_agent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_repo_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_repo_url: Optional[str] = None
 
 @dataclass
 class TableImage(BaseWorldGLTFTableProperties):
@@ -187,8 +203,12 @@ class TableImage(BaseWorldGLTFTableProperties):
     vircadia_babylonjs_light_texcoord: Optional[int] = None
     vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
     vircadia_babylonjs_light_mode: Optional[Babylon.Light.Mode] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[List[str]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[List[str]] = None
+    vircadia_babylonjs_script_agent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_repo_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_repo_url: Optional[str] = None
 
 @dataclass
 class TableSampler(BaseWorldGLTFTableProperties):
@@ -209,8 +229,12 @@ class TableSampler(BaseWorldGLTFTableProperties):
     vircadia_babylonjs_light_texcoord: Optional[int] = None
     vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
     vircadia_babylonjs_light_mode: Optional[Babylon.Light.Mode] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[List[str]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[List[str]] = None
+    vircadia_babylonjs_script_agent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_repo_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_repo_url: Optional[str] = None
 
 @dataclass
 class TableAnimation(BaseWorldGLTFTableProperties):
@@ -229,8 +253,12 @@ class TableAnimation(BaseWorldGLTFTableProperties):
     vircadia_babylonjs_light_texcoord: Optional[int] = None
     vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
     vircadia_babylonjs_light_mode: Optional[Babylon.Light.Mode] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[List[str]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[List[str]] = None
+    vircadia_babylonjs_script_agent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_repo_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_repo_url: Optional[str] = None
 
 @dataclass
 class TableSkin(BaseWorldGLTFTableProperties):
@@ -250,8 +278,12 @@ class TableSkin(BaseWorldGLTFTableProperties):
     vircadia_babylonjs_light_texcoord: Optional[int] = None
     vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
     vircadia_babylonjs_light_mode: Optional[Babylon.Light.Mode] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[List[str]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[List[str]] = None
+    vircadia_babylonjs_script_agent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_repo_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_repo_url: Optional[str] = None
 
 @dataclass
 class TableCamera(BaseWorldGLTFTableProperties):
@@ -271,8 +303,12 @@ class TableCamera(BaseWorldGLTFTableProperties):
     vircadia_babylonjs_light_texcoord: Optional[int] = None
     vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
     vircadia_babylonjs_light_mode: Optional[Babylon.Light.Mode] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[List[str]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[List[str]] = None
+    vircadia_babylonjs_script_agent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_repo_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_repo_url: Optional[str] = None
 
 @dataclass
 class TableBuffer(BaseWorldGLTFTableProperties):
@@ -291,8 +327,12 @@ class TableBuffer(BaseWorldGLTFTableProperties):
     vircadia_babylonjs_light_texcoord: Optional[int] = None
     vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
     vircadia_babylonjs_light_mode: Optional[Babylon.Light.Mode] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[List[str]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[List[str]] = None
+    vircadia_babylonjs_script_agent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_repo_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_repo_url: Optional[str] = None
 
 @dataclass
 class TableBufferView(BaseWorldGLTFTableProperties):
@@ -314,8 +354,12 @@ class TableBufferView(BaseWorldGLTFTableProperties):
     vircadia_babylonjs_light_texcoord: Optional[int] = None
     vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
     vircadia_babylonjs_light_mode: Optional[Babylon.Light.Mode] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[List[str]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[List[str]] = None
+    vircadia_babylonjs_script_agent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_repo_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_repo_url: Optional[str] = None
 
 @dataclass
 class TableAccessor(BaseWorldGLTFTableProperties):
@@ -340,8 +384,12 @@ class TableAccessor(BaseWorldGLTFTableProperties):
     vircadia_babylonjs_light_texcoord: Optional[int] = None
     vircadia_babylonjs_light_use_as_shadowmap: Optional[bool] = None
     vircadia_babylonjs_light_mode: Optional[Babylon.Light.Mode] = None
-    vircadia_babylonjs_script_agent_scripts: Optional[List[str]] = None
-    vircadia_babylonjs_script_persistent_scripts: Optional[List[str]] = None
+    vircadia_babylonjs_script_agent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_agent_script_git_repo_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_raw_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_file_url: Optional[str] = None
+    vircadia_babylonjs_script_persistent_script_git_repo_url: Optional[str] = None
     vircadia_world_uuid: Optional[str] = None
 
 @dataclass
