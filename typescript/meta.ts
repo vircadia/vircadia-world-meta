@@ -60,6 +60,44 @@ export namespace Primitive {
             return new C_Color3(parsedData.r, parsedData.g, parsedData.b);
         }
     }
+
+    export const S_Color4 = z.object({
+        r: z.number(),
+        g: z.number(),
+        b: z.number(),
+        a: z.number(),
+    });
+
+    export type I_Color4 = z.infer<typeof S_Color4>;
+
+    export class C_Color4 {
+        public r: number;
+        public g: number;
+        public b: number;
+        public a: number;
+
+        constructor(_r?: number, _g?: number, _b?: number, _a?: number) {
+            this.r = _r ?? 0;
+            this.g = _g ?? 0;
+            this.b = _b ?? 0;
+            this.a = _a ?? 0;
+        }
+
+        static parse(obj: {
+            r: number | any;
+            g: number | any;
+            b: number | any;
+            a: number | any;
+        }): C_Color4 {
+            const parsedData = S_Color4.parse(obj);
+            return new C_Color4(
+                parsedData.r,
+                parsedData.g,
+                parsedData.b,
+                parsedData.a,
+            );
+        }
+    }
 }
 
 export namespace World {
@@ -126,6 +164,10 @@ export namespace World {
         };
         general__parent_entity_id?: string;
 
+        permissions__read?: string[];
+        permissions__write?: string[];
+        permissions__execute?: string[];
+
         babylonjs__mesh_is_instance?: boolean;
         babylonjs__mesh_instance_of_id?: string;
         babylonjs__mesh_material_id?: string;
@@ -133,8 +175,16 @@ export namespace World {
         babylonjs__mesh_gltf_data?: any;
         babylonjs__mesh_physics_properties?: any;
         babylonjs__mesh_joints?: any[];
-        babylonjs__script_local_scripts?: any[];
-        babylonjs__script_persistent_scripts?: any[];
+        babylonjs__script_local_scripts?: {
+            raw_file_url?: string;
+            git_file_path?: string;
+            git_repo_url?: string;
+        }[];
+        babylonjs__script_persistent_scripts?: {
+            raw_file_url?: string;
+            git_file_path?: string;
+            git_repo_url?: string;
+        }[];
         babylonjs__lod_mode?: string;
         babylonjs__lod_auto?: boolean;
         babylonjs__lod_distance?: number;
@@ -152,12 +202,12 @@ export namespace World {
         babylonjs__light_intensity?: number;
         babylonjs__light_range?: number;
         babylonjs__light_radius?: number;
-        babylonjs__light_diffuse?: Primitive.I_Color3;
-        babylonjs__light_specular?: Primitive.I_Color3;
+        babylonjs__light_diffuse?: Primitive.I_Color4;
+        babylonjs__light_specular?: Primitive.I_Color4;
         babylonjs__light_direction?: Primitive.I_Vector3;
         babylonjs__light_angle?: number;
         babylonjs__light_exponent?: number;
-        babylonjs__light_ground_color?: Primitive.I_Color3;
+        babylonjs__light_ground_color?: Primitive.I_Color4;
         babylonjs__light_intensity_mode?: string;
         babylonjs__light_falloff_type?: string;
         babylonjs__shadow_enabled?: boolean;
@@ -175,10 +225,10 @@ export namespace World {
         agent__inventory?: any;
 
         material__type?: string;
-        material__ambient?: Primitive.I_Color3;
-        material__diffuse?: Primitive.I_Color3;
-        material__specular?: Primitive.I_Color3;
-        material__emissive?: Primitive.I_Color3;
+        material__ambient?: Primitive.I_Color4;
+        material__diffuse?: Primitive.I_Color4;
+        material__specular?: Primitive.I_Color4;
+        material__emissive?: Primitive.I_Color4;
         material__alpha?: number;
         material__backFaceCulling?: boolean;
         material__wireframe?: boolean;
@@ -212,9 +262,9 @@ export namespace World {
         material__ambientTextureStrength?: number;
         material__ambientTextureImpactOnAnalyticalLights?: number;
         material__metallicF0Factor?: number;
-        material__metallicReflectanceColor?: Primitive.I_Color3;
-        material__reflectionColor?: Primitive.I_Color3;
-        material__reflectivityColor?: Primitive.I_Color3;
+        material__metallicReflectanceColor?: Primitive.I_Color4;
+        material__reflectionColor?: Primitive.I_Color4;
+        material__reflectivityColor?: Primitive.I_Color4;
         material__microSurface?: number;
         material__useMicroSurfaceFromReflectivityMapAlpha?: boolean;
         material__useAutoMicroSurfaceFromReflectivityMap?: boolean;
