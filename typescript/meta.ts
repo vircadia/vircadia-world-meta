@@ -112,12 +112,6 @@ export namespace World {
         }
     }
 
-    export interface I_WorldConnection {
-        supabaseClient: SupabaseClient;
-        worldUrl: string;
-        worldKey: string;
-    }
-
     export interface I_Entity {
         general__uuid: string;
         general__name: string;
