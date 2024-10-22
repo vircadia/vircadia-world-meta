@@ -1,6 +1,7 @@
 /// <reference lib="dom" />
 // deno-lint-ignore-file no-namespace
 import { z } from "zod";
+import type * as BABYLON from "@babylonjs/core";
 
 export namespace Primitive {
     export const S_Vector3 = z.object({
@@ -148,6 +149,14 @@ export namespace World {
                 SPECULAR = "specular",
             }
         }
+
+        export namespace Script {
+            export interface I_Context {
+                BABYLON: typeof BABYLON;
+                mesh: BABYLON.AbstractMesh;
+                scene: BABYLON.Scene;
+            }
+        }
     }
 
     export interface I_Entity {
@@ -191,12 +200,6 @@ export namespace World {
         babylonjs__lod_size?: number;
         babylonjs__lod_hide?: number;
         babylonjs__billboard_mode?: number;
-        babylonjs__script_agent_script_raw_file_url?: string[];
-        babylonjs__script_agent_script_git_file_path?: string[];
-        babylonjs__script_agent_script_git_repo_url?: string[];
-        babylonjs__script_persistent_script_raw_file_url?: string[];
-        babylonjs__script_persistent_script_git_file_path?: string[];
-        babylonjs__script_persistent_script_git_repo_url?: string[];
 
         babylonjs__light_type?: string;
         babylonjs__light_intensity?: number;
