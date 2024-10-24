@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 // deno-lint-ignore-file no-namespace
-import { z } from "zod";
 import type * as BABYLON from "@babylonjs/core";
+import { z } from "zod";
 
 export namespace Primitive {
     export const S_Vector3 = z.object({
@@ -405,5 +405,36 @@ export namespace Server {
         SUPABASE_GRAPHQL = "supabase-graphql",
         SUPABASE_INBUCKET = "supabase-inbucket",
         SUPABASE_STUDIO = "supabase-studio",
+
+        SERVER_API = "server-api",
     }
+
+    export enum E_SERVER_API_ROUTE {
+        BUNDLE_SCRIPTS = "api/bundle-scripts",
+    }
+
+    export const S_SERVER_API_REQUEST_BUNDLE_SCRIPTS = z.object({
+        script_urls: z.array(z.string()).optional(),
+        script_raw: z.array(z.string()).optional(),
+    });
+
+    export type I_SERVER_API_REQUEST_BUNDLE_SCRIPTS = z.infer<
+        typeof S_SERVER_API_REQUEST_BUNDLE_SCRIPTS
+    >;
+
+    export const S_SERVER_API_RESPONSE_BUNDLE_SCRIPTS = z.object({
+        scripts: z.array(
+            z.object({
+                url: z.string().optional(),
+                code: z.string().optional(),
+                size: z.number().optional(),
+                timestamp: z.string().optional(),
+                error: z.string().optional(),
+            }),
+        ),
+    });
+
+    export type I_SERVER_API_RESPONSE_BUNDLE_SCRIPTS = z.infer<
+        typeof S_SERVER_API_RESPONSE_BUNDLE_SCRIPTS
+    >;
 }
